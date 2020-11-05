@@ -1,5 +1,7 @@
 一款纯粹的Java序列化框架
+====================
 
+### 特性
 - **纯粹**, 严格按照字节顺序和长度写入，不产生额外的描述性信息；
 - **性能**, 基于Netty的ByteBuf，可使用池化内存与堆外内存提升性能；
 - **多版本**, 同一个Class支持多个版本的配置。 
@@ -8,7 +10,7 @@
 - 适用于多数序列化场景，用于传输或存储对象；
 - 开发初期的目的是为了解析部标、国标相关的通讯协议。
 
-## 使用
+### 使用
 ```java
 
 public class Test {
@@ -77,7 +79,7 @@ public class Test {
 }
 ```
 
-## Maven
+### Maven
   ```xml
   <dependency>
     <groupId>io.github.yezhihao</groupId>
