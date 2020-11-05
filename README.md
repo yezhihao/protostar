@@ -90,6 +90,8 @@ public class Test {
 
 更多的例子请参考Test目录
 
+使用该组件的项目：[https://gitee.com/yezhihao/jt808-server/tree/master](https://gitee.com/yezhihao/jt808-server/tree/master)
+
 项目会不定期进行更新，建议star和watch一份，您的支持是我最大的动力。
 
 如有任何疑问或者BUG，请联系我，非常感谢。
