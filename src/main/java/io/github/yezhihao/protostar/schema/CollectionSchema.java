@@ -1,7 +1,7 @@
 package io.github.yezhihao.protostar.schema;
 
-import io.netty.buffer.ByteBuf;
 import io.github.yezhihao.protostar.Schema;
+import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,13 +10,14 @@ import java.util.Map;
 
 public class CollectionSchema<T> implements Schema<List<T>> {
 
-    private static volatile Map<Schema, CollectionSchema> cache = new HashMap<>();
+    private static volatile Map<Object, CollectionSchema> cache = new HashMap<>();
 
     public static Schema<List> getInstance(Schema schema) {
-        CollectionSchema instance = cache.get(schema);
-        if (instance == null) {
+        Object key = schema;
+        CollectionSchema instance;
+        if ((instance = cache.get(key)) == null) {
             synchronized (cache) {
-                if (instance == null) {
+                if ((instance = cache.get(key)) == null) {
                     instance = new CollectionSchema(schema);
                     cache.put(schema, instance);
                     log.debug("new CollectionSchema({})", schema);

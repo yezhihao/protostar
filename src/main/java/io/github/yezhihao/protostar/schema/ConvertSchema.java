@@ -1,8 +1,8 @@
 package io.github.yezhihao.protostar.schema;
 
-import io.netty.buffer.ByteBuf;
-import io.github.yezhihao.protostar.converter.Converter;
 import io.github.yezhihao.protostar.Schema;
+import io.github.yezhihao.protostar.converter.Converter;
+import io.netty.buffer.ByteBuf;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,18 +12,18 @@ import java.util.Map;
  */
 public class ConvertSchema<T> implements Schema<T> {
 
-    private static volatile Map<String, ConvertSchema> cache = new HashMap<>();
+    private static volatile Map<Object, ConvertSchema> cache = new HashMap<>();
 
     public static Schema getInstance(Class<? extends Converter> clazz) {
-        String name = clazz.getName();
-        ConvertSchema instance = cache.get(name);
-        if (instance == null) {
+        String key = clazz.getName();
+        ConvertSchema instance;
+        if ((instance = cache.get(key)) == null) {
             synchronized (cache) {
-                if (instance == null) {
+                if ((instance = cache.get(key)) == null) {
                     try {
                         Converter converter = clazz.newInstance();
                         instance = new ConvertSchema(converter);
-                        cache.put(name, instance);
+                        cache.put(key, instance);
                         log.debug("new ConvertSchema({})", clazz);
                     } catch (Exception e) {
                         throw new RuntimeException(e);

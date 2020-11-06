@@ -1,20 +1,21 @@
 package io.github.yezhihao.protostar.schema;
 
-import io.netty.buffer.ByteBuf;
 import io.github.yezhihao.protostar.Schema;
+import io.netty.buffer.ByteBuf;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ObjectSchema<T> implements Schema<T> {
 
-    private static volatile Map<Schema, ObjectSchema> cache = new HashMap<>();
+    private static volatile Map<Object, ObjectSchema> cache = new HashMap<>();
 
     public static Schema getInstance(Schema schema) {
-        ObjectSchema instance = cache.get(schema);
-        if (instance == null) {
+        Object key = schema;
+        ObjectSchema instance;
+        if ((instance = cache.get(key)) == null) {
             synchronized (cache) {
-                if (instance == null) {
+                if ((instance = cache.get(key)) == null) {
                     instance = new ObjectSchema(schema);
                     cache.put(schema, instance);
                     log.debug("new ObjectSchema({})", schema);

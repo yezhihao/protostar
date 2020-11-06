@@ -1,8 +1,8 @@
 package io.github.yezhihao.protostar.schema;
 
-import io.netty.buffer.ByteBuf;
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.util.Bcd;
+import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -12,15 +12,15 @@ import java.util.Map;
 public class StringSchema {
 
     public static class Chars implements Schema<String> {
-        private static volatile Map<String, Chars> cache = new HashMap<>();
+        private static volatile Map<Object, Chars> cache = new HashMap<>();
 
         public static Schema<String> getInstance(byte pad, String charset) {
             charset = charset.toLowerCase();
             String key = new StringBuilder(10).append((char) pad).append('/').append(charset).toString();
-            Chars instance = cache.get(key);
-            if (instance == null) {
+            Chars instance;
+            if ((instance = cache.get(key)) == null) {
                 synchronized (cache) {
-                    if (instance == null) {
+                    if ((instance = cache.get(key)) == null) {
                         instance = new Chars(pad, charset);
                         cache.put(key, instance);
                         log.debug("new StringSchema({},{})", pad, charset);
