@@ -1,7 +1,7 @@
 package io.github.yezhihao.protostar;
 
-import io.github.yezhihao.protostar.schema.ByteArraySchema;
-import io.github.yezhihao.protostar.schema.IntSchema;
+import io.github.yezhihao.protostar.schema.ArraySchema;
+import io.github.yezhihao.protostar.schema.NumberSchema;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,16 +36,16 @@ public abstract class PrepareLoadStrategy extends IdStrategy {
     public PrepareLoadStrategy addSchema(Object key, DataType dataType) {
         switch (dataType) {
             case BYTE:
-                this.typeIdMapping.put(key, IntSchema.Int8.INSTANCE);
+                this.typeIdMapping.put(key, NumberSchema.Int8.INSTANCE);
                 break;
             case WORD:
-                this.typeIdMapping.put(key, IntSchema.Int16.INSTANCE);
+                this.typeIdMapping.put(key, NumberSchema.Int16.INSTANCE);
                 break;
             case DWORD:
-                this.typeIdMapping.put(key, IntSchema.Int32.INSTANCE);
+                this.typeIdMapping.put(key, NumberSchema.Int32.INSTANCE);
                 break;
             case BYTES:
-                this.typeIdMapping.put(key, ByteArraySchema.INSTANCE);
+                this.typeIdMapping.put(key, ArraySchema.ByteArraySchema.INSTANCE);
                 break;
             default:
                 throw new RuntimeException("不支持的类型转换");

@@ -34,19 +34,13 @@ public abstract class FieldFactory {
         Schema fieldSchema;
         switch (dataType) {
             case BYTE:
-                fieldSchema = IntSchema.Int8.INSTANCE;
-                break;
             case WORD:
-                fieldSchema = IntSchema.Int16.INSTANCE;
-                break;
             case DWORD:
-                if (Integer.TYPE.isAssignableFrom(typeClass) || Integer.class.isAssignableFrom(typeClass))
-                    fieldSchema = IntSchema.Int32.INSTANCE;
-                else
-                    fieldSchema = LongSchema.Long32.INSTANCE;
-                break;
             case QWORD:
-                fieldSchema = LongSchema.Long64.INSTANCE;
+                if (typeClass.isArray())
+                    fieldSchema = ArraySchema.getSchema(dataType);
+                else
+                    fieldSchema = NumberSchema.getSchema(dataType, typeClass);
                 break;
             case BCD8421:
                 if (LocalDateTime.class.isAssignableFrom(typeClass))
@@ -60,7 +54,7 @@ public abstract class FieldFactory {
                 else if (ByteBuffer.class.isAssignableFrom(typeClass))
                     fieldSchema = ByteBufferSchema.INSTANCE;
                 else
-                    fieldSchema = ByteArraySchema.INSTANCE;
+                    fieldSchema = ArraySchema.ByteArraySchema.INSTANCE;
                 break;
             case STRING:
                 fieldSchema = StringSchema.Chars.getInstance(field.pad(), field.charset());
