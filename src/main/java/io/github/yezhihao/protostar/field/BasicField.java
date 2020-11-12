@@ -1,8 +1,8 @@
 package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.annotation.Field;
+import io.github.yezhihao.protostar.util.StrUtils;
 import io.netty.buffer.ByteBuf;
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public abstract class BasicField<T> implements Comparable<BasicField<T>> {
 
     public void println(int index, String desc, String hex, Object value) {
         if (value != null)
-            System.out.println(index + "\t" + "[" + hex + "] " + desc + ": " + (value.getClass().isArray() ? ArrayUtils.toString(value) : value));
+            System.out.println(index + "\t" + "[" + hex + "] " + desc + ": " + StrUtils.toString(value));
     }
 
     public int index() {
