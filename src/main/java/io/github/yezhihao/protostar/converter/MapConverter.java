@@ -1,7 +1,7 @@
 package io.github.yezhihao.protostar.converter;
 
-import io.netty.buffer.ByteBuf;
 import io.github.yezhihao.protostar.util.ByteBufUtils;
+import io.netty.buffer.ByteBuf;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -27,7 +27,6 @@ public abstract class MapConverter<K, V> implements Converter<Map<K, V>> {
             K id = readKey(input);
             int len = ByteBufUtils.readInt(input, valueSize());
             Object value = convert(id, input.readSlice(len));
-            if (value == null) break;
             map.put(id, (V) value);
         } while (input.isReadable());
         return map;
