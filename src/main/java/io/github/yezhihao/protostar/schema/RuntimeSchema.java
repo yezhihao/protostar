@@ -1,8 +1,10 @@
 package io.github.yezhihao.protostar.schema;
 
+import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.field.BasicField;
 import io.netty.buffer.ByteBuf;
-import io.github.yezhihao.protostar.Schema;
+
+import java.lang.reflect.Constructor;
 
 /**
  * 运行时根据Class生成的消息结构，用于序列化对象
@@ -15,6 +17,7 @@ public class RuntimeSchema<T> implements Schema<T> {
     protected final int length;
     protected final Class<T> typeClass;
     protected final BasicField[] fields;
+    protected final Constructor<T> constructor;
 
     public RuntimeSchema(Class<T> typeClass, int version, BasicField[] fields) {
         this.typeClass = typeClass;
@@ -24,27 +27,27 @@ public class RuntimeSchema<T> implements Schema<T> {
         int lastIndex = lastField.index();
         int lastLength = lastField.length() < 0 ? 256 : lastField.length();
         this.length = lastIndex + lastLength;
+        try {
+            this.constructor = typeClass.getDeclaredConstructor((Class[]) null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public T readFrom(ByteBuf input) {
-        T message = null;
-        boolean isEmpty = true;//防止死循环
         BasicField field = null;
         try {
-            message = typeClass.newInstance();
+            T result = constructor.newInstance((Object[]) null);
             for (int i = 0; i < fields.length; i++) {
-                field = fields[i];
                 if (!input.isReadable())
                     break;
-                field.readFrom(input, message);
-                isEmpty = false;
+                field = fields[i];
+                field.readFrom(input, result);
             }
+            return result;
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed readFrom " + typeClass.getName() + field, e);
+            throw new RuntimeException("Read failed " + typeClass.getName() + field, e);
         }
-        if (isEmpty)
-            return null;
-        return message;
     }
 
     public void writeTo(ByteBuf output, T message) {
@@ -55,7 +58,7 @@ public class RuntimeSchema<T> implements Schema<T> {
                 field.writeTo(output, message);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed writeTo " + typeClass.getName() + field, e);
+            throw new RuntimeException("Write failed " + typeClass.getName() + field, e);
         }
     }
 
