@@ -2,15 +2,13 @@ package io.github.yezhihao.protostar.annotation;
 
 import io.github.yezhihao.protostar.DataType;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * @author yezhihao
  * home https://gitee.com/yezhihao/jt808-server
  */
+@Repeatable(Fs.class)
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Field {

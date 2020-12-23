@@ -21,11 +21,12 @@ public class Test {
         Schema<Foo> schema = multiVersionSchema.get(0);
 
         ByteBuf buffer = Unpooled.buffer(32);
-        schema.writeTo(buffer, foo());
+        Foo foo = foo();
+        schema.writeTo(buffer, foo);
         String hex = ByteBufUtil.hexDump(buffer);
         System.out.println(hex);
 
-        Foo foo = schema.readFrom(buffer);
+        foo = schema.readFrom(buffer);
         System.out.println(foo);
     }
 
