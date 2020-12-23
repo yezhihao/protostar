@@ -73,7 +73,6 @@ public class Test {
         }
 
         @Field(index = 3, type = DataType.BCD8421, desc = "日期", version = {0, 1})
-        @Field(index = 3, type = DataType.BCD8421, desc = "日期", version = {0, 1})
         public LocalDateTime getDateTime() {
             return dateTime;
         }
