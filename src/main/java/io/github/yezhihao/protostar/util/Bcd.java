@@ -64,13 +64,17 @@ public class Bcd {
         int year = HUNDRED_YEAR + num(bcd[i - 5]);
         if (year < YEAR_RANGE)
             year += 100;
-        return LocalDateTime.of(
-                year,
-                num(bcd[i - 4]),
-                num(bcd[i - 3]),
-                num(bcd[i - 2]),
-                num(bcd[i - 1]),
-                num(bcd[i]));
+        try {
+            return LocalDateTime.of(
+                    year,
+                    num(bcd[i - 4]),
+                    num(bcd[i - 3]),
+                    num(bcd[i - 2]),
+                    num(bcd[i - 1]),
+                    num(bcd[i]));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /** 日期转BCD (yyMMdd) */

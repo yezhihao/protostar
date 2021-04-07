@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.yezhihao</groupId>
     <artifactId>protostar</artifactId>
-    <version>1.0.3.RELEASE</version>
+    <version>1.0.4.RELEASE</version>
     <packaging>jar</packaging>
 
     <name>Protostar</name>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
-            <version>4.1.58.Final</version>
+            <version>4.1.63.Final</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
