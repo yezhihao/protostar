@@ -111,7 +111,7 @@ public class NumberSchema {
 
         @Override
         public void writeTo(ByteBuf output, Long value) {
-            output.writeLong(value.intValue());
+            output.writeLong(value);
         }
     }
 }
