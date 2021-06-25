@@ -1,12 +1,10 @@
 package io.github.yezhihao.protostar.field;
 
+import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
+import io.github.yezhihao.protostar.util.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.github.yezhihao.protostar.Schema;
-import io.github.yezhihao.protostar.util.ByteBufUtils;
-
-import java.beans.PropertyDescriptor;
 
 /**
  * 动态长度的字段
@@ -19,8 +17,8 @@ public class DynamicLengthField<T> extends BasicField<T> {
 
     protected final int lengthSize;
 
-    public DynamicLengthField(Field field, PropertyDescriptor property, Schema<T> schema) {
-        super(field, property);
+    public DynamicLengthField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
+        super(field, f);
         this.schema = schema;
         this.lengthSize = field.lengthSize();
     }
@@ -30,12 +28,12 @@ public class DynamicLengthField<T> extends BasicField<T> {
         if (!input.isReadable(length))
             return false;
         Object value = schema.readFrom(input, length);
-        writeMethod.invoke(message, value);
+        f.set(message, value);
         return true;
     }
 
     public void writeTo(ByteBuf output, Object message) throws Exception {
-        Object value = readMethod.invoke(message);
+        Object value = f.get(message);
         if (value != null) {
             int begin = output.writerIndex();
             output.writeBytes(ByteBufUtils.BLOCKS[lengthSize]);
@@ -55,8 +53,8 @@ public class DynamicLengthField<T> extends BasicField<T> {
 
     public static class Logger<T> extends DynamicLengthField<T> {
 
-        public Logger(Field field, PropertyDescriptor property, Schema<T> schema) {
-            super(field, property, schema);
+        public Logger(Field field, java.lang.reflect.Field f, Schema<T> schema) {
+            super(field, f, schema);
         }
 
         public boolean readFrom(ByteBuf input, Object message) throws Exception {
@@ -66,18 +64,18 @@ public class DynamicLengthField<T> extends BasicField<T> {
             if (!input.isReadable(length))
                 return false;
             Object value = schema.readFrom(input, length);
-            writeMethod.invoke(message, value);
+            f.set(message, value);
 
             int after = input.readerIndex();
             String hex = ByteBufUtil.hexDump(input.slice(before, after - before));
-            println(this.index, this.desc, hex, value);
+            println(this.index, this.field.desc(), hex, value);
             return true;
         }
 
         public void writeTo(ByteBuf output, Object message) throws Exception {
             int before = output.writerIndex();
 
-            Object value = readMethod.invoke(message);
+            Object value = f.get(message);
             if (value != null) {
                 int begin = output.writerIndex();
                 output.writeBytes(ByteBufUtils.BLOCKS[lengthSize]);
@@ -88,7 +86,7 @@ public class DynamicLengthField<T> extends BasicField<T> {
 
             int after = output.writerIndex();
             String hex = ByteBufUtil.hexDump(output.slice(before, after - before));
-            println(this.index, this.desc, hex, value);
+            println(this.index, this.field.desc(), hex, value);
         }
     }
 }

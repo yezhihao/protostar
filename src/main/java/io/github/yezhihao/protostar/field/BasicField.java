@@ -6,9 +6,6 @@ import io.netty.buffer.ByteBuf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
-
 /**
  * 固定长度的字段
  * @author yezhihao
@@ -19,23 +16,21 @@ public abstract class BasicField<T> implements Comparable<BasicField<T>> {
 
     protected final int index;
     protected final int length;
-    protected final String desc;
-    protected final Method readMethod;
-    protected final Method writeMethod;
-    protected final PropertyDescriptor property;
     protected final Field field;
+    protected final java.lang.reflect.Field f;
 
-    public BasicField(Field field, PropertyDescriptor property) {
+    public BasicField(Field field, java.lang.reflect.Field f) {
         this.index = field.index();
         int length = field.length();
         if (length < 0)
             length = field.type().length;
         this.length = length;
-        this.desc = field.desc();
-        this.readMethod = property.getReadMethod();
-        this.writeMethod = property.getWriteMethod();
         this.field = field;
-        this.property = property;
+        this.f = f;
+        try {
+            f.setAccessible(true);
+        } catch (Exception e) {
+        }
     }
 
     public abstract boolean readFrom(ByteBuf input, Object message) throws Exception;
@@ -62,13 +57,12 @@ public abstract class BasicField<T> implements Comparable<BasicField<T>> {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder(60);
+        final StringBuilder sb = new StringBuilder(50);
         sb.append('{');
         sb.append("index=").append(index);
         sb.append(", length=").append(length);
-        sb.append(", desc").append(desc);
-        sb.append(", readMethod=").append(readMethod.getName());
-        sb.append(", writeMethod=").append(writeMethod.getName());
+        sb.append(", desc").append(field.desc());
+        sb.append(", field=").append(f.getName());
         sb.append('}');
         return sb.toString();
     }

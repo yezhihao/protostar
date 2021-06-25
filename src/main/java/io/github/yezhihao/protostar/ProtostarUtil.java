@@ -1,5 +1,7 @@
 package io.github.yezhihao.protostar;
 
+import io.github.yezhihao.protostar.schema.RuntimeSchema;
+
 import java.util.Map;
 
 /**
@@ -24,15 +26,15 @@ public class ProtostarUtil {
         }
     }
 
-    public static Schema getSchema(Object typeId, Integer version) {
-        return LOAD_STRATEGY.getSchema(typeId, version);
+    public static RuntimeSchema getRuntimeSchema(Object typeId, Integer version) {
+        return LOAD_STRATEGY.getRuntimeSchema(typeId, version);
     }
 
-    public static Schema getSchema(Class<?> typeClass, Integer version) {
-        return LOAD_STRATEGY.getSchema(typeClass, version);
+    public static RuntimeSchema getRuntimeSchema(Class<?> typeClass, Integer version) {
+        return LOAD_STRATEGY.getRuntimeSchema(typeClass, version);
     }
 
-    public static <T> Map<Integer, Schema<T>> getSchema(Class<T> typeClass) {
-        return LOAD_STRATEGY.getSchema(typeClass);
+    public static <T> Map<Integer, RuntimeSchema<T>> getRuntimeSchema(Class<T> typeClass) {
+        return LOAD_STRATEGY.getRuntimeSchema(typeClass);
     }
 }

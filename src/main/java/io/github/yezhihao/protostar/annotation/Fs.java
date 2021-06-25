@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * @author yezhihao
  * home https://gitee.com/yezhihao/jt808-server
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Fs {
 

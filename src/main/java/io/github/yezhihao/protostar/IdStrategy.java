@@ -5,11 +5,6 @@ import io.github.yezhihao.protostar.field.BasicField;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.netty.buffer.ByteBuf;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
@@ -54,11 +49,11 @@ public abstract class IdStrategy {
         if (schema != null)
             return (Schema<T>) schema;
 
-        List<PropertyDescriptor> properties = findFieldProperties(typeClass);
-        if (properties.isEmpty())
+        List<java.lang.reflect.Field> fs = findFields(typeClass);
+        if (fs.isEmpty())
             return null;
 
-        List<BasicField> fieldList = findFields(root, properties);
+        List<BasicField> fieldList = findFields(root, fs);
         BasicField[] fields = fieldList.toArray(new BasicField[fieldList.size()]);
         Arrays.sort(fields);
 
@@ -67,57 +62,44 @@ public abstract class IdStrategy {
         return (Schema<T>) schema;
     }
 
-    protected static List<PropertyDescriptor> findFieldProperties(Class typeClass) {
-        BeanInfo beanInfo;
-        try {
-            beanInfo = Introspector.getBeanInfo(typeClass);
-        } catch (IntrospectionException e) {
-            throw new RuntimeException(e);
-        }
-        PropertyDescriptor[] properties = beanInfo.getPropertyDescriptors();
-        List<PropertyDescriptor> result = new ArrayList<>(properties.length);
+    protected static List<java.lang.reflect.Field> findFields(Class typeClass) {
+        java.lang.reflect.Field[] fields = typeClass.getDeclaredFields();
+        List<java.lang.reflect.Field> result = new ArrayList<>(fields.length);
 
-        for (PropertyDescriptor property : properties) {
-            Method readMethod = property.getReadMethod();
-
-            if (readMethod != null) {
-                if (readMethod.isAnnotationPresent(Field.class)) {
-                    result.add(property);
-                }
+        for (java.lang.reflect.Field f : fields) {
+            if (f.isAnnotationPresent(Field.class)) {
+                result.add(f);
             }
         }
         return result;
     }
 
-    protected static List<BasicField> findFields(Map<Object, Schema> root, List<PropertyDescriptor> properties) {
-        List<BasicField> fields = new ArrayList<>(properties.size());
+    protected static List<BasicField> findFields(Map<Object, Schema> root, List<java.lang.reflect.Field> fs) {
+        List<BasicField> fields = new ArrayList<>(fs.size());
 
-        for (PropertyDescriptor property : properties) {
-            Method readMethod = property.getReadMethod();
-
-            Field field = readMethod.getDeclaredAnnotation(Field.class);
+        for (java.lang.reflect.Field f : fs) {
+            Field field = f.getDeclaredAnnotation(Field.class);
             if (field != null) {
-                fillField(root, fields, property, field);
+                fillField(root, fields, f, field);
             }
         }
         return fields;
     }
 
-    protected static void fillField(Map<Object, Schema> root, List<BasicField> fields, PropertyDescriptor propertyDescriptor, Field field) {
-        Class typeClass = propertyDescriptor.getPropertyType();
-        Method readMethod = propertyDescriptor.getReadMethod();
+    protected static void fillField(Map<Object, Schema> root, List<BasicField> fields, java.lang.reflect.Field f, Field field) {
+        Class typeClass = f.getType();
 
         BasicField value;
 
         if (field.type() == DataType.OBJ || field.type() == DataType.LIST) {
             if (Collection.class.isAssignableFrom(typeClass))
-                typeClass = (Class) ((ParameterizedType) readMethod.getGenericReturnType()).getActualTypeArguments()[0];
+                typeClass = (Class) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
             loadSchema(root, typeClass);
             Schema schema = root.get(typeClass.getName());
-            value = FieldFactory.create(field, propertyDescriptor, schema);
+            value = FieldFactory.create(field, f, schema);
             fields.add(value);
         } else {
-            value = FieldFactory.create(field, propertyDescriptor);
+            value = FieldFactory.create(field, f);
             fields.add(value);
         }
     }

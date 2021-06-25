@@ -2,10 +2,9 @@ package io.github.yezhihao.protostar.convert;
 
 import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.ProtostarUtil;
-import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Convert;
 import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.annotation.Fs;
+import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -17,9 +16,9 @@ import java.util.TreeMap;
 public class Test {
 
     public static void main(String[] args) {
-        Map<Integer, Schema<Foo>> multiVersionSchema = ProtostarUtil.getSchema(Foo.class);
-        Schema<Foo> schema_v0 = multiVersionSchema.get(0);
-        Schema<Foo> schema_v1 = multiVersionSchema.get(1);
+        Map<Integer, RuntimeSchema<Foo>> multiVersionSchema = ProtostarUtil.getRuntimeSchema(Foo.class);
+        RuntimeSchema<Foo> schema_v0 = multiVersionSchema.get(0);
+        RuntimeSchema<Foo> schema_v1 = multiVersionSchema.get(1);
 
         ByteBuf buffer = Unpooled.buffer(32);
         schema_v0.writeTo(buffer, foo());
@@ -56,13 +55,18 @@ public class Test {
 
     public static class Foo {
 
+        @Field(index = 0, type = DataType.STRING, lengthSize = 1, desc = "名称", version = 0)
+        @Field(index = 0, type = DataType.STRING, length = 10, desc = "名称", version = 1)
         private String name;
+        @Field(index = 1, type = DataType.WORD, desc = "ID", version = 0)
+        @Field(index = 1, type = DataType.DWORD, desc = "ID", version = 1)
         private int id;
+        @Field(index = 3, type = DataType.BCD8421, desc = "日期", version = {0, 1})
         private LocalDateTime dateTime;
+        @Convert(converter = AttributeConverter.class)
+        @Field(index = 4, type = DataType.MAP, desc = "属性", version = {0, 1})
         private Map<Integer, Object> attributes;
 
-        @Fs({@Field(index = 0, type = DataType.STRING, lengthSize = 1, desc = "名称", version = 0),
-                @Field(index = 0, type = DataType.STRING, length = 10, desc = "名称", version = 1)})
         public String getName() {
             return name;
         }
@@ -71,8 +75,6 @@ public class Test {
             this.name = name;
         }
 
-        @Fs({@Field(index = 1, type = DataType.WORD, desc = "ID", version = 0),
-                @Field(index = 1, type = DataType.DWORD, desc = "ID", version = 1)})
         public int getId() {
             return id;
         }
@@ -81,7 +83,6 @@ public class Test {
             this.id = id;
         }
 
-        @Field(index = 3, type = DataType.BCD8421, desc = "日期", version = {0, 1})
         public LocalDateTime getDateTime() {
             return dateTime;
         }
@@ -90,8 +91,6 @@ public class Test {
             this.dateTime = dateTime;
         }
 
-        @Convert(converter = AttributeConverter.class)
-        @Field(index = 4, type = DataType.MAP, desc = "属性", version = {0, 1})
         public Map<Integer, Object> getAttributes() {
             return attributes;
         }

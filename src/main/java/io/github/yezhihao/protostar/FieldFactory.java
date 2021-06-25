@@ -10,7 +10,6 @@ import io.github.yezhihao.protostar.schema.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyDescriptor;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 
@@ -23,13 +22,13 @@ public abstract class FieldFactory {
     protected static Logger log = LoggerFactory.getLogger(FieldFactory.class.getSimpleName());
     public static boolean EXPLAIN = false;
 
-    public static BasicField create(Field field, PropertyDescriptor property) {
-        return create(field, property, null);
+    public static BasicField create(Field field, java.lang.reflect.Field f) {
+        return create(field, f, null);
     }
 
-    public static BasicField create(Field field, PropertyDescriptor property, Schema schema) {
+    public static BasicField create(Field field, java.lang.reflect.Field f, Schema schema) {
         DataType dataType = field.type();
-        Class<?> typeClass = property.getPropertyType();
+        Class<?> typeClass = f.getType();
 
         Schema fieldSchema;
         switch (dataType) {
@@ -63,7 +62,7 @@ public abstract class FieldFactory {
                 if (schema != null) {
                     fieldSchema = ObjectSchema.getInstance(schema);
                 } else {
-                    Convert convert = property.getReadMethod().getAnnotation(Convert.class);
+                    Convert convert = f.getAnnotation(Convert.class);
                     fieldSchema = ConvertSchema.getInstance(convert.converter());
                 }
                 break;
@@ -71,7 +70,7 @@ public abstract class FieldFactory {
                 fieldSchema = CollectionSchema.getInstance(schema);
                 break;
             case MAP:
-                Convert convert = property.getReadMethod().getAnnotation(Convert.class);
+                Convert convert = f.getAnnotation(Convert.class);
                 fieldSchema = ConvertSchema.getInstance(convert.converter());
                 break;
             default:
@@ -82,19 +81,19 @@ public abstract class FieldFactory {
         BasicField result;
         if (EXPLAIN) {
             if (field.lengthSize() > 0) {
-                result = new DynamicLengthField.Logger(field, property, fieldSchema);
+                result = new DynamicLengthField.Logger(field, f, fieldSchema);
             } else if (field.length() > 0) {
-                result = new FixedLengthField.Logger(field, property, fieldSchema);
+                result = new FixedLengthField.Logger(field, f, fieldSchema);
             } else {
-                result = new FixedField.Logger(field, property, fieldSchema);
+                result = new FixedField.Logger(field, f, fieldSchema);
             }
         } else {
             if (field.lengthSize() > 0) {
-                result = new DynamicLengthField(field, property, fieldSchema);
+                result = new DynamicLengthField(field, f, fieldSchema);
             } else if (field.length() > 0) {
-                result = new FixedLengthField(field, property, fieldSchema);
+                result = new FixedLengthField(field, f, fieldSchema);
             } else {
-                result = new FixedField(field, property, fieldSchema);
+                result = new FixedField(field, f, fieldSchema);
             }
         }
         return result;

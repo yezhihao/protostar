@@ -1,9 +1,9 @@
 package io.github.yezhihao.protostar;
 
 import io.github.yezhihao.protostar.annotation.Message;
+import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.github.yezhihao.protostar.util.ClassUtils;
 
-import java.beans.Introspector;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class DefaultLoadStrategy extends LoadStrategy {
 
-    private Map<String, Map<Integer, Schema<?>>> typeClassMapping = new HashMap(140);
+    private Map<String, Map<Integer, RuntimeSchema<?>>> typeClassMapping = new HashMap(140);
 
     public DefaultLoadStrategy() {
     }
@@ -26,33 +26,32 @@ public class DefaultLoadStrategy extends LoadStrategy {
             if (message != null) {
                 int[] values = message.value();
                 for (int typeId : values)
-                    loadSchema(typeClassMapping, typeId, type);
+                    loadRuntimeSchema(typeClassMapping, typeId, type);
             }
         }
-        Introspector.flushCaches();
     }
 
     @Override
-    public <T> Schema<T> getSchema(Class<T> typeClass, Integer version) {
-        Map<Integer, Schema<?>> schemas = typeClassMapping.get(typeClass.getName());
+    public <T> RuntimeSchema<T> getRuntimeSchema(Class<T> typeClass, Integer version) {
+        Map<Integer, RuntimeSchema<?>> schemas = typeClassMapping.get(typeClass.getName());
         if (schemas == null) {
-            schemas = loadSchema(typeClassMapping, typeClass);
+            schemas = loadRuntimeSchema(typeClassMapping, typeClass);
         }
         if (schemas == null) return null;
-        return (Schema<T>) schemas.get(version);
+        return (RuntimeSchema<T>) schemas.get(version);
     }
 
     @Override
-    public <T> Map<Integer, Schema<T>> getSchema(Class<T> typeClass) {
-        Map<Integer, Schema<?>> schemas = typeClassMapping.get(typeClass.getName());
+    public <T> Map<Integer, RuntimeSchema<T>> getRuntimeSchema(Class<T> typeClass) {
+        Map<Integer, RuntimeSchema<?>> schemas = typeClassMapping.get(typeClass.getName());
         if (schemas == null) {
-            schemas = loadSchema(typeClassMapping, typeClass);
+            schemas = loadRuntimeSchema(typeClassMapping, typeClass);
         }
         if (schemas == null) return null;
 
-        HashMap<Integer, Schema<T>> result = new HashMap<>(schemas.size());
-        for (Map.Entry<Integer, Schema<?>> entry : schemas.entrySet()) {
-            result.put(entry.getKey(), (Schema<T>) entry.getValue());
+        HashMap<Integer, RuntimeSchema<T>> result = new HashMap<>(schemas.size());
+        for (Map.Entry<Integer, RuntimeSchema<?>> entry : schemas.entrySet()) {
+            result.put(entry.getKey(), (RuntimeSchema<T>) entry.getValue());
         }
         return result;
     }

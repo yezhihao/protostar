@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * home https://gitee.com/yezhihao/jt808-server
  */
 @Repeatable(Fs.class)
-@Target(ElementType.METHOD)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Field {
 

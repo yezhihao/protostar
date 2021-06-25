@@ -3,8 +3,8 @@ package io.github.yezhihao.protostar.simple;
 import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.FieldFactory;
 import io.github.yezhihao.protostar.ProtostarUtil;
-import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
+import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -17,16 +17,24 @@ public class Test {
     public static void main(String[] args) {
         FieldFactory.EXPLAIN = true;
 
-        Map<Integer, Schema<Foo>> multiVersionSchema = ProtostarUtil.getSchema(Foo.class);
-        Schema<Foo> schema = multiVersionSchema.get(0);
+        Map<Integer, RuntimeSchema<Foo>> bodySchemas = ProtostarUtil.getRuntimeSchema(Foo.class);
+        RuntimeSchema<Foo> bodySchema = bodySchemas.get(0);
+
+        Map<Integer, RuntimeSchema<BaseDO>> headSchemas = ProtostarUtil.getRuntimeSchema(BaseDO.class);
+        RuntimeSchema<BaseDO> headSchema = headSchemas.get(0);
 
         ByteBuf buffer = Unpooled.buffer(32);
         Foo foo = foo();
-        schema.writeTo(buffer, foo);
+        headSchema.writeTo(buffer, foo);
+        bodySchema.writeTo(buffer, foo);
+
         String hex = ByteBufUtil.hexDump(buffer);
         System.out.println(hex);
 
-        foo = schema.readFrom(buffer);
+
+        Foo foo1 = new Foo();
+        headSchema.mergeFrom(buffer, foo1);
+        bodySchema.mergeFrom(buffer, foo1);
         System.out.println(foo);
     }
 
@@ -35,16 +43,45 @@ public class Test {
         foo.setName("张三");
         foo.setId(128);
         foo.setDateTime(LocalDateTime.of(2020, 7, 7, 19, 23, 59));
+
+        foo.setType(1);
+        foo.setClientId("123qwe");
         return foo;
     }
 
-    public static class Foo {
+    public static class BaseDO {
 
-        private String name;
-        private int id;
-        private LocalDateTime dateTime;
+        @Field(index = 0, type = DataType.WORD, desc = "ID")
+        protected int type;
+        @Field(index = 1, type = DataType.STRING, length = 20, desc = "名称")
+        protected String clientId;
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
+        }
+
+        public String getClientId() {
+            return clientId;
+        }
+
+        public void setClientId(String clientId) {
+            this.clientId = clientId;
+        }
+    }
+
+    public static class Foo extends BaseDO {
 
         @Field(index = 0, type = DataType.STRING, lengthSize = 1, desc = "名称")
+        private String name;
+        @Field(index = 1, type = DataType.WORD, desc = "ID")
+        private int id;
+        @Field(index = 3, type = DataType.BCD8421, desc = "日期")
+        private LocalDateTime dateTime;
+
         public String getName() {
             return name;
         }
@@ -53,7 +90,6 @@ public class Test {
             this.name = name;
         }
 
-        @Field(index = 1, type = DataType.WORD, desc = "ID")
         public int getId() {
             return id;
         }
@@ -62,7 +98,6 @@ public class Test {
             this.id = id;
         }
 
-        @Field(index = 3, type = DataType.BCD8421, desc = "日期")
         public LocalDateTime getDateTime() {
             return dateTime;
         }
@@ -74,7 +109,9 @@ public class Test {
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder("Foo{");
-            sb.append("name='").append(name).append('\'');
+            sb.append("type=").append(type);
+            sb.append(", clientId='").append(clientId).append('\'');
+            sb.append(", name='").append(name).append('\'');
             sb.append(", id=").append(id);
             sb.append(", dateTime=").append(dateTime);
             sb.append('}');

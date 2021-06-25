@@ -34,6 +34,29 @@ public class RuntimeSchema<T> implements Schema<T> {
         }
     }
 
+    public T newInstance() {
+        try {
+            return constructor.newInstance((Object[]) null);
+        } catch (Exception e) {
+            throw new RuntimeException("newInstance failed " + typeClass.getName(), e);
+        }
+    }
+
+    public T mergeFrom(ByteBuf input, T result) {
+        BasicField field = null;
+        try {
+            for (int i = 0; i < fields.length; i++) {
+                if (!input.isReadable())
+                    break;
+                field = fields[i];
+                field.readFrom(input, result);
+            }
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("Read failed " + typeClass.getName() + field, e);
+        }
+    }
+
     public T readFrom(ByteBuf input) {
         BasicField field = null;
         try {

@@ -5,7 +5,9 @@ import io.github.yezhihao.protostar.annotation.Field;
 
 public class Attr1 {
 
+    @Field(index = 0, type = DataType.STRING, lengthSize = 1, desc = "名称")
     private String name;
+    @Field(index = 1, type = DataType.WORD, desc = "ID")
     private int id;
 
     public Attr1() {
@@ -16,7 +18,6 @@ public class Attr1 {
         this.id = id;
     }
 
-    @Field(index = 0, type = DataType.STRING, lengthSize = 1, desc = "名称")
     public String getName() {
         return name;
     }
@@ -25,7 +26,6 @@ public class Attr1 {
         this.name = name;
     }
 
-    @Field(index = 1, type = DataType.WORD, desc = "ID")
     public int getId() {
         return id;
     }
