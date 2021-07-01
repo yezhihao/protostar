@@ -2,32 +2,20 @@ package io.github.yezhihao.protostar.schema;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.util.Bcd;
+import io.github.yezhihao.protostar.util.Cache;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class StringSchema {
 
     public static class Chars implements Schema<String> {
-        private static volatile Map<Object, Chars> cache = new HashMap<>();
+        private static final Cache<String, Chars> cache = new Cache<>();
 
-        public static Schema<String> getInstance(byte pad, String charset) {
-            charset = charset.toLowerCase();
-            String key = new StringBuilder(10).append((char) pad).append('/').append(charset).toString();
-            Chars instance;
-            if ((instance = cache.get(key)) == null) {
-                synchronized (cache) {
-                    if ((instance = cache.get(key)) == null) {
-                        instance = new Chars(pad, charset);
-                        cache.put(key, instance);
-                        log.debug("new StringSchema({},{})", pad, charset);
-                    }
-                }
-            }
-            return instance;
+        public static Chars getInstance(final byte pad, final String charset) {
+            String key = new StringBuilder(10).append((char) pad).append('/').append(charset.toLowerCase()).toString();
+            return cache.get(key, k -> new Chars(pad, charset));
         }
 
         private final byte pad;

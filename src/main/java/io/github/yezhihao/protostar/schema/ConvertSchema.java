@@ -2,36 +2,24 @@ package io.github.yezhihao.protostar.schema;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.converter.Converter;
+import io.github.yezhihao.protostar.util.Cache;
 import io.netty.buffer.ByteBuf;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 自定义结构转换
  */
 public class ConvertSchema<T> implements Schema<T> {
 
-    private static volatile Map<Object, ConvertSchema> cache = new HashMap<>();
+    private static final Cache<String, ConvertSchema> cache = new Cache<>();
 
-    public static Schema getInstance(Class<? extends Converter> clazz) {
-        String key = clazz.getName();
-        ConvertSchema instance;
-        if ((instance = cache.get(key)) == null) {
-            synchronized (cache) {
-                if ((instance = cache.get(key)) == null) {
-                    try {
-                        Converter converter = clazz.newInstance();
-                        instance = new ConvertSchema(converter);
-                        cache.put(key, instance);
-                        log.debug("new ConvertSchema({})", clazz);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+    public static ConvertSchema getInstance(Class<? extends Converter> clazz) {
+        return cache.get(clazz.getName(), key -> {
+            try {
+                return new ConvertSchema(clazz.newInstance());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-        }
-        return instance;
+        });
     }
 
     private final Converter<T> converter;

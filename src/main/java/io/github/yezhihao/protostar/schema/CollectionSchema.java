@@ -1,30 +1,18 @@
 package io.github.yezhihao.protostar.schema;
 
 import io.github.yezhihao.protostar.Schema;
+import io.github.yezhihao.protostar.util.Cache;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CollectionSchema<T> implements Schema<List<T>> {
 
-    private static volatile Map<Object, CollectionSchema> cache = new HashMap<>();
+    private static final Cache<Schema, CollectionSchema> CACHE = new Cache<>();
 
-    public static Schema<List> getInstance(Schema schema) {
-        Object key = schema;
-        CollectionSchema instance;
-        if ((instance = cache.get(key)) == null) {
-            synchronized (cache) {
-                if ((instance = cache.get(key)) == null) {
-                    instance = new CollectionSchema(schema);
-                    cache.put(schema, instance);
-                    log.debug("new CollectionSchema({})", schema);
-                }
-            }
-        }
-        return instance;
+    public static CollectionSchema getInstance(Schema schema) {
+        return CACHE.get(schema, key -> new CollectionSchema(key));
     }
 
     private final Schema<T> schema;
