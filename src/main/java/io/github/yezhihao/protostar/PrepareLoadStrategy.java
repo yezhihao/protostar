@@ -42,7 +42,7 @@ public abstract class PrepareLoadStrategy extends IdStrategy {
                 this.typeIdMapping.put(key, NumberSchema.Int16.INSTANCE);
                 break;
             case DWORD:
-                this.typeIdMapping.put(key, NumberSchema.Long32.INSTANCE);
+                this.typeIdMapping.put(key, NumberSchema.Int32.INSTANCE);
                 break;
             case QWORD:
                 this.typeIdMapping.put(key, NumberSchema.Long64.INSTANCE);
