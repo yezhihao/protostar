@@ -1,6 +1,7 @@
 package io.github.yezhihao.protostar.annotation;
 
 import io.github.yezhihao.protostar.DataType;
+import io.github.yezhihao.protostar.converter.Converter;
 
 import java.lang.annotation.*;
 
@@ -23,9 +24,11 @@ public @interface Field {
 
     String charset() default "GBK";
 
-    byte pad() default 0x00;
+    byte pad() default 0;
 
     String desc() default "";
 
     int[] version() default {-1, 0, 1};
+
+    Class<? extends Converter> converter() default Converter.class;
 }

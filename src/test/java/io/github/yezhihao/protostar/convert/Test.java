@@ -2,7 +2,6 @@ package io.github.yezhihao.protostar.convert;
 
 import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.ProtostarUtil;
-import io.github.yezhihao.protostar.annotation.Convert;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.netty.buffer.ByteBuf;
@@ -63,8 +62,8 @@ public class Test {
         private int id;
         @Field(index = 3, type = DataType.BCD8421, desc = "日期", version = {0, 1})
         private LocalDateTime dateTime;
-        @Convert(converter = AttributeConverter.class)
-        @Field(index = 4, type = DataType.MAP, desc = "属性", version = {0, 1})
+        @Field(index = 4, type = DataType.MAP, desc = "属性", version = 0, converter = AttributeConverter.class)
+        @Field(index = 4, type = DataType.MAP, desc = "属性", version = 1, converter = AttributeConverterV2.class)
         private Map<Integer, Object> attributes;
 
         public String getName() {

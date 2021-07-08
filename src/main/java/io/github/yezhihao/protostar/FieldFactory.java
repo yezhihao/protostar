@@ -1,14 +1,11 @@
 package io.github.yezhihao.protostar;
 
-import io.github.yezhihao.protostar.annotation.Convert;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.field.BasicField;
 import io.github.yezhihao.protostar.field.DynamicLengthField;
 import io.github.yezhihao.protostar.field.FixedField;
 import io.github.yezhihao.protostar.field.FixedLengthField;
 import io.github.yezhihao.protostar.schema.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
@@ -19,7 +16,7 @@ import java.time.LocalDateTime;
  * home https://gitee.com/yezhihao/jt808-server
  */
 public abstract class FieldFactory {
-    protected static Logger log = LoggerFactory.getLogger(FieldFactory.class.getSimpleName());
+
     public static boolean EXPLAIN = false;
 
     public static BasicField create(Field field, java.lang.reflect.Field f) {
@@ -59,19 +56,16 @@ public abstract class FieldFactory {
                 fieldSchema = StringSchema.Chars.getInstance(field.pad(), field.charset());
                 break;
             case OBJ:
-                if (schema != null) {
+                if (schema != null)
                     fieldSchema = ObjectSchema.getInstance(schema);
-                } else {
-                    Convert convert = f.getAnnotation(Convert.class);
-                    fieldSchema = ConvertSchema.getInstance(convert.converter());
-                }
+                else
+                    fieldSchema = ConvertSchema.getInstance(field.converter());
                 break;
             case LIST:
                 fieldSchema = CollectionSchema.getInstance(schema);
                 break;
             case MAP:
-                Convert convert = f.getAnnotation(Convert.class);
-                fieldSchema = ConvertSchema.getInstance(convert.converter());
+                fieldSchema = ConvertSchema.getInstance(field.converter());
                 break;
             default:
                 throw new RuntimeException("不支持的类型转换");
