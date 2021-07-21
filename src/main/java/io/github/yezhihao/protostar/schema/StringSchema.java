@@ -1,14 +1,19 @@
 package io.github.yezhihao.protostar.schema;
 
 import io.github.yezhihao.protostar.Schema;
-import io.github.yezhihao.protostar.util.Bcd;
 import io.github.yezhihao.protostar.util.Cache;
+import io.github.yezhihao.protostar.util.CharsBuilder;
 import io.netty.buffer.ByteBuf;
+import io.netty.util.internal.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
 public class StringSchema {
+
+    private static final Logger log = LoggerFactory.getLogger(StringSchema.class.getSimpleName());
 
     public static class Chars implements Schema<String> {
         private static final Cache<String, Chars> cache = new Cache<>();
@@ -65,7 +70,7 @@ public class StringSchema {
                     output.writeBytes(bytes);
                 } else if (srcPos < 0) {
                     output.writeBytes(bytes, -srcPos, length);
-                    log.error("字符长度超出限制: 长度[{}],数据长度[{}],{}", length, bytes.length, value);
+                    log.info("字符长度超出限制: 长度[{}],数据长度[{}],{}", length, bytes.length, value);
                 } else {
                     output.writeBytes(bytes);
                 }
@@ -74,7 +79,6 @@ public class StringSchema {
             }
         }
     }
-
 
     public static class BCD implements Schema<String> {
         public static final Schema INSTANCE = new BCD();
@@ -91,12 +95,10 @@ public class StringSchema {
         public String readFrom(ByteBuf input, int length) {
             byte[] bytes = new byte[length];
             input.readBytes(bytes);
-            char[] chars = Bcd.toChars(bytes);
 
-            int i = Bcd.indexOf(chars, '0');
-            if (i == 0)
-                return new String(chars);
-            return new String(chars, i, chars.length - i);
+            CharsBuilder cb = new CharsBuilder(length << 1);
+            StringUtil.toHexStringPadded(cb, bytes);
+            return cb.leftStrip('0');
         }
 
         @Override
@@ -115,9 +117,53 @@ public class StringSchema {
                     chars[--i] = '0';
             } else {
                 value.getChars(-i, charLength - i, chars, 0);
-                log.warn("字符长度超出限制: 长度[{}],[{}]", charLength, value);
+                log.info("字符长度超出限制: 长度[{}],[{}]", charLength, value);
             }
-            byte[] src = Bcd.from(chars);
+            byte[] src = StringUtil.decodeHexDump(new CharsBuilder(chars));
+            output.writeBytes(src);
+        }
+    }
+
+    public static class HEX implements Schema<String> {
+        public static final Schema INSTANCE = new HEX();
+
+        private HEX() {
+        }
+
+        @Override
+        public String readFrom(ByteBuf input) {
+            return readFrom(input, input.readableBytes());
+        }
+
+        @Override
+        public String readFrom(ByteBuf input, int length) {
+            byte[] bytes = new byte[length];
+            input.readBytes(bytes);
+
+            CharsBuilder cb = new CharsBuilder(length << 1);
+            StringUtil.toHexStringPadded(cb, bytes);
+            return cb.toString();
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, String value) {
+            writeTo(output, value.length() >> 1, value);
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, int length, String value) {
+            int charLength = length << 1;
+            char[] chars = new char[charLength];
+            int i = charLength - value.length();
+            if (i >= 0) {
+                value.getChars(0, charLength - i, chars, i);
+                while (i > 0)
+                    chars[--i] = '0';
+            } else {
+                value.getChars(-i, charLength - i, chars, 0);
+                log.info("字符长度超出限制: 长度[{}],[{}]", charLength, value);
+            }
+            byte[] src = StringUtil.decodeHexDump(new CharsBuilder(chars));
             output.writeBytes(src);
         }
     }

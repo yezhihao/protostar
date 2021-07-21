@@ -17,35 +17,6 @@ public class Bcd {
     public static final int YEAR_RANGE = YEAR - 30;
     public static final int HUNDRED_YEAR = YEAR_RANGE / 100 * 100;
 
-    /** BCD转String */
-    public static String toString(byte[] bcd) {
-        return new String(toChars(bcd));
-    }
-
-    /** BCD转char[] */
-    public static char[] toChars(byte[] bcd) {
-        char[] chars = new char[bcd.length * 2];
-        for (int i = 0, j = 0; i < bcd.length; i++) {
-            chars[j++] = (char) (48 + (bcd[i] >> 4 & 0xf));
-            chars[j++] = (char) (48 + (bcd[i] & 0xf));
-        }
-        return chars;
-    }
-
-    /** String转BCD */
-    public static byte[] from(String str) {
-        return from(str.toCharArray());
-    }
-
-    /** char[]转BCD */
-    public static byte[] from(char[] chars) {
-        byte[] bcd = new byte[chars.length / 2];
-        for (int i = 0, j = 0; i < bcd.length; i++) {
-            bcd[i] = (byte) ((chars[j++] - 48 << 4) | ((chars[j++] - 48 & 0xf)));
-        }
-        return bcd;
-    }
-
     /** 时间转BCD (yyMMddHHmmss) */
     public static byte[] from(LocalDateTime dateTime) {
         byte[] bcd = new byte[6];
@@ -112,11 +83,5 @@ public class Bcd {
 
     public static int num(byte bcd) {
         return (bcd >> 4 & 0xf) * 10 + (bcd & 0xf);
-    }
-
-    public static int indexOf(char[] chars, char pad) {
-        int i = 0, len = chars.length;
-        while (i < len && chars[i] == pad) i++;
-        return i;
     }
 }

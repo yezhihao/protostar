@@ -1,8 +1,6 @@
 package io.github.yezhihao.protostar;
 
 import io.netty.buffer.ByteBuf;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 消息结构
@@ -10,8 +8,6 @@ import org.slf4j.LoggerFactory;
  * home https://gitee.com/yezhihao/jt808-server
  */
 public interface Schema<T> {
-
-    Logger log = LoggerFactory.getLogger(Schema.class.getSimpleName());
 
     T readFrom(ByteBuf input);
 

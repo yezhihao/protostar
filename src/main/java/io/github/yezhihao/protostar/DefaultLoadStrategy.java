@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class DefaultLoadStrategy extends LoadStrategy {
 
-    private Map<String, Map<Integer, RuntimeSchema<?>>> typeClassMapping = new HashMap(140);
+    private Map<String, Map<Integer, RuntimeSchema<?>>> typeClassMapping = new HashMap(256);
 
     public DefaultLoadStrategy() {
     }

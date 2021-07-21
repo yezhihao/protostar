@@ -52,6 +52,9 @@ public abstract class FieldFactory {
                 else
                     fieldSchema = ArraySchema.ByteArraySchema.INSTANCE;
                 break;
+            case HEX:
+                fieldSchema = StringSchema.HEX.INSTANCE;
+                break;
             case STRING:
                 fieldSchema = StringSchema.Chars.getInstance(field.pad(), field.charset());
                 break;

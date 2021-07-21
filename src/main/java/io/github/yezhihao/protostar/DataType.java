@@ -19,6 +19,8 @@ public enum DataType {
     BYTES(-1),
     /** BCD8421码 */
     BCD8421(-1),
+    /** 十六进制字符串 */
+    HEX(-1),
     /** 字符串 */
     STRING(-1),
     /** 对象 */
