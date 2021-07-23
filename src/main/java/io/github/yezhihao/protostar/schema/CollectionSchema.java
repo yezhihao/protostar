@@ -37,7 +37,11 @@ public class CollectionSchema<T> implements Schema<List<T>> {
 
     @Override
     public List<T> readFrom(ByteBuf input, int length) {
-        return this.readFrom(input.readSlice(length));
+        int writerIndex = input.writerIndex();
+        input.writerIndex(input.readerIndex() + length);
+        List<T> result = this.readFrom(input);
+        input.writerIndex(writerIndex);
+        return result;
     }
 
     @Override

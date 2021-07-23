@@ -35,8 +35,13 @@ public class ConvertSchema<T> implements Schema<T> {
 
     @Override
     public T readFrom(ByteBuf input, int length) {
-        if (length > 0)
-            input = input.readSlice(length);
+        if (length > 0) {
+            int writerIndex = input.writerIndex();
+            input.writerIndex(input.readerIndex() + length);
+            T result = converter.convert(input);
+            input.writerIndex(writerIndex);
+            return result;
+        }
         return converter.convert(input);
     }
 

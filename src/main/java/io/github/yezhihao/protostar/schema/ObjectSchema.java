@@ -25,8 +25,13 @@ public class ObjectSchema<T> implements Schema<T> {
 
     @Override
     public T readFrom(ByteBuf input, int length) {
-        if (length > 0)
-            input = input.readSlice(length);
+        if (length > 0) {
+            int writerIndex = input.writerIndex();
+            input.writerIndex(input.readerIndex() + length);
+            T result = schema.readFrom(input);
+            input.writerIndex(writerIndex);
+            return result;
+        }
         return schema.readFrom(input);
     }
 
