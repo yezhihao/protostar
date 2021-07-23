@@ -8,6 +8,7 @@ import io.netty.util.internal.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
@@ -58,24 +59,25 @@ public class StringSchema {
 
         @Override
         public void writeTo(ByteBuf output, int length, String value) {
-            byte[] bytes = value.getBytes(charset);
+            ByteBuffer buffer = charset.encode(value);
             if (length > 0) {
-                int srcPos = length - bytes.length;
+                int srcPos = length - buffer.limit();
 
                 if (srcPos > 0) {
                     byte[] pads = new byte[srcPos];
                     if (pad != 0x00)
                         Arrays.fill(pads, pad);
                     output.writeBytes(pads);
-                    output.writeBytes(bytes);
+                    output.writeBytes(buffer);
                 } else if (srcPos < 0) {
-                    output.writeBytes(bytes, -srcPos, length);
-                    log.info("字符长度超出限制: 长度[{}],数据长度[{}],{}", length, bytes.length, value);
+                    buffer.position(-srcPos);
+                    output.writeBytes(buffer);
+                    log.info("字符长度超出限制: 长度[{}],数据长度[{}],{}", length, buffer.limit(), value);
                 } else {
-                    output.writeBytes(bytes);
+                    output.writeBytes(buffer);
                 }
             } else {
-                output.writeBytes(bytes);
+                output.writeBytes(buffer);
             }
         }
     }

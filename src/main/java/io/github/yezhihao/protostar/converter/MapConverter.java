@@ -27,9 +27,16 @@ public abstract class MapConverter<K, V> extends PrepareLoadStrategy implements 
         Map<K, V> map = new TreeMap<>();
         do {
             K key = readKey(input);
-            int len = ByteBufUtils.readInt(input, valueSize());
-            Object value = readValue(key, input.readSlice(len));
-            map.put(key, (V) value);
+            int length = ByteBufUtils.readInt(input, valueSize());
+
+            if (input.isReadable(length)) {
+                int writerIndex = input.writerIndex();
+                input.writerIndex(input.readerIndex() + length);
+                map.put(key, (V) readValue(key, input));
+                input.writerIndex(writerIndex);
+            } else {
+                map.put(key, (V) readValue(key, input));
+            }
         } while (input.isReadable());
         return map;
     }
