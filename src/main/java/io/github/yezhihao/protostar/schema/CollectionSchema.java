@@ -1,6 +1,7 @@
 package io.github.yezhihao.protostar.schema;
 
 import io.github.yezhihao.protostar.Schema;
+import io.github.yezhihao.protostar.util.ByteBufUtils;
 import io.github.yezhihao.protostar.util.Cache;
 import io.netty.buffer.ByteBuf;
 
@@ -9,28 +10,42 @@ import java.util.List;
 
 public class CollectionSchema<T> implements Schema<List<T>> {
 
-    private static final Cache<Schema, CollectionSchema> CACHE = new Cache<>();
+    private static final Cache<String, CollectionSchema> CACHE = new Cache<>();
 
-    public static CollectionSchema getInstance(Schema schema) {
-        return CACHE.get(schema, key -> new CollectionSchema(key));
+    public static CollectionSchema getInstance(Schema schema, int lengthSize) {
+        return CACHE.get(schema.hashCode() + "_" + lengthSize, key -> new CollectionSchema(schema, lengthSize));
     }
 
     private final Schema<T> schema;
 
-    private CollectionSchema(Schema<T> schema) {
+    private final int lengthSize;
+
+    private CollectionSchema(Schema<T> schema, int lengthSize) {
         this.schema = schema;
+        this.lengthSize = lengthSize;
     }
 
     @Override
     public List<T> readFrom(ByteBuf input) {
         if (!input.isReadable())
             return null;
-        List<T> list = new ArrayList<>();
-        do {
-            T obj = schema.readFrom(input);
-            if (obj == null) break;
-            list.add(obj);
-        } while (input.isReadable());
+        List<T> list;
+        if (lengthSize > 0) {
+            int length = ByteBufUtils.readInt(input, lengthSize);
+            list = new ArrayList<>(length);
+            for (int i = 0; i < length; i++) {
+                T obj = schema.readFrom(input);
+                if (obj == null) break;
+                list.add(obj);
+            }
+        } else {
+            list = new ArrayList<>(2);
+            do {
+                T obj = schema.readFrom(input);
+                if (obj == null) break;
+                list.add(obj);
+            } while (input.isReadable());
+        }
         return list;
     }
 
@@ -48,7 +63,8 @@ public class CollectionSchema<T> implements Schema<List<T>> {
     public void writeTo(ByteBuf output, List<T> list) {
         if (list == null || list.isEmpty())
             return;
-
+        if (lengthSize > 0)
+            ByteBufUtils.writeInt(output, lengthSize, list.size());
         for (T obj : list) {
             schema.writeTo(output, obj);
         }

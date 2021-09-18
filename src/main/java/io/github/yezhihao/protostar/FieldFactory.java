@@ -65,7 +65,7 @@ public abstract class FieldFactory {
                     fieldSchema = ConvertSchema.getInstance(field.converter());
                 break;
             case LIST:
-                fieldSchema = CollectionSchema.getInstance(schema);
+                fieldSchema = CollectionSchema.getInstance(schema, field.lengthSize());
                 break;
             case MAP:
                 fieldSchema = ConvertSchema.getInstance(field.converter());
@@ -85,7 +85,7 @@ public abstract class FieldFactory {
                 result = new FixedField.Logger(field, f, fieldSchema);
             }
         } else {
-            if (field.lengthSize() > 0) {
+            if (field.lengthSize() > 0 && !(fieldSchema instanceof CollectionSchema)) {
                 result = new DynamicLengthField(field, f, fieldSchema);
             } else if (field.length() > 0) {
                 result = new FixedLengthField(field, f, fieldSchema);

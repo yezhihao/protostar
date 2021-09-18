@@ -3,8 +3,6 @@ package io.github.yezhihao.protostar.field;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.util.StrUtils;
 import io.netty.buffer.ByteBuf;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 固定长度的字段
@@ -12,7 +10,6 @@ import org.slf4j.LoggerFactory;
  * home https://gitee.com/yezhihao/jt808-server
  */
 public abstract class BasicField<T> implements Comparable<BasicField<T>> {
-    protected static Logger log = LoggerFactory.getLogger(BasicField.class.getSimpleName());
 
     protected final int index;
     protected final int length;
