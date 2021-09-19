@@ -70,10 +70,10 @@ public abstract class MapConverter<K, V> extends PrepareLoadStrategy implements 
         if (schema != null) {
             int lengthSize = valueSize();
             int begin = output.writerIndex();
-            output.writeBytes(ByteBufUtils.BLOCKS[lengthSize]);
+            ByteBufUtils.writeInt(output, lengthSize, 0);
             schema.writeTo(output, value);
             int length = output.writerIndex() - begin - lengthSize;
-            ByteBufUtils.setInt(output, lengthSize, begin, length);
+            ByteBufUtils.setInt(output, begin, lengthSize, length);
         } else {
             log.warn("未注册的信息:ID[{}], VALUE[{}]", key, value);
         }

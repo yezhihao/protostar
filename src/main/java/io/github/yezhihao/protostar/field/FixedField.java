@@ -12,9 +12,9 @@ import io.netty.buffer.ByteBufUtil;
  */
 public class FixedField<T> extends BasicField<T> {
 
-    protected final Schema<T> schema;
+    protected final Schema schema;
 
-    public FixedField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
+    public FixedField(Field field, java.lang.reflect.Field f, Schema schema) {
         super(field, f);
         this.schema = schema;
     }
@@ -28,7 +28,7 @@ public class FixedField<T> extends BasicField<T> {
     public void writeTo(ByteBuf output, Object message) throws Exception {
         Object value = f.get(message);
         if (value != null)
-            schema.writeTo(output, (T) value);
+            schema.writeTo(output, value);
     }
 
     public static class Logger<T> extends FixedField<T> {
@@ -54,7 +54,7 @@ public class FixedField<T> extends BasicField<T> {
 
             Object value = f.get(message);
             if (value != null)
-                schema.writeTo(output, (T) value);
+                schema.writeTo(output, value);
 
             int after = output.writerIndex();
             String hex = ByteBufUtil.hexDump(output.slice(before, after - before));

@@ -9,13 +9,6 @@ import io.netty.buffer.ByteBuf;
  */
 public class ByteBufUtils {
 
-    /** 长度域占位数据块 */
-    public static final byte[][] BLOCKS = new byte[][]{
-            new byte[0],
-            new byte[1], new byte[2],
-            new byte[3], new byte[4]};
-
-
     public static int readInt(ByteBuf input, int length) {
         int value;
         switch (length) {
@@ -56,20 +49,20 @@ public class ByteBufUtils {
         }
     }
 
-    public static int getInt(ByteBuf output, int length, int index) {
+    public static int getInt(ByteBuf input, int index, int length) {
         int value;
         switch (length) {
             case 1:
-                value = output.getUnsignedByte(index);
+                value = input.getUnsignedByte(index);
                 break;
             case 2:
-                value = output.getUnsignedShort(index);
+                value = input.getUnsignedShort(index);
                 break;
             case 3:
-                value = output.getUnsignedMedium(index);
+                value = input.getUnsignedMedium(index);
                 break;
             case 4:
-                value = output.getInt(index);
+                value = input.getInt(index);
                 break;
             default:
                 throw new RuntimeException("unsupported length: " + length + " (expected: 1, 2, 3, 4)");
@@ -77,7 +70,7 @@ public class ByteBufUtils {
         return value;
     }
 
-    public static void setInt(ByteBuf output, int length, int index, int value) {
+    public static void setInt(ByteBuf output, int index, int length, int value) {
         switch (length) {
             case 1:
                 output.setByte(index, value);

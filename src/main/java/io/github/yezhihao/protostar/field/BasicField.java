@@ -30,9 +30,9 @@ public abstract class BasicField<T> implements Comparable<BasicField<T>> {
         }
     }
 
-    public abstract boolean readFrom(ByteBuf input, Object message) throws Exception;
+    public abstract boolean readFrom(ByteBuf input, T message) throws Exception;
 
-    public abstract void writeTo(ByteBuf output, Object message) throws Exception;
+    public abstract void writeTo(ByteBuf output, T message) throws Exception;
 
     public void println(int index, String desc, String hex, Object value) {
         if (value != null)

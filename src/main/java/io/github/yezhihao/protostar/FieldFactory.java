@@ -1,10 +1,7 @@
 package io.github.yezhihao.protostar;
 
 import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.field.BasicField;
-import io.github.yezhihao.protostar.field.DynamicLengthField;
-import io.github.yezhihao.protostar.field.FixedField;
-import io.github.yezhihao.protostar.field.FixedLengthField;
+import io.github.yezhihao.protostar.field.*;
 import io.github.yezhihao.protostar.schema.*;
 
 import java.nio.ByteBuffer;
@@ -65,7 +62,7 @@ public abstract class FieldFactory {
                     fieldSchema = ConvertSchema.getInstance(field.converter());
                 break;
             case LIST:
-                fieldSchema = CollectionSchema.getInstance(schema, field.lengthSize());
+                fieldSchema = CollectionSchema.getInstance(schema);
                 break;
             case MAP:
                 fieldSchema = ConvertSchema.getInstance(field.converter());
@@ -78,15 +75,21 @@ public abstract class FieldFactory {
         BasicField result;
         if (EXPLAIN) {
             if (field.lengthSize() > 0) {
-                result = new DynamicLengthField.Logger(field, f, fieldSchema);
+                if (fieldSchema instanceof CollectionSchema)
+                    result = new DynamicTotalField.Logger(field, f, fieldSchema);
+                else
+                    result = new DynamicLengthField.Logger(field, f, fieldSchema);
             } else if (field.length() > 0) {
                 result = new FixedLengthField.Logger(field, f, fieldSchema);
             } else {
                 result = new FixedField.Logger(field, f, fieldSchema);
             }
         } else {
-            if (field.lengthSize() > 0 && !(fieldSchema instanceof CollectionSchema)) {
-                result = new DynamicLengthField(field, f, fieldSchema);
+            if (field.lengthSize() > 0) {
+                if (fieldSchema instanceof CollectionSchema)
+                    result = new DynamicTotalField(field, f, fieldSchema);
+                else
+                    result = new DynamicLengthField(field, f, fieldSchema);
             } else if (field.length() > 0) {
                 result = new FixedLengthField(field, f, fieldSchema);
             } else {

@@ -13,11 +13,11 @@ import io.netty.buffer.ByteBufUtil;
  */
 public class DynamicLengthField<T> extends BasicField<T> {
 
-    protected final Schema<T> schema;
+    protected final Schema schema;
 
     protected final int lengthSize;
 
-    public DynamicLengthField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
+    public DynamicLengthField(Field field, java.lang.reflect.Field f, Schema schema) {
         super(field, f);
         this.schema = schema;
         this.lengthSize = field.lengthSize();
@@ -36,10 +36,10 @@ public class DynamicLengthField<T> extends BasicField<T> {
         Object value = f.get(message);
         if (value != null) {
             int begin = output.writerIndex();
-            output.writeBytes(ByteBufUtils.BLOCKS[lengthSize]);
-            schema.writeTo(output, (T) value);
+            ByteBufUtils.writeInt(output, lengthSize, 0);
+            schema.writeTo(output, value);
             int length = output.writerIndex() - begin - lengthSize;
-            ByteBufUtils.setInt(output, lengthSize, begin, length);
+            ByteBufUtils.setInt(output, begin, lengthSize, length);
         }
     }
 
@@ -78,10 +78,10 @@ public class DynamicLengthField<T> extends BasicField<T> {
             Object value = f.get(message);
             if (value != null) {
                 int begin = output.writerIndex();
-                output.writeBytes(ByteBufUtils.BLOCKS[lengthSize]);
-                schema.writeTo(output, (T) value);
+                ByteBufUtils.writeInt(output, lengthSize, 0);
+                schema.writeTo(output, value);
                 int length = output.writerIndex() - begin - lengthSize;
-                ByteBufUtils.setInt(output, lengthSize, begin, length);
+                ByteBufUtils.setInt(output, begin, lengthSize, length);
             }
 
             int after = output.writerIndex();

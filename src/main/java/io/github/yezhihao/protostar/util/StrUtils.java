@@ -90,4 +90,17 @@ public class StrUtils {
             return false;
         return componentType.isArray();
     }
+
+    public static String leftPad(String str, int size, char ch) {
+        int length = str.length();
+        int pads = size - length;
+        if (pads > 0) {
+            char[] result = new char[size];
+            str.getChars(0, length, result, pads);
+            while (pads > 0)
+                result[--pads] = ch;
+            return new String(result);
+        }
+        return str;
+    }
 }
