@@ -38,6 +38,8 @@ public class CollectionSchema<T> implements Schema<Collection<T>> {
     @Override
     public Collection<T> readFrom(ByteBuf input, int totalSize) {
         int total = ByteBufUtils.readInt(input, totalSize);
+        if (total <= 0)
+            return null;
         Collection<T> list = new ArrayList<>(total);
         for (int i = 0; i < total; i++) {
             T obj = schema.readFrom(input);
@@ -58,8 +60,10 @@ public class CollectionSchema<T> implements Schema<Collection<T>> {
 
     @Override
     public void writeTo(ByteBuf output, int totalSize, Collection<T> list) {
-        if (list == null || list.isEmpty())
+        if (list == null || list.isEmpty()) {
+            ByteBufUtils.writeInt(output, totalSize, 0);
             return;
+        }
 
         ByteBufUtils.writeInt(output, totalSize, list.size());
         for (T obj : list) {

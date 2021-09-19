@@ -33,8 +33,7 @@ public class DynamicTotalField<T> extends BasicField<T> {
 
     public void writeTo(ByteBuf output, Object message) throws Exception {
         Collection value = (Collection) f.get(message);
-        if (value != null)
-            schema.writeTo(output, totalSize, value);
+        schema.writeTo(output, totalSize, value);
     }
 
     @Override
@@ -63,14 +62,12 @@ public class DynamicTotalField<T> extends BasicField<T> {
 
         public void writeTo(ByteBuf output, Object message) throws Exception {
             Collection value = (Collection) f.get(message);
-            if (value != null) {
 
-                int total = value.size();
-                String hex = StrUtils.leftPad(Integer.toHexString(total), totalSize << 1, '0');
-                println(this.index, this.field.desc() + "总数", hex, total);
+            int total = value == null ? 0 : value.size();
+            String hex = StrUtils.leftPad(Integer.toHexString(total), totalSize << 1, '0');
+            println(this.index, this.field.desc() + "总数", hex, total);
 
-                schema.writeTo(output, totalSize, value);
-            }
+            schema.writeTo(output, totalSize, value);
         }
     }
 }
