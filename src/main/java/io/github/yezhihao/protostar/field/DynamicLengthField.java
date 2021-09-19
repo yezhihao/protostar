@@ -3,6 +3,7 @@ package io.github.yezhihao.protostar.field;
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.util.ByteBufUtils;
+import io.github.yezhihao.protostar.util.StrUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 
@@ -61,14 +62,17 @@ public class DynamicLengthField<T> extends BasicField<T> {
             int before = input.readerIndex();
 
             int length = ByteBufUtils.readInt(input, lengthSize);
+            String hex = StrUtils.leftPad(Integer.toHexString(length), lengthSize << 1, '0');
+            println(this.index, this.field.desc() + "长度", hex, length);
+
             if (!input.isReadable(length))
                 return false;
             Object value = schema.readFrom(input, length);
             f.set(message, value);
 
             int after = input.readerIndex();
-            String hex = ByteBufUtil.hexDump(input.slice(before, after - before));
-            println(this.index, this.field.desc(), hex, value);
+            hex = ByteBufUtil.hexDump(input.slice(before + lengthSize, after - before - lengthSize));
+            println(this.index + lengthSize, this.field.desc(), hex, value);
             return true;
         }
 
@@ -85,8 +89,13 @@ public class DynamicLengthField<T> extends BasicField<T> {
             }
 
             int after = output.writerIndex();
-            String hex = ByteBufUtil.hexDump(output.slice(before, after - before));
-            println(this.index, this.field.desc(), hex, value);
+
+            int length = ByteBufUtils.getInt(output, before, lengthSize);
+            String hex = StrUtils.leftPad(Integer.toHexString(length), lengthSize << 1, '0');
+            println(this.index, this.field.desc() + "长度", hex, length);
+
+            hex = ByteBufUtil.hexDump(output.slice(before + lengthSize, after - before - lengthSize));
+            println(this.index + lengthSize, this.field.desc(), hex, value);
         }
     }
 }
