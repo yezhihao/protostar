@@ -25,19 +25,27 @@ public abstract class MapConverter<K, V> extends PrepareLoadStrategy implements 
         if (!input.isReadable())
             return null;
         Map<K, V> map = new TreeMap<>();
-        do {
-            K key = readKey(input);
-            int length = ByteBufUtils.readInt(input, valueSize());
+        K key = null;
+        int length = 0;
+        try {
+            do {
+                key = readKey(input);
+                length = ByteBufUtils.readInt(input, valueSize());
+                if (length <= 0)
+                    continue;
 
-            if (input.isReadable(length)) {
-                int writerIndex = input.writerIndex();
-                input.writerIndex(input.readerIndex() + length);
-                map.put(key, (V) readValue(key, input));
-                input.writerIndex(writerIndex);
-            } else {
-                map.put(key, (V) readValue(key, input));
-            }
-        } while (input.isReadable());
+                if (input.isReadable(length)) {
+                    int writerIndex = input.writerIndex();
+                    input.writerIndex(input.readerIndex() + length);
+                    map.put(key, (V) readValue(key, input));
+                    input.writerIndex(writerIndex);
+                } else {
+                    map.put(key, (V) readValue(key, input));
+                }
+            } while (input.isReadable());
+        } catch (Exception e) {
+            log.warn("解析出错:KEY[{}], LENGTH[{}]", key, length);
+        }
         return map;
     }
 
