@@ -92,7 +92,7 @@ public class ToStringBuilder {
     }
 
     private static class Builder implements Comparable<Builder> {
-        private static final BiConsumer<StringBuilder, Object> APPEND_OBJ = (sb, obj) -> sb.append(obj);
+        private static final BiConsumer<StringBuilder, Object> APPEND_OBJ = StringBuilder::append;
         private static final BiConsumer<StringBuilder, Object> APPEND_ARRAY = (sb, array) -> {
             sb.append('[');
             int length = Array.getLength(array);

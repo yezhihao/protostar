@@ -5,7 +5,6 @@ import java.lang.annotation.Annotation;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -19,12 +18,7 @@ public class ClassUtils {
 
     public static List<Class<?>> getClassList(String packageName, Class<? extends Annotation> annotationClass) {
         List<Class<?>> classList = getClassList(packageName);
-        Iterator<Class<?>> iterator = classList.iterator();
-        while (iterator.hasNext()) {
-            Class<?> next = iterator.next();
-            if (!next.isAnnotationPresent(annotationClass))
-                iterator.remove();
-        }
+        classList.removeIf(aClass -> !aClass.isAnnotationPresent(annotationClass));
         return classList;
     }
 

@@ -9,7 +9,7 @@ public class ObjectSchema<T> implements Schema<T> {
     private static final Cache<Schema, ObjectSchema> cache = new Cache<>();
 
     public static ObjectSchema getInstance(Schema schema) {
-        return cache.get(schema, key -> new ObjectSchema(key));
+        return cache.get(schema, ObjectSchema::new);
     }
 
     private final Schema<T> schema;

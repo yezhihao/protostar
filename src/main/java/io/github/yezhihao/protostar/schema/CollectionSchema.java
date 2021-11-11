@@ -13,7 +13,7 @@ public class CollectionSchema<T> implements Schema<Collection<T>> {
     private static final Cache<Schema, CollectionSchema> CACHE = new Cache<>();
 
     public static CollectionSchema getInstance(Schema schema) {
-        return CACHE.get(schema, key -> new CollectionSchema(key));
+        return CACHE.get(schema, CollectionSchema::new);
     }
 
     private final Schema<T> schema;
