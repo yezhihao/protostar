@@ -6,7 +6,7 @@ import io.github.yezhihao.protostar.schema.NumberSchema;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class PrepareLoadStrategy extends IdStrategy {
+public abstract class PrepareLoadStrategy extends SingleVersionSchemaManager {
 
     private final Map<Object, Schema> typeClassMapping = new HashMap<>();
 
@@ -16,7 +16,6 @@ public abstract class PrepareLoadStrategy extends IdStrategy {
 
     protected abstract void addSchemas(PrepareLoadStrategy schemaRegistry);
 
-    @Override
     public <T> Schema<T> getSchema(Class<T> typeClass) {
         return typeClassMapping.get(typeClass);
     }

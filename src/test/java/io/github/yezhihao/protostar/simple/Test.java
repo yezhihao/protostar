@@ -17,10 +17,10 @@ public class Test {
     public static void main(String[] args) {
         FieldFactory.EXPLAIN = true;
 
-        Map<Integer, RuntimeSchema<Foo>> bodySchemas = ProtostarUtil.getRuntimeSchema(Foo.class);
+        Map<Integer, RuntimeSchema> bodySchemas = ProtostarUtil.getRuntimeSchema(Foo.class);
         RuntimeSchema<Foo> bodySchema = bodySchemas.get(0);
 
-        Map<Integer, RuntimeSchema<BaseDO>> headSchemas = ProtostarUtil.getRuntimeSchema(BaseDO.class);
+        Map<Integer, RuntimeSchema> headSchemas = ProtostarUtil.getRuntimeSchema(BaseDO.class);
         RuntimeSchema<BaseDO> headSchema = headSchemas.get(0);
 
         ByteBuf buffer = Unpooled.buffer(32);

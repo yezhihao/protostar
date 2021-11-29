@@ -15,7 +15,7 @@ import java.util.TreeMap;
 public class Test {
 
     public static void main(String[] args) {
-        Map<Integer, RuntimeSchema<Foo>> multiVersionSchema = ProtostarUtil.getRuntimeSchema(Foo.class);
+        Map<Integer, RuntimeSchema> multiVersionSchema = ProtostarUtil.getRuntimeSchema(Foo.class);
         RuntimeSchema<Foo> schema_v0 = multiVersionSchema.get(0);
         RuntimeSchema<Foo> schema_v1 = multiVersionSchema.get(1);
 
