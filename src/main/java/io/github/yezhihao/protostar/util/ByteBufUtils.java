@@ -100,4 +100,11 @@ public class ByteBufUtils {
             output.writeBytes(bytes);
         }
     }
+
+    public static boolean startsWith(ByteBuf haystack, byte[] prefix) {
+        for (int i = 0, j = haystack.readerIndex(); i < prefix.length; )
+            if (prefix[i++] != haystack.getByte(j++))
+                return false;
+        return true;
+    }
 }

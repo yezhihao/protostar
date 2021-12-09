@@ -18,12 +18,12 @@ public class ClassUtils {
 
     public static List<Class> getClassList(String packageName, Class<? extends Annotation> annotationClass) {
         List<Class> classList = getClassList(packageName);
-        classList.removeIf(aClass -> !aClass.isAnnotationPresent(annotationClass));
+        classList.removeIf(next -> !next.isAnnotationPresent(annotationClass));
         return classList;
     }
 
     public static List<Class> getClassList(String packageName) {
-        List<Class> classList = new LinkedList();
+        List<Class> classList = new LinkedList<>();
         String path = packageName.replace(".", "/");
         try {
             Enumeration<URL> urls = ClassUtils.getClassLoader().getResources(path);

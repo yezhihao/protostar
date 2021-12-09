@@ -44,6 +44,8 @@ public abstract class FieldFactory {
             case BYTES:
                 if (String.class.isAssignableFrom(typeClass))
                     fieldSchema = StringSchema.Chars.getInstance(field.pad(), field.charset());
+                else if (LocalDateTime.class.isAssignableFrom(typeClass))
+                    fieldSchema = DateTimeSchema.BYTES.INSTANCE;
                 else if (ByteBuffer.class.isAssignableFrom(typeClass))
                     fieldSchema = ByteBufferSchema.INSTANCE;
                 else
