@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
 /**
  * 固定长度的字段
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public abstract class BasicField<T> implements Comparable<BasicField<T>> {
 

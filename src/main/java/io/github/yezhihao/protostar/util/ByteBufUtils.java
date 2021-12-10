@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 /**
  * Netty ByteBuf工具类
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public class ByteBufUtils {
 

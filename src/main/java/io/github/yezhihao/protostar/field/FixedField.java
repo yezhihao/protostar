@@ -8,7 +8,7 @@ import io.netty.buffer.ByteBufUtil;
 /**
  * 原子域
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public class FixedField<T> extends BasicField<T> {
 

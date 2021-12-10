@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 /**
  * 消息结构
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public interface Schema<T> {
 

@@ -12,7 +12,7 @@ import java.util.*;
 /**
  * 多版本Schema加载器
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public class ProtostarUtil {
 

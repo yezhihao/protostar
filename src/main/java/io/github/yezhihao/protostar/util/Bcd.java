@@ -9,7 +9,7 @@ import java.time.LocalTime;
 /**
  * BCD编码工具类
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  * @see DateTimeUtils
  */
 @Deprecated

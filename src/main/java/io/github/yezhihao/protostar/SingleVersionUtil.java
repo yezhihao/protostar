@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * 单版本Schema加载器
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public abstract class SingleVersionUtil {
 

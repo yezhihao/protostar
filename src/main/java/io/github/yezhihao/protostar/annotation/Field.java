@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 
 /**
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 @Repeatable(Fs.class)
 @Target(ElementType.FIELD)

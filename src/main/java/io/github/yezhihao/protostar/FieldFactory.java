@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * FieldFactory
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public abstract class FieldFactory {
 

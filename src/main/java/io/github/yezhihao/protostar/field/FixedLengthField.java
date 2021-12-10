@@ -8,7 +8,7 @@ import io.netty.buffer.ByteBufUtil;
 /**
  * 固定长度的字段
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public class FixedLengthField<T> extends BasicField<T> {
 

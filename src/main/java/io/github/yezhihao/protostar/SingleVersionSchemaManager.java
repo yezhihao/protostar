@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * 单版本Schema管理器
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public class SingleVersionSchemaManager {
 

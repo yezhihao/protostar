@@ -9,7 +9,7 @@ import java.lang.reflect.Constructor;
 /**
  * 运行时根据Class生成的消息结构，用于序列化对象
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public class RuntimeSchema<T> implements Schema<T> {
 

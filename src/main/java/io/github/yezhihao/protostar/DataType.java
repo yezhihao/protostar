@@ -3,7 +3,7 @@ package io.github.yezhihao.protostar;
 /**
  * 支持的数据类型
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public enum DataType {
 

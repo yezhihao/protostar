@@ -11,7 +11,7 @@ import java.util.Collection;
 /**
  * 动态长度的字段
  * @author yezhihao
- * home https://gitee.com/yezhihao/jt808-server
+ * https://gitee.com/yezhihao/jt808-server
  */
 public class DynamicTotalField<T> extends BasicField<T> {
 
