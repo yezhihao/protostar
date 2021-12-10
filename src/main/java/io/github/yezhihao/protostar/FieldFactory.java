@@ -24,7 +24,7 @@ public abstract class FieldFactory {
         DataType dataType = field.type();
         Class<?> typeClass = f.getType();
 
-        Schema fieldSchema;
+        Schema fieldSchema = null;
         switch (dataType) {
             case BYTE:
             case WORD:
@@ -69,10 +69,10 @@ public abstract class FieldFactory {
             case MAP:
                 fieldSchema = ConvertSchema.getInstance(field.converter());
                 break;
-            default:
-                throw new RuntimeException("不支持的类型转换");
         }
 
+        if (fieldSchema == null)
+            throw new IllegalArgumentException("不支持的类型转换 field:" + f.getName() + ",desc:" + field.desc() + "[" + dataType + " to " + typeClass.getSimpleName() + "]");
 
         BasicField result;
         if (EXPLAIN) {

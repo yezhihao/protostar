@@ -4,36 +4,76 @@ import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.Schema;
 import io.netty.buffer.ByteBuf;
 
+import static io.github.yezhihao.protostar.DataType.*;
+
 public class NumberSchema {
 
     public static Schema getSchema(DataType dataType, Class<?> typeClass) {
-        Schema schema;
-        switch (dataType) {
-            case BYTE:
-                schema = Int8.INSTANCE;
-                break;
-            case WORD:
-                schema = Int16.INSTANCE;
-                break;
-            case DWORD:
-                if (Integer.TYPE.isAssignableFrom(typeClass) || Integer.class.isAssignableFrom(typeClass))
-                    schema = NumberSchema.Int32.INSTANCE;
-                else
-                    schema = NumberSchema.Long32.INSTANCE;
-                break;
-            case QWORD:
-                schema = Long64.INSTANCE;
-                break;
-            default:
-                throw new RuntimeException("不支持的类型转换");
+        if (Byte.TYPE.isAssignableFrom(typeClass) || Byte.class.isAssignableFrom(typeClass)) {
+            if (dataType == BYTE)
+                return BYTE2Byte.INSTANCE;
+        } else if (Short.TYPE.isAssignableFrom(typeClass) || Short.class.isAssignableFrom(typeClass)) {
+            if (dataType == BYTE)
+                return BYTE2Short.INSTANCE;
+            if (dataType == WORD)
+                return WORD2Short.INSTANCE;
+        } else if (Integer.TYPE.isAssignableFrom(typeClass) || Integer.class.isAssignableFrom(typeClass)) {
+            if (dataType == BYTE)
+                return BYTE2Int.INSTANCE;
+            if (dataType == WORD)
+                return WORD2Int.INSTANCE;
+            if (dataType == DWORD)
+                return DWORD2Int.INSTANCE;
+        } else if (Long.TYPE.isAssignableFrom(typeClass) || Long.class.isAssignableFrom(typeClass)) {
+            if (dataType == DWORD)
+                return DWORD2Long.INSTANCE;
+            if (dataType == QWORD)
+                return QWORD2Long.INSTANCE;
+        } else if (String.class.isAssignableFrom(typeClass)) {
+            if (dataType == QWORD)
+                return QWORD2String.INSTANCE;
         }
-        return schema;
+        return null;
     }
 
-    public static class Int8 implements Schema<Integer> {
-        public static final Schema INSTANCE = new Int8();
+    public static class BYTE2Byte implements Schema<Byte> {
+        public static final Schema INSTANCE = new BYTE2Byte();
 
-        private Int8() {
+        private BYTE2Byte() {
+        }
+
+        @Override
+        public Byte readFrom(ByteBuf input) {
+            return input.readByte();
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, Byte value) {
+            output.writeByte(value);
+        }
+    }
+
+    public static class BYTE2Short implements Schema<Short> {
+        public static final Schema INSTANCE = new BYTE2Short();
+
+        private BYTE2Short() {
+        }
+
+        @Override
+        public Short readFrom(ByteBuf input) {
+            return input.readUnsignedByte();
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, Short value) {
+            output.writeByte(value);
+        }
+    }
+
+    public static class BYTE2Int implements Schema<Integer> {
+        public static final Schema INSTANCE = new BYTE2Int();
+
+        private BYTE2Int() {
         }
 
         @Override
@@ -47,10 +87,27 @@ public class NumberSchema {
         }
     }
 
-    public static class Int16 implements Schema<Integer> {
-        public static final Schema INSTANCE = new Int16();
+    public static class WORD2Short implements Schema<Short> {
+        public static final Schema INSTANCE = new WORD2Short();
 
-        private Int16() {
+        private WORD2Short() {
+        }
+
+        @Override
+        public Short readFrom(ByteBuf input) {
+            return input.readShort();
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, Short value) {
+            output.writeShort(value);
+        }
+    }
+
+    public static class WORD2Int implements Schema<Integer> {
+        public static final Schema INSTANCE = new WORD2Int();
+
+        private WORD2Int() {
         }
 
         @Override
@@ -64,10 +121,10 @@ public class NumberSchema {
         }
     }
 
-    public static class Int32 implements Schema<Integer> {
-        public static final Schema INSTANCE = new Int32();
+    public static class DWORD2Int implements Schema<Integer> {
+        public static final Schema INSTANCE = new DWORD2Int();
 
-        private Int32() {
+        private DWORD2Int() {
         }
 
         @Override
@@ -81,10 +138,10 @@ public class NumberSchema {
         }
     }
 
-    public static class Long32 implements Schema<Long> {
-        public static final Schema INSTANCE = new Long32();
+    public static class DWORD2Long implements Schema<Long> {
+        public static final Schema INSTANCE = new DWORD2Long();
 
-        private Long32() {
+        private DWORD2Long() {
         }
 
         @Override
@@ -98,10 +155,10 @@ public class NumberSchema {
         }
     }
 
-    public static class Long64 implements Schema<Long> {
-        public static final Schema INSTANCE = new Long64();
+    public static class QWORD2Long implements Schema<Long> {
+        public static final Schema INSTANCE = new QWORD2Long();
 
-        private Long64() {
+        private QWORD2Long() {
         }
 
         @Override
@@ -112,6 +169,23 @@ public class NumberSchema {
         @Override
         public void writeTo(ByteBuf output, Long value) {
             output.writeLong(value);
+        }
+    }
+
+    public static class QWORD2String implements Schema<String> {
+        public static final Schema INSTANCE = new QWORD2String();
+
+        private QWORD2String() {
+        }
+
+        @Override
+        public String readFrom(ByteBuf input) {
+            return Long.toString(input.readLong());
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, String value) {
+            output.writeLong(Long.parseUnsignedLong(value, 10));
         }
     }
 }

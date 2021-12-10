@@ -35,22 +35,22 @@ public abstract class PrepareLoadStrategy extends SingleVersionSchemaManager {
     public PrepareLoadStrategy addSchema(Object key, DataType dataType) {
         switch (dataType) {
             case BYTE:
-                this.typeIdMapping.put(key, NumberSchema.Int8.INSTANCE);
+                this.typeIdMapping.put(key, NumberSchema.BYTE2Int.INSTANCE);
                 break;
             case WORD:
-                this.typeIdMapping.put(key, NumberSchema.Int16.INSTANCE);
+                this.typeIdMapping.put(key, NumberSchema.WORD2Int.INSTANCE);
                 break;
             case DWORD:
-                this.typeIdMapping.put(key, NumberSchema.Long32.INSTANCE);
+                this.typeIdMapping.put(key, NumberSchema.DWORD2Long.INSTANCE);
                 break;
             case QWORD:
-                this.typeIdMapping.put(key, NumberSchema.Long64.INSTANCE);
+                this.typeIdMapping.put(key, NumberSchema.QWORD2Long.INSTANCE);
                 break;
             case BYTES:
                 this.typeIdMapping.put(key, ArraySchema.ByteArraySchema.INSTANCE);
                 break;
             default:
-                throw new RuntimeException("不支持的类型转换");
+                throw new IllegalArgumentException("不支持的类型转换" + dataType);
         }
         return this;
     }

@@ -11,7 +11,7 @@ public class AttributeConverterV2 extends MapConverter<Integer, Object> {
     @Override
     protected void addSchemas(PrepareLoadStrategy schemaRegistry) {
         schemaRegistry
-                .addSchema(1, NumberSchema.Int32.INSTANCE)
+                .addSchema(1, NumberSchema.DWORD2Int.INSTANCE)
                 .addSchema(2, StringSchema.Chars.getInstance((byte) 0, "UTF-8"))
 
                 .addSchema(3, Attr1.class)
