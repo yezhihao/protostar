@@ -2,7 +2,6 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.Info;
 import io.netty.buffer.ByteBuf;
@@ -56,29 +55,26 @@ public class BasicField<T> implements Schema<T>, Comparable<BasicField> {
     }
 
     public T readFrom(ByteBuf input, Explain explain) {
-        int before = input.readerIndex();
+        int begin = input.readerIndex();
 
-        T value;
-        if (schema instanceof RuntimeSchema)
-            value = ((RuntimeSchema<T>) schema).readFrom(input, explain);
-        else
-            value = schema.readFrom(input);
+        T value = schema.readFrom(input, explain);
 
-        int after = input.readerIndex();
-        String hex = ByteBufUtil.hexDump(input.slice(before, after - before));
-        explain.add(Info.field(before, field, hex, value));
+        int end = input.readerIndex();
+        String raw = ByteBufUtil.hexDump(input, begin, end - begin);
+        explain.add(Info.field(begin, field, value, raw));
         return value;
     }
 
     public void writeTo(ByteBuf output, T value, Explain explain) {
-        int before = output.writerIndex();
+        int begin = output.writerIndex();
 
-        if (value != null)
+        if (value != null) {
             schema.writeTo(output, value);
 
-        int after = output.writerIndex();
-        String hex = ByteBufUtil.hexDump(output.slice(before, after - before));
-        explain.add(Info.field(before, field, hex, value));
+            int end = output.writerIndex();
+            String raw = ByteBufUtil.hexDump(output, begin, end - begin);
+            explain.add(Info.field(begin, field, value, raw));
+        }
     }
 
     public int length() {
@@ -93,12 +89,12 @@ public class BasicField<T> implements Schema<T>, Comparable<BasicField> {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder(50);
-        sb.append('{');
+        sb.append('[');
         sb.append("index=").append(field.index());
         sb.append(", length=").append(length);
-        sb.append(", desc").append(field.desc());
         sb.append(", field=").append(f.getName());
-        sb.append('}');
+        sb.append(", desc").append(field.desc());
+        sb.append(']');
         return sb.toString();
     }
 }

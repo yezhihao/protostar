@@ -4,7 +4,6 @@ import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.Info;
-import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 
@@ -30,30 +29,26 @@ public class FixedLengthField<T> extends BasicField<T> {
 
     @Override
     public T readFrom(ByteBuf input, Explain explain) {
-        int before = input.readerIndex();
+        int begin = input.readerIndex();
 
-        T value;
-        if (schema instanceof RuntimeSchema)
-            value = ((RuntimeSchema<T>) schema).readFrom(input, length, explain);
-        else
-            value = schema.readFrom(input, length);
+        T value = schema.readFrom(input, length, explain);
 
-        int after = input.readerIndex();
-        String hex = ByteBufUtil.hexDump(input.slice(before, after - before));
-        explain.add(Info.field(before, field, hex, value));
+        int end = input.readerIndex();
+        String raw = ByteBufUtil.hexDump(input, begin, end - begin);
+        explain.add(Info.field(begin, field, value, raw));
         return value;
     }
 
     @Override
     public void writeTo(ByteBuf output, T value, Explain explain) {
-        int before = output.writerIndex();
+        int begin = output.writerIndex();
 
         if (value != null) {
             schema.writeTo(output, length, value);
 
-            int after = output.writerIndex();
-            String hex = ByteBufUtil.hexDump(output.slice(before, after - before));
-            explain.add(Info.field(before, field, hex, value));
+            int end = output.writerIndex();
+            String raw = ByteBufUtil.hexDump(output, begin, end - begin);
+            explain.add(Info.field(begin, field, value, raw));
         }
     }
 }

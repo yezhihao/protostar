@@ -2,8 +2,9 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.schema.RuntimeSchema;
-import io.github.yezhihao.protostar.util.*;
+import io.github.yezhihao.protostar.util.Explain;
+import io.github.yezhihao.protostar.util.Info;
+import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 
@@ -23,8 +24,6 @@ public class DynamicLengthField<T> extends BasicField<T> {
 
     public T readFrom(ByteBuf input) {
         int length = intTool.read(input);
-        if (!input.isReadable(length))
-            return null;
         return schema.readFrom(input, length);
     }
 
@@ -40,41 +39,37 @@ public class DynamicLengthField<T> extends BasicField<T> {
 
     @Override
     public T readFrom(ByteBuf input, Explain explain) {
-        int before = input.readerIndex();
+        int begin = input.readerIndex();
 
         int length = intTool.read(input);
-        String hex = StrUtils.leftPad(Integer.toHexString(length), lengthSize << 1, '0');
-        explain.add(Info.lengthField(before, field, hex, length));
+        explain.add(Info.lengthField(begin, field, length));
 
-        if (!input.isReadable(length))
-            return null;
-        T value = ((RuntimeSchema<T>) schema).readFrom(input, length, explain);
+        T value = schema.readFrom(input, length, explain);
 
-        int after = input.readerIndex();
-        hex = ByteBufUtil.hexDump(input.slice(before + lengthSize, after - before - lengthSize));
-        explain.add(Info.field(before + lengthSize, field, hex, value));
+        int end = input.readerIndex();
+        String raw = ByteBufUtil.hexDump(input, begin + lengthSize, end - begin - lengthSize);
+        explain.add(Info.field(begin + lengthSize, field, value, raw));
         return value;
     }
 
     @Override
     public void writeTo(ByteBuf output, T value, Explain explain) {
-        int before = output.writerIndex();
+        int begin = output.writerIndex();
 
         intTool.write(output, 0);
         if (value != null) {
             schema.writeTo(output, value);
-            int length = output.writerIndex() - before - lengthSize;
-            intTool.set(output, before, length);
+            int length = output.writerIndex() - begin - lengthSize;
+            intTool.set(output, begin, length);
         }
 
-        int after = output.writerIndex();
+        int length = intTool.get(output, begin);
+        explain.add(Info.lengthField(begin, field, length));
 
-        int length = ByteBufUtils.getInt(output, before, lengthSize);
-        String hex = StrUtils.leftPad(Integer.toHexString(length), lengthSize << 1, '0');
-        explain.add(Info.lengthField(before, field, hex, length));
         if (value != null) {
-            hex = ByteBufUtil.hexDump(output.slice(before + lengthSize, after - before - lengthSize));
-            explain.add(Info.field(before + lengthSize, field, hex, value));
+            int end = output.writerIndex();
+            String raw = ByteBufUtil.hexDump(output, begin + lengthSize, end - begin - lengthSize);
+            explain.add(Info.field(begin + lengthSize, field, value, raw));
         }
     }
 

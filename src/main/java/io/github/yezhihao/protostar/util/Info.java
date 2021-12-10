@@ -4,25 +4,26 @@ import io.github.yezhihao.protostar.annotation.Field;
 
 public class Info {
 
-    private int index;
-    private Field field;
-    private String hex;
-    private Object value;
-    private boolean lengthField;
+    private final int index;
+    private final Field field;
+    private final Object value;
+    private final String raw;
+    private final boolean lengthField;
 
-    public static Info field(int index, Field field, String hex, Object value) {
-        Info result = new Info();
-        result.index = index;
-        result.field = field;
-        result.hex = hex;
-        result.value = value;
-        return result;
+    private Info(int index, Field field, Object value, String raw, boolean lengthField) {
+        this.index = index;
+        this.field = field;
+        this.value = value;
+        this.raw = raw;
+        this.lengthField = lengthField;
     }
 
-    public static Info lengthField(int index, Field field, String hex, Object value) {
-        Info result = field(index, field, hex, value);
-        result.lengthField = true;
-        return result;
+    public static Info field(int index, Field field, Object value, String raw) {
+        return new Info(index, field, value, raw, false);
+    }
+
+    public static Info lengthField(int index, Field field, int value) {
+        return new Info(index, field, value, StrUtils.leftPad(Integer.toHexString(value), field.lengthSize() << 1, '0'), true);
     }
 
     public int getIndex() {
@@ -33,8 +34,8 @@ public class Info {
         return field;
     }
 
-    public String getHex() {
-        return hex;
+    public String getRaw() {
+        return raw;
     }
 
     public Object getValue() {

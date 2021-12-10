@@ -2,11 +2,9 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.Info;
 import io.github.yezhihao.protostar.util.IntTool;
-import io.github.yezhihao.protostar.util.StrUtils;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
@@ -30,7 +28,7 @@ public class ArrayTotalField extends BasicField {
         int total = intTool.read(input);
         if (total <= 0)
             return null;
-        Collection value = new ArrayList<>(total);
+        ArrayList value = new ArrayList<>(total);
         for (int i = 0; i < total; i++) {
             Object t = schema.readFrom(input);
             value.add(t);
@@ -52,16 +50,15 @@ public class ArrayTotalField extends BasicField {
 
     @Override
     public Object readFrom(ByteBuf input, Explain explain) {
-        int before = input.readerIndex();
+        int begin = input.readerIndex();
         int total = intTool.read(input);
-        String hex = StrUtils.leftPad(Integer.toHexString(total), lengthSize << 1, '0');
-        explain.add(Info.lengthField(before, field, hex, total));
+        explain.add(Info.lengthField(begin, field, total));
 
         if (total <= 0)
             return null;
-        Collection value = new ArrayList<>(total);
+        ArrayList value = new ArrayList<>(total);
         for (int i = 0; i < total; i++) {
-            Object t = ((RuntimeSchema) schema).readFrom(input, explain);
+            Object t = schema.readFrom(input, explain);
             value.add(t);
         }
         return value;
@@ -69,12 +66,16 @@ public class ArrayTotalField extends BasicField {
 
     @Override
     public void writeTo(ByteBuf output, Object value, Explain explain) {
-        int before = output.readerIndex();
-        int total = value == null ? 0 : ((Collection) value).size();
-        String hex = StrUtils.leftPad(Integer.toHexString(total), lengthSize << 1, '0');
-        explain.add(Info.lengthField(before, field, hex, total));
+        int begin = output.readerIndex();
+        Collection list = (Collection) value;
+        int total = list == null ? 0 : list.size();
+        explain.add(Info.lengthField(begin, field, total));
 
-        this.writeTo(output, value);
+        if (list != null) {
+            for (Object t : list) {
+                schema.writeTo(output, t, explain);
+            }
+        }
     }
 
     @Override

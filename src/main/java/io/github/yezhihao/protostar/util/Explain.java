@@ -32,7 +32,7 @@ public class Explain {
         for (Info info : list) {
             Object value = info.getValue();
             if (value != null)
-                System.out.println(info.getIndex() + "\t" + "[" + info.getHex() + "] " + info.getField().desc() + ": " + StrUtils.toString(value));
+                System.out.println(info.getIndex() + "\t" + "[" + info.getRaw() + "] " + info.getField().desc() + ": " + StrUtils.toString(value));
         }
     }
 }

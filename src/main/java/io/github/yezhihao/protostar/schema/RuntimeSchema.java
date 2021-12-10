@@ -114,14 +114,6 @@ public class RuntimeSchema<T> implements Schema<T> {
         }
     }
 
-    public T readFrom(ByteBuf input, int length, Explain explain) {
-        int writerIndex = input.writerIndex();
-        input.writerIndex(input.readerIndex() + length);
-        T result = readFrom(input, explain);
-        input.writerIndex(writerIndex);
-        return result;
-    }
-
     @Override
     public T readFrom(ByteBuf input, int length) {
         int writerIndex = input.writerIndex();
@@ -131,6 +123,16 @@ public class RuntimeSchema<T> implements Schema<T> {
         return result;
     }
 
+    @Override
+    public T readFrom(ByteBuf input, int length, Explain explain) {
+        int writerIndex = input.writerIndex();
+        input.writerIndex(input.readerIndex() + length);
+        T result = readFrom(input, explain);
+        input.writerIndex(writerIndex);
+        return result;
+    }
+
+    @Override
     public void writeTo(ByteBuf output, T message) {
         BasicField field = null;
         try {
@@ -138,6 +140,20 @@ public class RuntimeSchema<T> implements Schema<T> {
                 field = fields[i];
                 Object value = field.get(message);
                 field.writeTo(output, value);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Write failed " + typeClass.getName() + field, e);
+        }
+    }
+
+    @Override
+    public void writeTo(ByteBuf output, T message, Explain explain) {
+        BasicField field = null;
+        try {
+            for (int i = 0; i < fields.length; i++) {
+                field = fields[i];
+                Object value = field.get(message);
+                field.writeTo(output, value, explain);
             }
         } catch (Exception e) {
             throw new RuntimeException("Write failed " + typeClass.getName() + field, e);

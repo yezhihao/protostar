@@ -2,6 +2,7 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
+import io.github.yezhihao.protostar.util.Explain;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
@@ -32,6 +33,26 @@ public class ArrayField extends BasicField {
         if (list != null && !list.isEmpty()) {
             for (Object t : list) {
                 schema.writeTo(output, t);
+            }
+        }
+    }
+
+    @Override
+    public Object readFrom(ByteBuf input, Explain explain) {
+        Collection value = new ArrayList<>();
+        while (input.isReadable()) {
+            Object t = schema.readFrom(input, explain);
+            value.add(t);
+        }
+        return value;
+    }
+
+    @Override
+    public void writeTo(ByteBuf output, Object value, Explain explain) {
+        Collection list = (Collection) value;
+        if (list != null && !list.isEmpty()) {
+            for (Object t : list) {
+                schema.writeTo(output, t, explain);
             }
         }
     }
