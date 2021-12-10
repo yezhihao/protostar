@@ -6,31 +6,27 @@ import io.netty.buffer.ByteBuf;
 
 public class ArraySchema {
 
+    public static final Schema BYTE_ARRAY = new ByteArray();
+    public static final Schema SHORT_ARRAY = new ShortArray();
+    public static final Schema INT_ARRAY = new IntArray();
+    public static final Schema LONG_ARRAY = new LongArray();
+
     public static Schema getSchema(DataType dataType) {
-        Schema schema;
         switch (dataType) {
             case BYTE:
-                schema = ByteArraySchema.INSTANCE;
-                break;
+                return BYTE_ARRAY;
             case WORD:
-                schema = ShortArraySchema.INSTANCE;
-                break;
+                return SHORT_ARRAY;
             case DWORD:
-                schema = IntArraySchema.INSTANCE;
-                break;
+                return INT_ARRAY;
             case QWORD:
-                schema = LongArraySchema.INSTANCE;
-                break;
-            default:
-                throw new RuntimeException("不支持的类型转换");
+                return LONG_ARRAY;
         }
-        return schema;
+        return null;
     }
 
-    public static class ByteArraySchema implements Schema<byte[]> {
-        public static final Schema INSTANCE = new ByteArraySchema();
-
-        private ByteArraySchema() {
+    public static class ByteArray implements Schema<byte[]> {
+        private ByteArray() {
         }
 
         @Override
@@ -60,10 +56,8 @@ public class ArraySchema {
         }
     }
 
-    public static class ShortArraySchema implements Schema<short[]> {
-        public static final Schema INSTANCE = new ShortArraySchema();
-
-        private ShortArraySchema() {
+    public static class ShortArray implements Schema<short[]> {
+        private ShortArray() {
         }
 
         @Override
@@ -101,10 +95,8 @@ public class ArraySchema {
         }
     }
 
-    public static class IntArraySchema implements Schema<int[]> {
-        public static final Schema INSTANCE = new IntArraySchema();
-
-        private IntArraySchema() {
+    public static class IntArray implements Schema<int[]> {
+        private IntArray() {
         }
 
         @Override
@@ -142,10 +134,8 @@ public class ArraySchema {
         }
     }
 
-    public static class LongArraySchema implements Schema<long[]> {
-        public static final Schema INSTANCE = new LongArraySchema();
-
-        private LongArraySchema() {
+    public static class LongArray implements Schema<long[]> {
+        private LongArray() {
         }
 
         @Override

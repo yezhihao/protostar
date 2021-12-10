@@ -62,8 +62,8 @@ public class Test {
         private int id;
         @Field(index = 3, type = DataType.BCD8421, desc = "日期", version = {0, 1})
         private LocalDateTime dateTime;
-        @Field(index = 4, type = DataType.MAP, desc = "属性", version = 0, converter = AttributeConverter.class)
-        @Field(index = 4, type = DataType.MAP, desc = "属性", version = 1, converter = AttributeConverterV2.class)
+        @Field(index = 4, type = DataType.MAP, desc = "属性", version = 0, converter = AttributeSchema.class)
+        @Field(index = 4, type = DataType.MAP, desc = "属性", version = 1, converter = AttributeSchemaV2.class)
         private Map<Integer, Object> attributes;
 
         public String getName() {

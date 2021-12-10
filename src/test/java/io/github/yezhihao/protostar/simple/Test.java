@@ -1,11 +1,10 @@
 package io.github.yezhihao.protostar.simple;
 
 import io.github.yezhihao.protostar.DataType;
-import io.github.yezhihao.protostar.FieldFactory;
 import io.github.yezhihao.protostar.ProtostarUtil;
 import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
+import io.github.yezhihao.protostar.util.Explain;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -16,8 +15,6 @@ import java.util.Map;
 public class Test {
 
     public static void main(String[] args) {
-        FieldFactory.EXPLAIN = true;
-
         Map<Integer, RuntimeSchema> bodySchemas = ProtostarUtil.getRuntimeSchema(Foo.class);
         RuntimeSchema<Foo> bodySchema = bodySchemas.get(0);
 

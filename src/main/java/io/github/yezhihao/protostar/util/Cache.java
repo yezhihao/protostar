@@ -1,7 +1,8 @@
 package io.github.yezhihao.protostar.util;
 
 import java.util.HashMap;
-import java.util.function.Function;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @author yezhihao
@@ -9,10 +10,14 @@ import java.util.function.Function;
  */
 public class Cache<K, V> {
 
-    private volatile HashMap<K, V> cache;
+    private volatile Map<K, V> cache;
 
     public Cache() {
         this(32);
+    }
+
+    public Cache(Map<K, V> cache) {
+        this.cache = cache;
     }
 
     public Cache(int initialCapacity) {
@@ -23,13 +28,13 @@ public class Cache<K, V> {
         return cache.get(key);
     }
 
-    public V get(K key, Function<K, V> function) {
+    public V get(K key, Supplier<V> function) {
         V value = cache.get(key);
         if (value == null) {
             synchronized (cache) {
                 value = cache.get(key);
                 if (value == null) {
-                    cache.put(key, value = function.apply(key));
+                    cache.put(key, value = function.get());
                 }
             }
         }

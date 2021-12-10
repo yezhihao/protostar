@@ -1,7 +1,7 @@
 package io.github.yezhihao.protostar.annotation;
 
 import io.github.yezhihao.protostar.DataType;
-import io.github.yezhihao.protostar.converter.Converter;
+import io.github.yezhihao.protostar.Schema;
 
 import java.lang.annotation.*;
 
@@ -36,5 +36,5 @@ public @interface Field {
 
     int[] version() default {-1, 0, 1};
 
-    Class<? extends Converter> converter() default Converter.class;
+    Class<? extends Schema> converter() default Schema.class;
 }

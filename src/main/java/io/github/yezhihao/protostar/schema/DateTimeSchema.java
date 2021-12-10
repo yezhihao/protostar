@@ -10,8 +10,10 @@ import static io.github.yezhihao.protostar.util.DateTimeUtils.Bytes;
 
 public class DateTimeSchema {
 
+    public static final Schema BCD = new BCD();
+    public static final Schema BYTES = new BYTES();
+
     public static class BCD implements Schema<LocalDateTime> {
-        public static final Schema INSTANCE = new BCD();
 
         private BCD() {
         }
@@ -42,7 +44,6 @@ public class DateTimeSchema {
     }
 
     public static class BYTES implements Schema<LocalDateTime> {
-        public static final Schema INSTANCE = new BYTES();
 
         private BYTES() {
         }

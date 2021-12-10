@@ -16,12 +16,15 @@ public class StringSchema {
 
     private static final Logger log = LoggerFactory.getLogger(StringSchema.class.getSimpleName());
 
+    public static final Schema BCD = new BCD();
+    public static final Schema HEX = new HEX();
+
     public static class Chars implements Schema<String> {
         private static final Cache<String, Chars> cache = new Cache<>();
 
         public static Chars getInstance(final byte pad, final String charset) {
             String key = new StringBuilder(10).append((char) pad).append('/').append(charset.toLowerCase()).toString();
-            return cache.get(key, k -> new Chars(pad, charset));
+            return cache.get(key, () -> new Chars(pad, charset));
         }
 
         private final byte pad;
@@ -83,8 +86,6 @@ public class StringSchema {
     }
 
     public static class BCD implements Schema<String> {
-        public static final Schema INSTANCE = new BCD();
-
         private BCD() {
         }
 
@@ -127,8 +128,6 @@ public class StringSchema {
     }
 
     public static class HEX implements Schema<String> {
-        public static final Schema INSTANCE = new HEX();
-
         private HEX() {
         }
 

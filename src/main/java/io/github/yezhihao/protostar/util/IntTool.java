@@ -30,7 +30,7 @@ public interface IntTool {
     IntTool BYTE = new IntTool() {
         @Override
         public int get(ByteBuf in, int i) {
-            return in.getByte(i);
+            return in.getUnsignedByte(i);
         }
 
         @Override
@@ -40,7 +40,7 @@ public interface IntTool {
 
         @Override
         public int read(ByteBuf in) {
-            return in.readByte();
+            return in.readUnsignedByte();
         }
 
         @Override
@@ -51,7 +51,7 @@ public interface IntTool {
     IntTool WORD = new IntTool() {
         @Override
         public int get(ByteBuf in, int i) {
-            return in.getShort(i);
+            return in.getUnsignedShort(i);
         }
 
         @Override
@@ -61,7 +61,7 @@ public interface IntTool {
 
         @Override
         public int read(ByteBuf in) {
-            return in.readShort();
+            return in.readUnsignedShort();
         }
 
         @Override
@@ -72,7 +72,7 @@ public interface IntTool {
     IntTool MEDIUM = new IntTool() {
         @Override
         public int get(ByteBuf in, int i) {
-            return in.getMedium(i);
+            return in.getUnsignedMedium(i);
         }
 
         @Override
@@ -82,7 +82,7 @@ public interface IntTool {
 
         @Override
         public int read(ByteBuf in) {
-            return in.readMedium();
+            return in.readUnsignedMedium();
         }
 
         @Override

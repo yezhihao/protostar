@@ -5,6 +5,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
 
 /**
@@ -13,7 +14,7 @@ import java.util.function.BiConsumer;
  */
 public class ToStringBuilder {
 
-    private static Cache<String, Builder[]> CACHE = new Cache<>();
+    private static Cache<String, Builder[]> CACHE = new Cache<>(new WeakHashMap<>());
 
     public static String toString(Object object) {
         return toString(null, object, true, (String[]) null);
@@ -49,7 +50,7 @@ public class ToStringBuilder {
     }
 
     private static Builder[] getBuilders(Class<?> typeClass, String... ignores) {
-        return CACHE.get(typeClass.getName(), s -> {
+        return CACHE.get(typeClass.getName(), () -> {
             Method[] methods = typeClass.getMethods();
             ArrayList<Builder> result = new ArrayList<>(methods.length);
 
