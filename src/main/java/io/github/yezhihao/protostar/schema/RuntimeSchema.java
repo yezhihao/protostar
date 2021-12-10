@@ -2,6 +2,7 @@ package io.github.yezhihao.protostar.schema;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.field.BasicField;
+import io.github.yezhihao.protostar.util.Explain;
 import io.netty.buffer.ByteBuf;
 
 import java.lang.reflect.Constructor;
@@ -23,10 +24,13 @@ public class RuntimeSchema<T> implements Schema<T> {
         this.typeClass = typeClass;
         this.version = version;
         this.fields = fields;
-        BasicField lastField = fields[fields.length - 1];
-        int lastIndex = lastField.index();
-        int lastLength = lastField.length() < 0 ? 256 : lastField.length();
-        this.length = lastIndex + lastLength;
+        int length = 0;
+        for (BasicField field : fields) {
+            int t = field.length();
+            if (t < 0) t = 32;
+            length += t;
+        }
+        this.length = length;
         try {
             this.constructor = typeClass.getDeclaredConstructor((Class[]) null);
         } catch (Exception e) {
@@ -49,7 +53,24 @@ public class RuntimeSchema<T> implements Schema<T> {
                 if (!input.isReadable())
                     break;
                 field = fields[i];
-                field.readFrom(input, result);
+                Object value = field.readFrom(input);
+                field.set(result, value);
+            }
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("Read failed " + typeClass.getName() + field, e);
+        }
+    }
+
+    public T mergeFrom(ByteBuf input, T result, Explain explain) {
+        BasicField field = null;
+        try {
+            for (int i = 0; i < fields.length; i++) {
+                if (!input.isReadable())
+                    break;
+                field = fields[i];
+                Object value = field.readFrom(input, explain);
+                field.set(result, value);
             }
             return result;
         } catch (Exception e) {
@@ -65,7 +86,8 @@ public class RuntimeSchema<T> implements Schema<T> {
                 if (!input.isReadable())
                     break;
                 field = fields[i];
-                field.readFrom(input, result);
+                Object value = field.readFrom(input);
+                field.set(result, value);
             }
             return result;
         } catch (Exception e) {
@@ -73,12 +95,49 @@ public class RuntimeSchema<T> implements Schema<T> {
         }
     }
 
+
+    public T readFrom(ByteBuf input, Explain explain) {
+        BasicField field = null;
+        try {
+            T result = constructor.newInstance((Object[]) null);
+            for (int i = 0; i < fields.length; i++) {
+                if (!input.isReadable())
+                    break;
+                field = fields[i];
+
+                Object value = field.readFrom(input, explain);
+                field.set(result, value);
+            }
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("Read failed " + typeClass.getName() + field, e);
+        }
+    }
+
+    public T readFrom(ByteBuf input, int length, Explain explain) {
+        int writerIndex = input.writerIndex();
+        input.writerIndex(input.readerIndex() + length);
+        T result = readFrom(input, explain);
+        input.writerIndex(writerIndex);
+        return result;
+    }
+
+    @Override
+    public T readFrom(ByteBuf input, int length) {
+        int writerIndex = input.writerIndex();
+        input.writerIndex(input.readerIndex() + length);
+        T result = readFrom(input);
+        input.writerIndex(writerIndex);
+        return result;
+    }
+
     public void writeTo(ByteBuf output, T message) {
         BasicField field = null;
         try {
             for (int i = 0; i < fields.length; i++) {
                 field = fields[i];
-                field.writeTo(output, message);
+                Object value = field.get(message);
+                field.writeTo(output, value);
             }
         } catch (Exception e) {
             throw new RuntimeException("Write failed " + typeClass.getName() + field, e);

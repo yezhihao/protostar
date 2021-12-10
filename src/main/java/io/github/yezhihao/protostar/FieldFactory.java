@@ -59,12 +59,12 @@ public abstract class FieldFactory {
                 break;
             case OBJ:
                 if (schema != null)
-                    fieldSchema = ObjectSchema.getInstance(schema);
+                    fieldSchema = schema;
                 else
                     fieldSchema = ConvertSchema.getInstance(field.converter());
                 break;
             case LIST:
-                fieldSchema = CollectionSchema.getInstance(schema);
+                fieldSchema = schema;
                 break;
             case MAP:
                 fieldSchema = ConvertSchema.getInstance(field.converter());
@@ -74,30 +74,18 @@ public abstract class FieldFactory {
         if (fieldSchema == null)
             throw new IllegalArgumentException("不支持的类型转换 field:" + f.getName() + ",desc:" + field.desc() + "[" + dataType + " to " + typeClass.getSimpleName() + "]");
 
-        BasicField result;
-        if (EXPLAIN) {
-            if (field.lengthSize() > 0) {
-                if (fieldSchema instanceof CollectionSchema)
-                    result = new ArrayTotalField.Logger(field, f, fieldSchema);
-                else
-                    result = new DynamicLengthField.Logger(field, f, fieldSchema);
-            } else if (field.length() > 0) {
-                result = new FixedLengthField.Logger(field, f, fieldSchema);
-            } else {
-                result = new FixedField.Logger(field, f, fieldSchema);
-            }
+        if (field.length() > 0) {
+            return new FixedLengthField(field, f, fieldSchema);
+        } else if (field.lengthSize() > 0) {
+            if (DataType.LIST == dataType)
+                return new ArrayTotalField(field, f, fieldSchema);
+            else
+                return new DynamicLengthField(field, f, fieldSchema);
         } else {
-            if (field.lengthSize() > 0) {
-                if (fieldSchema instanceof CollectionSchema)
-                    result = new ArrayTotalField(field, f, fieldSchema);
-                else
-                    result = new DynamicLengthField(field, f, fieldSchema);
-            } else if (field.length() > 0) {
-                result = new FixedLengthField(field, f, fieldSchema);
-            } else {
-                result = new FixedField(field, f, fieldSchema);
-            }
+            if (DataType.LIST == dataType)
+                return new ArrayField(field, f, fieldSchema);
+            else
+                return new BasicField(field, f, fieldSchema);
         }
-        return result;
     }
 }

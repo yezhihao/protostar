@@ -2,8 +2,8 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.util.ByteBufUtils;
-import io.github.yezhihao.protostar.util.StrUtils;
+import io.github.yezhihao.protostar.schema.RuntimeSchema;
+import io.github.yezhihao.protostar.util.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 
@@ -14,88 +14,75 @@ import io.netty.buffer.ByteBufUtil;
  */
 public class DynamicLengthField<T> extends BasicField<T> {
 
-    protected final Schema schema;
+    private final IntTool intTool;
 
-    protected final int lengthSize;
-
-    public DynamicLengthField(Field field, java.lang.reflect.Field f, Schema schema) {
-        super(field, f);
-        this.schema = schema;
-        this.lengthSize = field.lengthSize();
+    public DynamicLengthField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
+        super(field, f, schema);
+        this.intTool = IntTool.getInstance(field.lengthSize());
     }
 
-    public boolean readFrom(ByteBuf input, Object message) throws Exception {
-        int length = ByteBufUtils.readInt(input, lengthSize);
+    public T readFrom(ByteBuf input) {
+        int length = intTool.read(input);
         if (!input.isReadable(length))
-            return false;
-        Object value = schema.readFrom(input, length);
-        f.set(message, value);
-        return true;
+            return null;
+        return schema.readFrom(input, length);
     }
 
-    public void writeTo(ByteBuf output, Object message) throws Exception {
-        Object value = f.get(message);
+    public void writeTo(ByteBuf output, T value) {
+        int begin = output.writerIndex();
+        intTool.write(output, 0);
         if (value != null) {
-            int begin = output.writerIndex();
-            ByteBufUtils.writeInt(output, lengthSize, 0);
             schema.writeTo(output, value);
             int length = output.writerIndex() - begin - lengthSize;
-            ByteBufUtils.setInt(output, begin, lengthSize, length);
+            intTool.set(output, begin, length);
         }
     }
 
     @Override
-    public int compareTo(BasicField<T> that) {
-        int r = Integer.compare(this.index, that.index);
+    public T readFrom(ByteBuf input, Explain explain) {
+        int before = input.readerIndex();
+
+        int length = intTool.read(input);
+        String hex = StrUtils.leftPad(Integer.toHexString(length), lengthSize << 1, '0');
+        explain.add(Info.lengthField(before, field, hex, length));
+
+        if (!input.isReadable(length))
+            return null;
+        T value = ((RuntimeSchema<T>) schema).readFrom(input, length, explain);
+
+        int after = input.readerIndex();
+        hex = ByteBufUtil.hexDump(input.slice(before + lengthSize, after - before - lengthSize));
+        explain.add(Info.field(before + lengthSize, field, hex, value));
+        return value;
+    }
+
+    @Override
+    public void writeTo(ByteBuf output, T value, Explain explain) {
+        int before = output.writerIndex();
+
+        intTool.write(output, 0);
+        if (value != null) {
+            schema.writeTo(output, value);
+            int length = output.writerIndex() - before - lengthSize;
+            intTool.set(output, before, length);
+        }
+
+        int after = output.writerIndex();
+
+        int length = ByteBufUtils.getInt(output, before, lengthSize);
+        String hex = StrUtils.leftPad(Integer.toHexString(length), lengthSize << 1, '0');
+        explain.add(Info.lengthField(before, field, hex, length));
+        if (value != null) {
+            hex = ByteBufUtil.hexDump(output.slice(before + lengthSize, after - before - lengthSize));
+            explain.add(Info.field(before + lengthSize, field, hex, value));
+        }
+    }
+
+    @Override
+    public int compareTo(BasicField that) {
+        int r = super.compareTo(that);
         if (r == 0)
             r = (that instanceof DynamicLengthField) ? 1 : -1;
         return r;
-    }
-
-    public static class Logger<T> extends DynamicLengthField<T> {
-
-        public Logger(Field field, java.lang.reflect.Field f, Schema<T> schema) {
-            super(field, f, schema);
-        }
-
-        public boolean readFrom(ByteBuf input, Object message) throws Exception {
-            int before = input.readerIndex();
-
-            int length = ByteBufUtils.readInt(input, lengthSize);
-            String hex = StrUtils.leftPad(Integer.toHexString(length), lengthSize << 1, '0');
-            println(this.index, this.field.desc() + "长度", hex, length);
-
-            if (!input.isReadable(length))
-                return false;
-            Object value = schema.readFrom(input, length);
-            f.set(message, value);
-
-            int after = input.readerIndex();
-            hex = ByteBufUtil.hexDump(input.slice(before + lengthSize, after - before - lengthSize));
-            println(this.index + lengthSize, this.field.desc(), hex, value);
-            return true;
-        }
-
-        public void writeTo(ByteBuf output, Object message) throws Exception {
-            int before = output.writerIndex();
-
-            Object value = f.get(message);
-            if (value != null) {
-                int begin = output.writerIndex();
-                ByteBufUtils.writeInt(output, lengthSize, 0);
-                schema.writeTo(output, value);
-                int length = output.writerIndex() - begin - lengthSize;
-                ByteBufUtils.setInt(output, begin, lengthSize, length);
-            }
-
-            int after = output.writerIndex();
-
-            int length = ByteBufUtils.getInt(output, before, lengthSize);
-            String hex = StrUtils.leftPad(Integer.toHexString(length), lengthSize << 1, '0');
-            println(this.index, this.field.desc() + "长度", hex, length);
-
-            hex = ByteBufUtil.hexDump(output.slice(before + lengthSize, after - before - lengthSize));
-            println(this.index + lengthSize, this.field.desc(), hex, value);
-        }
     }
 }

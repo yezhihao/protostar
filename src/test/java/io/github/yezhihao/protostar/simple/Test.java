@@ -4,6 +4,7 @@ import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.FieldFactory;
 import io.github.yezhihao.protostar.ProtostarUtil;
 import io.github.yezhihao.protostar.annotation.Field;
+import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -33,8 +34,11 @@ public class Test {
 
 
         Foo foo1 = new Foo();
-        headSchema.mergeFrom(buffer, foo1);
+
+        Explain explain = new Explain();
+        headSchema.mergeFrom(buffer, foo1, explain);
         bodySchema.mergeFrom(buffer, foo1);
+        explain.println();
         System.out.println(foo);
     }
 
