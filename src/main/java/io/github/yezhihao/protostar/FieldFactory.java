@@ -78,7 +78,7 @@ public abstract class FieldFactory {
         if (EXPLAIN) {
             if (field.lengthSize() > 0) {
                 if (fieldSchema instanceof CollectionSchema)
-                    result = new DynamicTotalField.Logger(field, f, fieldSchema);
+                    result = new ArrayTotalField.Logger(field, f, fieldSchema);
                 else
                     result = new DynamicLengthField.Logger(field, f, fieldSchema);
             } else if (field.length() > 0) {
@@ -89,7 +89,7 @@ public abstract class FieldFactory {
         } else {
             if (field.lengthSize() > 0) {
                 if (fieldSchema instanceof CollectionSchema)
-                    result = new DynamicTotalField(field, f, fieldSchema);
+                    result = new ArrayTotalField(field, f, fieldSchema);
                 else
                     result = new DynamicLengthField(field, f, fieldSchema);
             } else if (field.length() > 0) {

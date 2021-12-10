@@ -13,13 +13,13 @@ import java.util.Collection;
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */
-public class DynamicTotalField<T> extends BasicField<T> {
+public class ArrayTotalField<T> extends BasicField<T> {
 
     protected final Schema<Collection<?>> schema;
 
     protected final int totalSize;
 
-    public DynamicTotalField(Field field, java.lang.reflect.Field f, Schema schema) {
+    public ArrayTotalField(Field field, java.lang.reflect.Field f, Schema schema) {
         super(field, f);
         this.schema = schema;
         this.totalSize = field.lengthSize();
@@ -40,11 +40,11 @@ public class DynamicTotalField<T> extends BasicField<T> {
     public int compareTo(BasicField<T> that) {
         int r = Integer.compare(this.index, that.index);
         if (r == 0)
-            r = (that instanceof DynamicTotalField) ? 1 : -1;
+            r = (that instanceof ArrayTotalField) ? 1 : -1;
         return r;
     }
 
-    public static class Logger<T> extends DynamicTotalField<T> {
+    public static class Logger<T> extends ArrayTotalField<T> {
 
         public Logger(Field field, java.lang.reflect.Field f, Schema<T> schema) {
             super(field, f, schema);
