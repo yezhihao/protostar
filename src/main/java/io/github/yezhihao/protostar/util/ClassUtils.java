@@ -2,11 +2,11 @@ package io.github.yezhihao.protostar.util;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -103,5 +103,15 @@ public class ClassUtils {
 
     public static ClassLoader getClassLoader() {
         return Thread.currentThread().getContextClassLoader();
+    }
+
+    public static Class getGenericType(Field f) {
+        Class typeClass = f.getType();
+        if (Collection.class.isAssignableFrom(typeClass)) {
+            return (Class) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
+        } else if (Map.class.isAssignableFrom(typeClass)) {
+            return (Class) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[1];
+        }
+        return typeClass;
     }
 }

@@ -1,29 +1,17 @@
 package io.github.yezhihao.protostar.schema;
 
-import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.Schema;
 import io.netty.buffer.ByteBuf;
 
 public class ArraySchema {
 
-    public static final Schema BYTE_ARRAY = new ByteArray();
-    public static final Schema SHORT_ARRAY = new ShortArray();
-    public static final Schema INT_ARRAY = new IntArray();
-    public static final Schema LONG_ARRAY = new LongArray();
-
-    public static Schema getSchema(DataType dataType) {
-        switch (dataType) {
-            case BYTE:
-                return BYTE_ARRAY;
-            case WORD:
-                return SHORT_ARRAY;
-            case DWORD:
-                return INT_ARRAY;
-            case QWORD:
-                return LONG_ARRAY;
-        }
-        return null;
-    }
+    public static final Schema CHARS = new CharArray();
+    public static final Schema BYTES = new ByteArray();
+    public static final Schema SHORTS = new ShortArray();
+    public static final Schema INTS = new IntArray();
+    public static final Schema FLOATS = new FloatArray();
+    public static final Schema LONGS = new LongArray();
+    public static final Schema DOUBLES = new DoubleArray();
 
     public static class ByteArray implements Schema<byte[]> {
         private ByteArray() {
@@ -53,6 +41,45 @@ public class ArraySchema {
         @Override
         public void writeTo(ByteBuf output, int length, byte[] array) {
             output.writeBytes(array, 0, length);
+        }
+    }
+
+    public static class CharArray implements Schema<char[]> {
+        private CharArray() {
+        }
+
+        @Override
+        public char[] readFrom(ByteBuf input) {
+            int total = input.readableBytes() >> 1;
+            char[] array = new char[total];
+            for (int i = 0; i < total; i++)
+                array[i] = input.readChar();
+            return array;
+        }
+
+        @Override
+        public char[] readFrom(ByteBuf input, int length) {
+            if (length < 0)
+                length = input.readableBytes();
+            int total = length >> 1;
+            char[] array = new char[total];
+            for (int i = 0; i < total; i++)
+                array[i] = input.readChar();
+            return array;
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, char[] array) {
+            for (int i = 0; i < array.length; i++) {
+                output.writeChar(array[i]);
+            }
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, int length, char[] array) {
+            for (int i = 0, total = length >> 1; i < total; i++) {
+                output.writeChar(array[i]);
+            }
         }
     }
 
@@ -169,6 +196,84 @@ public class ArraySchema {
         public void writeTo(ByteBuf output, int length, long[] array) {
             for (int i = 0, total = length >> 3; i < total; i++) {
                 output.writeLong(array[i]);
+            }
+        }
+    }
+
+    public static class FloatArray implements Schema<float[]> {
+        private FloatArray() {
+        }
+
+        @Override
+        public float[] readFrom(ByteBuf input) {
+            int total = input.readableBytes() >> 2;
+            float[] array = new float[total];
+            for (int i = 0; i < total; i++)
+                array[i] = input.readFloat();
+            return array;
+        }
+
+        @Override
+        public float[] readFrom(ByteBuf input, int length) {
+            if (length < 0)
+                length = input.readableBytes();
+            int total = length >> 2;
+            float[] array = new float[total];
+            for (int i = 0; i < total; i++)
+                array[i] = input.readFloat();
+            return array;
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, float[] array) {
+            for (int i = 0; i < array.length; i++) {
+                output.writeFloat(array[i]);
+            }
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, int length, float[] array) {
+            for (int i = 0, total = length >> 2; i < total; i++) {
+                output.writeFloat(array[i]);
+            }
+        }
+    }
+
+    public static class DoubleArray implements Schema<double[]> {
+        private DoubleArray() {
+        }
+
+        @Override
+        public double[] readFrom(ByteBuf input) {
+            int total = input.readableBytes() >> 3;
+            double[] array = new double[total];
+            for (int i = 0; i < total; i++)
+                array[i] = input.readDouble();
+            return array;
+        }
+
+        @Override
+        public double[] readFrom(ByteBuf input, int length) {
+            if (length < 0)
+                length = input.readableBytes();
+            int total = length >> 3;
+            double[] array = new double[total];
+            for (int i = 0; i < total; i++)
+                array[i] = input.readDouble();
+            return array;
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, double[] array) {
+            for (int i = 0; i < array.length; i++) {
+                output.writeDouble(array[i]);
+            }
+        }
+
+        @Override
+        public void writeTo(ByteBuf output, int length, double[] array) {
+            for (int i = 0, total = length >> 3; i < total; i++) {
+                output.writeDouble(array[i]);
             }
         }
     }

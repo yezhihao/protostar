@@ -5,8 +5,9 @@ import io.github.yezhihao.protostar.annotation.Fs;
 import io.github.yezhihao.protostar.annotation.MergeSuperclass;
 import io.github.yezhihao.protostar.field.BasicField;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
+import io.github.yezhihao.protostar.schema.SchemaRegistry;
+import io.github.yezhihao.protostar.util.ClassUtils;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 /**
@@ -101,22 +102,19 @@ public class ProtostarUtil {
     private static void fillField(Map<String, Map<Integer, RuntimeSchema>> root, Map<Integer, List<BasicField>> multiVersionFields, java.lang.reflect.Field f, Field field) {
         Class typeClass = f.getType();
 
-        BasicField value;
-        int[] versions = field.version();
-
-        if (field.type() == DataType.OBJ || field.type() == DataType.LIST) {
-            if (Collection.class.isAssignableFrom(typeClass))
-                typeClass = (Class) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
-            getRuntimeSchema(root, typeClass);
-            for (int ver : versions) {
-                Map<Integer, RuntimeSchema> schemaMap = root.getOrDefault(typeClass.getName(), Collections.EMPTY_MAP);
-                RuntimeSchema schema = schemaMap.get(ver);
-                value = FieldFactory.create(field, f, schema);
+        Schema schema = SchemaRegistry.get(typeClass, field);
+        if (schema != null) {
+            BasicField value = FieldFactory.create(field, f, schema);
+            for (int ver : field.version()) {
                 multiVersionFields.get(ver).add(value);
             }
         } else {
-            value = FieldFactory.create(field, f);
-            for (int ver : versions) {
+            typeClass = ClassUtils.getGenericType(f);
+
+            Map<Integer, RuntimeSchema> schemaMap = Optional.ofNullable(getRuntimeSchema(root, typeClass)).orElse(Collections.EMPTY_MAP);
+            for (int ver : field.version()) {
+                schema = schemaMap.get(ver);
+                BasicField value = FieldFactory.create(field, f, schema);
                 multiVersionFields.get(ver).add(value);
             }
         }

@@ -10,28 +10,27 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 
 public class StringSchema {
 
     private static final Logger log = LoggerFactory.getLogger(StringSchema.class.getSimpleName());
+    private static final Cache<String, Schema> cache = new Cache<>();
 
-    public static final Schema BCD = new BCD();
-    public static final Schema HEX = new HEX();
+    public static final Schema<String> ASCII = StringSchema.getInstance("US-ASCII");
+    public static final Schema<String> UTF8 = StringSchema.getInstance("UTF-8");
+    public static final Schema<String> GBK = StringSchema.getInstance("GBK");
+    public static final Schema<String> BCD = cache.put("BCD", new BCD());
+    public static final Schema<String> HEX = cache.put("HEX", new HEX());
 
-    public static class Chars implements Schema<String> {
-        private static final Cache<String, Chars> cache = new Cache<>();
+    public static Schema<String> getInstance(final String charset) {
+        return cache.get(charset.toUpperCase(), () -> new STR(charset));
+    }
 
-        public static Chars getInstance(final byte pad, final String charset) {
-            String key = new StringBuilder(10).append((char) pad).append('/').append(charset.toLowerCase()).toString();
-            return cache.get(key, () -> new Chars(pad, charset));
-        }
-
-        private final byte pad;
+    public static class STR implements Schema<String> {
+        private final byte pad = 0;
         private final Charset charset;
 
-        private Chars(byte pad, String charset) {
-            this.pad = pad;
+        private STR(String charset) {
             this.charset = Charset.forName(charset);
         }
 
@@ -68,8 +67,6 @@ public class StringSchema {
 
                 if (srcPos > 0) {
                     byte[] pads = new byte[srcPos];
-                    if (pad != 0x00)
-                        Arrays.fill(pads, pad);
                     output.writeBytes(pads);
                     output.writeBytes(buffer);
                 } else if (srcPos < 0) {

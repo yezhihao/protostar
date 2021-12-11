@@ -3,8 +3,9 @@ package io.github.yezhihao.protostar;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.field.BasicField;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
+import io.github.yezhihao.protostar.schema.SchemaRegistry;
+import io.github.yezhihao.protostar.util.ClassUtils;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 /**
@@ -64,17 +65,15 @@ public abstract class SingleVersionUtil {
     private static void fillField(Map<Object, Schema> root, List<BasicField> fields, java.lang.reflect.Field f, Field field) {
         Class typeClass = f.getType();
 
-        BasicField value;
-
-        if (field.type() == DataType.OBJ || field.type() == DataType.LIST) {
-            if (Collection.class.isAssignableFrom(typeClass))
-                typeClass = (Class) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
-            getRuntimeSchema(root, typeClass);
-            Schema schema = root.get(typeClass.getName());
-            value = FieldFactory.create(field, f, schema);
+        Schema schema = SchemaRegistry.get(typeClass, field);
+        if (schema != null) {
+            BasicField value = FieldFactory.create(field, f, schema);
             fields.add(value);
         } else {
-            value = FieldFactory.create(field, f);
+            typeClass = ClassUtils.getGenericType(f);
+
+            schema = getRuntimeSchema(root, typeClass);
+            BasicField value = FieldFactory.create(field, f, schema);
             fields.add(value);
         }
     }

@@ -91,64 +91,70 @@ public class DateTimeUtils {
 
     public static class Bytes {
 
-        /** 时间转BCD (yyMMddHHmmss) */
+        /** 时间转byte[] (yyMMddHHmmss) */
         public static byte[] from(LocalDateTime dateTime) {
-            byte[] bcd = new byte[6];
-            bcd[0] = (byte) (dateTime.getYear() % 100);
-            bcd[1] = (byte) dateTime.getMonthValue();
-            bcd[2] = (byte) dateTime.getDayOfMonth();
-            bcd[3] = (byte) dateTime.getHour();
-            bcd[4] = (byte) dateTime.getMinute();
-            bcd[5] = (byte) dateTime.getSecond();
-            return bcd;
+            byte[] bytes = new byte[6];
+            bytes[0] = (byte) (dateTime.getYear() % 100);
+            bytes[1] = (byte) dateTime.getMonthValue();
+            bytes[2] = (byte) dateTime.getDayOfMonth();
+            bytes[3] = (byte) dateTime.getHour();
+            bytes[4] = (byte) dateTime.getMinute();
+            bytes[5] = (byte) dateTime.getSecond();
+            return bytes;
         }
 
-        /** BCD转时间 (yyMMddHHmmss) */
-        public static LocalDateTime toDateTime(byte[] bcd) {
-            int i = bcd.length - 1;
-            int year = HUNDRED_YEAR + bcd[i - 5];
+        /** byte[]转时间 (yyMMddHHmmss) */
+        public static LocalDateTime toDateTime(byte[] bytes) {
+            int year = HUNDRED_YEAR + bytes[0];
             if (year < YEAR_RANGE)
                 year += 100;
             try {
                 return LocalDateTime.of(
                         year,
-                        bcd[i - 4],
-                        bcd[i - 3],
-                        bcd[i - 2],
-                        bcd[i - 1],
-                        bcd[i]);
+                        bytes[1],
+                        bytes[2],
+                        bytes[3],
+                        bytes[4],
+                        bytes[5]);
             } catch (Exception e) {
                 return null;
             }
         }
 
-        /** 日期转BCD (yyMMdd) */
+        /** 日期转byte[] (yyMMdd) */
         public static byte[] from(LocalDate date) {
-            byte[] bcd = new byte[3];
-            bcd[0] = (byte) (date.getYear() % 100);
-            bcd[1] = (byte) date.getMonthValue();
-            bcd[2] = (byte) date.getDayOfMonth();
-            return bcd;
+            return new byte[]{
+                    (byte) (date.getYear() % 100),
+                    (byte) date.getMonthValue(),
+                    (byte) date.getDayOfMonth()
+            };
         }
 
-        /** BCD转日期 (yyMMdd) */
-        public static LocalDate toDate(byte[] bcd) {
-            int i = bcd.length - 1;
-            int year = HUNDRED_YEAR + bcd[i - 2];
+        /** byte[]转日期 (yyMMdd) */
+        public static LocalDate toDate(byte[] bytes) {
+            int i = bytes.length - 1;
+            int year = HUNDRED_YEAR + bytes[i - 2];
             if (year < YEAR_RANGE)
                 year += 100;
-            return LocalDate.of(year, bcd[i - 1], bcd[i]);
+            return LocalDate.of(year, bytes[i - 1], bytes[i]);
         }
 
-        /** BCD转时间 (HHMM) */
-        public static LocalTime readTime2(ByteBuf input) {
-            return LocalTime.of(input.readByte(), input.readByte());
+        /** 日期转byte[] (yyMMdd) */
+        public static byte[] from(LocalTime time) {
+            return new byte[]{
+                    (byte) time.getHour(),
+                    (byte) time.getMinute(),
+                    (byte) time.getSecond()
+            };
         }
 
-        /** BCD转时间 (HHMM) */
-        public static void writeTime2(ByteBuf output, LocalTime time) {
-            output.writeByte(time.getHour());
-            output.writeByte(time.getMinute());
+        /** byte[]转日期 (yyMMdd) */
+        public static LocalTime toTime(byte[] bytes) {
+            return LocalTime.of(
+                    bytes[0],
+                    bytes[1],
+                    bytes[2]
+            );
         }
     }
 }

@@ -41,6 +41,13 @@ public class Cache<K, V> {
         return value;
     }
 
+    public V put(K key, V value) {
+        synchronized (cache) {
+            cache.put(key, value);
+        }
+        return value;
+    }
+
     @Override
     public String toString() {
         return cache.toString();

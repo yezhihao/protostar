@@ -1,49 +1,48 @@
 package io.github.yezhihao.protostar.schema;
 
-import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.Schema;
 import io.netty.buffer.ByteBuf;
 
-import static io.github.yezhihao.protostar.DataType.*;
-
 public final class NumberSchema {
 
-    public static final Schema BYTE2Byte = new BYTE2Byte();
-    public static final Schema BYTE2Short = new BYTE2Short();
-    public static final Schema BYTE2Int = new BYTE2Int();
-    public static final Schema WORD2Short = new WORD2Short();
-    public static final Schema WORD2Int = new WORD2Int();
-    public static final Schema DWORD2Int = new DWORD2Int();
-    public static final Schema DWORD2Long = new DWORD2Long();
-    public static final Schema QWORD2Long = new QWORD2Long();
-    public static final Schema QWORD2String = new QWORD2String();
+    public static final Schema BOOL = new BOOL();
+    public static final Schema CHAR = new CHAR();
+    public static final Schema BYTE_BYTE = new BYTE2Byte();
+    public static final Schema BYTE_SHORT = new BYTE2Short();
+    public static final Schema BYTE_INT = new BYTE2Int();
+    public static final Schema WORD_SHORT = new WORD2Short();
+    public static final Schema WORD_INT = new WORD2Int();
+    public static final Schema DWORD_INT = new DWORD2Int();
+    public static final Schema DWORD_LONG = new DWORD2Long();
+    public static final Schema DWORD_FLOAT = new DWORD2Float();
+    public static final Schema QWORD_LONG = new QWORD2Long();
+    public static final Schema QWORD_DOUBLE = new QWORD2Double();
 
-    public static Schema getSchema(DataType dataType, Class<?> typeClass) {
-        if (Byte.TYPE.isAssignableFrom(typeClass) || Byte.class.isAssignableFrom(typeClass)) {
-            if (dataType == BYTE)
-                return BYTE2Byte;
-        } else if (Short.TYPE.isAssignableFrom(typeClass) || Short.class.isAssignableFrom(typeClass)) {
-            if (dataType == BYTE)
-                return BYTE2Short;
-            if (dataType == WORD)
-                return WORD2Short;
-        } else if (Integer.TYPE.isAssignableFrom(typeClass) || Integer.class.isAssignableFrom(typeClass)) {
-            if (dataType == BYTE)
-                return BYTE2Int;
-            if (dataType == WORD)
-                return WORD2Int;
-            if (dataType == DWORD)
-                return DWORD2Int;
-        } else if (Long.TYPE.isAssignableFrom(typeClass) || Long.class.isAssignableFrom(typeClass)) {
-            if (dataType == DWORD)
-                return DWORD2Long;
-            if (dataType == QWORD)
-                return QWORD2Long;
-        } else if (String.class.isAssignableFrom(typeClass)) {
-            if (dataType == QWORD)
-                return QWORD2String;
+    public static class BOOL implements Schema<Boolean> {
+
+        private BOOL() {
         }
-        return null;
+
+        public Boolean readFrom(ByteBuf input) {
+            return input.readBoolean();
+        }
+
+        public void writeTo(ByteBuf output, Boolean value) {
+            output.writeBoolean(value);
+        }
+    }
+
+    public static class CHAR implements Schema<Character> {
+        private CHAR() {
+        }
+
+        public Character readFrom(ByteBuf input) {
+            return input.readChar();
+        }
+
+        public void writeTo(ByteBuf output, Character value) {
+            output.writeChar(value);
+        }
     }
 
     public static class BYTE2Byte implements Schema<Byte> {
@@ -137,6 +136,19 @@ public final class NumberSchema {
         }
     }
 
+    public static class DWORD2Float implements Schema<Float> {
+        private DWORD2Float() {
+        }
+
+        public Float readFrom(ByteBuf input) {
+            return input.readFloat();
+        }
+
+        public void writeTo(ByteBuf output, Float value) {
+            output.writeFloat(value);
+        }
+    }
+
     public static class QWORD2Long implements Schema<Long> {
         private QWORD2Long() {
         }
@@ -150,16 +162,16 @@ public final class NumberSchema {
         }
     }
 
-    public static class QWORD2String implements Schema<String> {
-        private QWORD2String() {
+    public static class QWORD2Double implements Schema<Double> {
+        private QWORD2Double() {
         }
 
-        public String readFrom(ByteBuf input) {
-            return Long.toString(input.readLong());
+        public Double readFrom(ByteBuf input) {
+            return input.readDouble();
         }
 
-        public void writeTo(ByteBuf output, String value) {
-            output.writeLong(Long.parseUnsignedLong(value, 10));
+        public void writeTo(ByteBuf output, Double value) {
+            output.writeDouble(value);
         }
     }
 }

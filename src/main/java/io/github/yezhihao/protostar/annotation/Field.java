@@ -29,8 +29,6 @@ public @interface Field {
     /** 字符集 type=STRING有效 */
     String charset() default "GBK";
 
-    byte pad() default 0;
-
     /** 描述 */
     String desc() default "";
 

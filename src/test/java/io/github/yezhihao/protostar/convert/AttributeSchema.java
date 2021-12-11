@@ -8,14 +8,14 @@ import io.github.yezhihao.protostar.schema.StringSchema;
 public class AttributeSchema extends MapSchema<Integer, Object> {
 
     public AttributeSchema() {
-        super(NumberSchema.BYTE2Int, 1);
+        super(NumberSchema.BYTE_INT, 1);
     }
 
     @Override
     protected void addSchemas(PrepareLoadStrategy schemaRegistry) {
         schemaRegistry
-                .addSchema(1, NumberSchema.DWORD2Int)
-                .addSchema(2, StringSchema.Chars.getInstance((byte) 0, "GBK"))
+                .addSchema(1, NumberSchema.DWORD_INT)
+                .addSchema(2, StringSchema.GBK)
 
                 .addSchema(3, Attr1.class)
                 .addSchema(4, Attr2.Schema.INSTANCE);

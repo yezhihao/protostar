@@ -14,7 +14,8 @@ public abstract class PrepareLoadStrategy extends SingleVersionSchemaManager {
         this.addSchemas(this);
     }
 
-    protected abstract void addSchemas(PrepareLoadStrategy schemaRegistry);
+    protected void addSchemas(PrepareLoadStrategy schemaRegistry) {
+    }
 
     public <T> Schema<T> getSchema(Class<T> typeClass) {
         return typeClassMapping.get(typeClass);
@@ -35,19 +36,19 @@ public abstract class PrepareLoadStrategy extends SingleVersionSchemaManager {
     public PrepareLoadStrategy addSchema(Object key, DataType dataType) {
         switch (dataType) {
             case BYTE:
-                this.typeIdMapping.put(key, NumberSchema.BYTE2Int);
+                this.typeIdMapping.put(key, NumberSchema.BYTE_INT);
                 break;
             case WORD:
-                this.typeIdMapping.put(key, NumberSchema.WORD2Int);
+                this.typeIdMapping.put(key, NumberSchema.WORD_INT);
                 break;
             case DWORD:
-                this.typeIdMapping.put(key, NumberSchema.DWORD2Long);
+                this.typeIdMapping.put(key, NumberSchema.DWORD_LONG);
                 break;
             case QWORD:
-                this.typeIdMapping.put(key, NumberSchema.QWORD2Long);
+                this.typeIdMapping.put(key, NumberSchema.QWORD_LONG);
                 break;
             case BYTES:
-                this.typeIdMapping.put(key, ArraySchema.BYTE_ARRAY);
+                this.typeIdMapping.put(key, ArraySchema.BYTES);
                 break;
             default:
                 throw new IllegalArgumentException("不支持的类型转换" + dataType);
