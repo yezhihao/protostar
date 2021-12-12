@@ -13,13 +13,16 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Field {
 
-    /** 排序,为空为代码顺序 */
+    /** 排序,默认使用代码顺序 */
     int index() default -1;
 
-    /** 长度,为空取类型长度 */
+    /** 长度,默认使用类型长度 */
     int length() default -1;
 
-    /** 长度域的长度（1-4） */
+    /**
+     * 该字段的前置长度单位
+     * 1.BYTE 2.WORD 3.MEDIUM 4.DWORD
+     */
     int lengthSize() default -1;
 
     /** 字符集 BCD、HEX、GBK、UTF-8等 */

@@ -3,25 +3,33 @@ package io.github.yezhihao.protostar.field;
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.util.Explain;
+import io.github.yezhihao.protostar.util.Info;
+import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * 数组域
+ * 总数数组域
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */
-public class ArrayField extends BasicField {
+public class CollectionTotalField extends BasicField {
 
-    public ArrayField(Field field, java.lang.reflect.Field f, Schema schema) {
+    protected final IntTool intTool;
+
+    public CollectionTotalField(Field field, java.lang.reflect.Field f, Schema schema) {
         super(field, f, schema);
+        this.intTool = IntTool.getInstance(field.lengthSize());
     }
 
     public Object readFrom(ByteBuf input) {
-        Collection value = new ArrayList<>();
-        while (input.isReadable()) {
+        int total = intTool.read(input);
+        if (total <= 0)
+            return null;
+        ArrayList value = new ArrayList<>(total);
+        for (int i = 0; i < total; i++) {
             Object t = schema.readFrom(input);
             value.add(t);
         }
@@ -30,7 +38,10 @@ public class ArrayField extends BasicField {
 
     public void writeTo(ByteBuf output, Object value) {
         Collection list = (Collection) value;
-        if (list != null && !list.isEmpty()) {
+        if (list == null || list.isEmpty()) {
+            intTool.write(output, 0);
+        } else {
+            intTool.write(output, list.size());
             for (Object t : list) {
                 schema.writeTo(output, t);
             }
@@ -39,8 +50,14 @@ public class ArrayField extends BasicField {
 
     @Override
     public Object readFrom(ByteBuf input, Explain explain) {
-        Collection value = new ArrayList<>();
-        while (input.isReadable()) {
+        int begin = input.readerIndex();
+        int total = intTool.read(input);
+        explain.add(Info.lengthField(begin, field, total));
+
+        if (total <= 0)
+            return null;
+        ArrayList value = new ArrayList<>(total);
+        for (int i = 0; i < total; i++) {
             Object t = schema.readFrom(input, explain);
             value.add(t);
         }
@@ -49,8 +66,12 @@ public class ArrayField extends BasicField {
 
     @Override
     public void writeTo(ByteBuf output, Object value, Explain explain) {
+        int begin = output.readerIndex();
         Collection list = (Collection) value;
-        if (list != null && !list.isEmpty()) {
+        int total = list == null ? 0 : list.size();
+        explain.add(Info.lengthField(begin, field, total));
+
+        if (list != null) {
             for (Object t : list) {
                 schema.writeTo(output, t, explain);
             }

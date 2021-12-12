@@ -39,12 +39,12 @@ public abstract class FieldFactory {
             return new FixedLengthField(field, f, schema);
         } else if (field.lengthSize() > 0) {
             if (Collection.class.isAssignableFrom(typeClass))
-                return new ArrayTotalField(field, f, schema);
+                return new CollectionTotalField(field, f, schema);
             else
                 return new DynamicLengthField(field, f, schema);
         } else {
             if (Collection.class.isAssignableFrom(typeClass))
-                return new ArrayField(field, f, schema);
+                return new CollectionField(field, f, schema);
             else
                 return new BasicField(field, f, schema);
         }
