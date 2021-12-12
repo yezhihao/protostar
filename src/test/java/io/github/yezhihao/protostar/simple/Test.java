@@ -1,6 +1,5 @@
 package io.github.yezhihao.protostar.simple;
 
-import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.ProtostarUtil;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
@@ -52,9 +51,9 @@ public class Test {
 
     public static class BaseDO {
 
-        @Field(index = 0, type = DataType.WORD, desc = "ID")
+        @Field(index = 0, length = 2, desc = "ID")
         protected int type;
-        @Field(index = 1, type = DataType.STRING, length = 20, desc = "名称")
+        @Field(index = 1, length = 20, desc = "名称")
         protected String clientId;
 
         public int getType() {
@@ -76,11 +75,11 @@ public class Test {
 
     public static class Foo extends BaseDO {
 
-        @Field(index = 0, type = DataType.STRING, lengthSize = 1, desc = "名称")
+        @Field(index = 0, lengthSize = 1, desc = "名称")
         private String name;
-        @Field(index = 1, type = DataType.WORD, desc = "ID")
+        @Field(index = 1, length = 2, desc = "ID")
         private int id;
-        @Field(index = 3, type = DataType.BCD8421, desc = "日期")
+        @Field(index = 3, charset = "BCD", desc = "日期")
         private LocalDateTime dateTime;
 
         public String getName() {

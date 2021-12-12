@@ -23,7 +23,7 @@ public abstract class PrepareLoadStrategy extends SingleVersionSchemaManager {
 
     public PrepareLoadStrategy addSchema(Object key, Schema schema) {
         if (schema == null)
-            throw new RuntimeException("key[" + key + "],schema is null");
+            throw new RuntimeException("key[" + key + "],converter is null");
         typeIdMapping.put(key, schema);
         return this;
     }

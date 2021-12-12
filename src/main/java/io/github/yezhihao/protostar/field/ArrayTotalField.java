@@ -77,12 +77,4 @@ public class ArrayTotalField extends BasicField {
             }
         }
     }
-
-    @Override
-    public int compareTo(BasicField that) {
-        int r = super.compareTo(that);
-        if (r == 0)
-            r = (that instanceof ArrayTotalField) ? 1 : -1;
-        return r;
-    }
 }

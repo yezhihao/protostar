@@ -1,6 +1,5 @@
 package io.github.yezhihao.protostar.annotation;
 
-import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.Schema;
 
 import java.lang.annotation.*;
@@ -23,10 +22,7 @@ public @interface Field {
     /** 长度域的长度（1-4） */
     int lengthSize() default -1;
 
-    /** 类型 */
-    DataType type() default DataType.BYTE;
-
-    /** 字符集 type=STRING有效 */
+    /** 字符集 BCD、HEX、GBK、UTF-8等 */
     String charset() default "GBK";
 
     /** 描述 */

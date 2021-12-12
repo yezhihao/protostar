@@ -1,6 +1,5 @@
 package io.github.yezhihao.protostar.schema;
 
-import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.util.Cache;
@@ -117,24 +116,18 @@ public class SchemaRegistry {
         String name = typeClass.getName();
 
         if (NUMBER.contains(name)) {
-            int length = field.length() > 0 ? field.length() : field.type().length;
+            int length = field.length();
             if (length > 0)
                 name = name + "/" + length;
             return SYS_SCHEMA.get(name);
         }
 
         String charset = field.charset().toUpperCase();
-
         if (CharSequence.class.isAssignableFrom(typeClass)) {
-            if (DataType.BCD8421 == field.type())
-                charset = "BCD";
-            if (DataType.HEX == field.type())
-                charset = "HEX";
             return StringSchema.getInstance(charset);
         }
-
         if (Temporal.class.isAssignableFrom(typeClass)) {
-            if (DataType.BCD8421 == field.type() || charset.equals("BCD"))
+            if (charset.equals("BCD"))
                 return SYS_SCHEMA.get(name + "/BCD");
             return SYS_SCHEMA.get(name);
         }

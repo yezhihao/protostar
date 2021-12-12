@@ -22,10 +22,7 @@ public class BasicField<T> implements Schema<T>, Comparable<BasicField> {
 
     public BasicField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
         this.schema = schema;
-        int length = field.length();
-        if (length < 0)
-            length = field.type().length;
-        this.length = length;
+        this.length = field.length();
         this.lengthSize = field.lengthSize();
         this.field = field;
         this.f = f;

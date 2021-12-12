@@ -72,12 +72,4 @@ public class DynamicLengthField<T> extends BasicField<T> {
             explain.add(Info.field(begin + lengthSize, field, value, raw));
         }
     }
-
-    @Override
-    public int compareTo(BasicField that) {
-        int r = super.compareTo(that);
-        if (r == 0)
-            r = (that instanceof DynamicLengthField) ? 1 : -1;
-        return r;
-    }
 }

@@ -1,13 +1,12 @@
 package io.github.yezhihao.protostar.convert;
 
-import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.annotation.Field;
 
 public class Attr1 {
 
-    @Field(index = 0, type = DataType.STRING, lengthSize = 1, desc = "名称")
+    @Field(index = 0, lengthSize = 1, desc = "名称")
     private String name;
-    @Field(index = 1, type = DataType.WORD, desc = "ID")
+    @Field(index = 1, length = 2, desc = "ID")
     private int id;
 
     public Attr1() {

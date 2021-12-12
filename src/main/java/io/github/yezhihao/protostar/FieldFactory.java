@@ -19,7 +19,7 @@ public abstract class FieldFactory {
     public static BasicField create(Field field, java.lang.reflect.Field f, Schema schema) {
         Class<?> typeClass = f.getType();
         if (schema == null)
-            throw new IllegalArgumentException("不支持的类型转换 name:" + f.getName() + ",desc:" + field.desc() + "[" + field.type() + " to " + typeClass.getName() + "]");
+            throw new IllegalArgumentException("不支持的类型转换 name:" + f.getName() + ",desc:" + field.desc() + "[" + field.length() + " to " + typeClass.getName() + "]");
 
         if (Map.class.isAssignableFrom(typeClass) && !MapSchema.class.isAssignableFrom(schema.getClass())) {
             Class keyClass = (Class) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];

@@ -1,6 +1,5 @@
 package io.github.yezhihao.protostar.convert;
 
-import io.github.yezhihao.protostar.DataType;
 import io.github.yezhihao.protostar.ProtostarUtil;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
@@ -54,13 +53,13 @@ public class Test {
 
     public static class Foo {
 
-        @Field(index = 0, type = DataType.STRING, lengthSize = 1, desc = "名称", version = 0)
-        @Field(index = 0, type = DataType.STRING, length = 10, desc = "名称", version = 1)
+        @Field(index = 0, lengthSize = 1, desc = "名称", version = 0)
+        @Field(index = 0, length = 10, desc = "名称", version = 1)
         private String name;
-        @Field(index = 1, type = DataType.WORD, desc = "ID", version = 0)
-        @Field(index = 1, type = DataType.DWORD, desc = "ID", version = 1)
+        @Field(index = 1, length = 2, desc = "ID", version = 0)
+        @Field(index = 1, length = 4, desc = "ID", version = 1)
         private int id;
-        @Field(index = 3, type = DataType.BCD8421, desc = "日期", version = {0, 1})
+        @Field(index = 3, charset = "BCD", desc = "日期", version = {0, 1})
         private LocalDateTime dateTime;
         @Field(index = 4, desc = "属性", version = 0, converter = AttributeSchema.class)
         @Field(index = 4, desc = "属性", version = 1, converter = AttributeSchemaV2.class)

@@ -56,12 +56,4 @@ public class ArrayField extends BasicField {
             }
         }
     }
-
-    @Override
-    public int compareTo(BasicField that) {
-        int r = super.compareTo(that);
-        if (r == 0)
-            r = (that instanceof ArrayField) ? 1 : -1;
-        return r;
-    }
 }
