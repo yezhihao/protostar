@@ -111,6 +111,8 @@ public class ClassUtils {
             return (Class) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
         } else if (Map.class.isAssignableFrom(typeClass)) {
             return (Class) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[1];
+        } else if (typeClass.isArray()) {
+            return typeClass.getComponentType();
         }
         return typeClass;
     }

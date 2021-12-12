@@ -40,6 +40,8 @@ public abstract class FieldFactory {
         } else if (field.lengthSize() > 0) {
             if (Collection.class.isAssignableFrom(typeClass))
                 return new CollectionTotalField(field, f, schema);
+            else if (typeClass.isArray() && !typeClass.getComponentType().isPrimitive())
+                return new ArrayTotalField(field, f, schema);
             else
                 return new DynamicLengthField(field, f, schema);
         } else {

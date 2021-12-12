@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * 数组域
+ * 集合域
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */
