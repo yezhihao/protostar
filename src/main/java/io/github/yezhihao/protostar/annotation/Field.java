@@ -19,11 +19,11 @@ public @interface Field {
     /** 长度,默认使用类型长度 */
     int length() default -1;
 
-    /**
-     * 该字段的前置长度单位
-     * 1.BYTE 2.WORD 3.MEDIUM 4.DWORD
-     */
-    int lengthSize() default -1;
+    /** 该字段的前置长度单位 1.BYTE 2.WORD 3.MEDIUM 4.DWORD */
+    int lengthUnit() default -1;
+
+    /** 该字段的前置数量单位 1.BYTE 2.WORD 3.MEDIUM 4.DWORD */
+    int totalUnit() default -1;
 
     /** 字符集 BCD、HEX、GBK、UTF-8等 */
     String charset() default "GBK";

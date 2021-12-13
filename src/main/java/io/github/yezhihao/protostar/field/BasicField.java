@@ -8,13 +8,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 
 /**
- * 基本类型字段
+ * 固定长度域
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */
 public class BasicField<T> implements Schema<T>, Comparable<BasicField> {
 
-    protected final int lengthSize;
     protected final int length;
     protected final Field field;
     protected final Schema<T> schema;
@@ -22,8 +21,7 @@ public class BasicField<T> implements Schema<T>, Comparable<BasicField> {
 
     public BasicField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
         this.schema = schema;
-        this.length = field.length();
-        this.lengthSize = field.lengthSize();
+        this.length = field.length() > -1 ? field.length() : schema.length();
         this.field = field;
         this.f = f;
         try {

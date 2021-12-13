@@ -23,7 +23,7 @@ public class Info {
     }
 
     public static Info lengthField(int index, Field field, int value) {
-        return new Info(index, field, value, StrUtils.leftPad(Integer.toHexString(value), field.lengthSize() << 1, '0'), true);
+        return new Info(index, field, value, StrUtils.leftPad(Integer.toHexString(value), field.lengthUnit() << 1, '0'), true);
     }
 
     public int getIndex() {

@@ -9,17 +9,19 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 
 /**
- * 动态长度的字段
+ * 指定长度单位域
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */
-public class DynamicLengthField<T> extends BasicField<T> {
+public class LengthUnitField<T> extends BasicField<T> {
 
     private final IntTool intTool;
+    private final int lengthUnit;
 
-    public DynamicLengthField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
+    public LengthUnitField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
         super(field, f, schema);
-        this.intTool = IntTool.getInstance(field.lengthSize());
+        this.lengthUnit = field.lengthUnit();
+        this.intTool = IntTool.getInstance(lengthUnit);
     }
 
     public T readFrom(ByteBuf input) {
@@ -32,7 +34,7 @@ public class DynamicLengthField<T> extends BasicField<T> {
         intTool.write(output, 0);
         if (value != null) {
             schema.writeTo(output, value);
-            int length = output.writerIndex() - begin - lengthSize;
+            int length = output.writerIndex() - begin - lengthUnit;
             intTool.set(output, begin, length);
         }
     }
@@ -47,8 +49,8 @@ public class DynamicLengthField<T> extends BasicField<T> {
         T value = schema.readFrom(input, length, explain);
 
         int end = input.readerIndex();
-        String raw = ByteBufUtil.hexDump(input, begin + lengthSize, end - begin - lengthSize);
-        explain.add(Info.field(begin + lengthSize, field, value, raw));
+        String raw = ByteBufUtil.hexDump(input, begin + lengthUnit, end - begin - lengthUnit);
+        explain.add(Info.field(begin + lengthUnit, field, value, raw));
         return value;
     }
 
@@ -59,7 +61,7 @@ public class DynamicLengthField<T> extends BasicField<T> {
         intTool.write(output, 0);
         if (value != null) {
             schema.writeTo(output, value);
-            int length = output.writerIndex() - begin - lengthSize;
+            int length = output.writerIndex() - begin - lengthUnit;
             intTool.set(output, begin, length);
         }
 
@@ -68,8 +70,8 @@ public class DynamicLengthField<T> extends BasicField<T> {
 
         if (value != null) {
             int end = output.writerIndex();
-            String raw = ByteBufUtil.hexDump(output, begin + lengthSize, end - begin - lengthSize);
-            explain.add(Info.field(begin + lengthSize, field, value, raw));
+            String raw = ByteBufUtil.hexDump(output, begin + lengthUnit, end - begin - lengthUnit);
+            explain.add(Info.field(begin + lengthUnit, field, value, raw));
         }
     }
 }
