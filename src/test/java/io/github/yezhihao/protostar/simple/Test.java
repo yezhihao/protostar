@@ -75,11 +75,11 @@ public class Test {
 
     public static class Foo extends BaseDO {
 
-        @Field(index = 0, lengthSize = 1, desc = "名称")
+        @Field(lengthUnit = 1, desc = "名称")
         private String name;
-        @Field(index = 1, length = 2, desc = "ID")
+        @Field(length = 2, desc = "ID")
         private int id;
-        @Field(index = 3, charset = "BCD", desc = "日期")
+        @Field(charset = "BCD", desc = "日期")
         private LocalDateTime dateTime;
 
         public String getName() {

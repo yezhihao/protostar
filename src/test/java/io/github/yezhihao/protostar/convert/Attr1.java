@@ -4,9 +4,9 @@ import io.github.yezhihao.protostar.annotation.Field;
 
 public class Attr1 {
 
-    @Field(index = 0, lengthSize = 1, desc = "名称")
+    @Field(lengthUnit = 1, desc = "名称")
     private String name;
-    @Field(index = 1, length = 2, desc = "ID")
+    @Field(length = 2, desc = "ID")
     private int id;
 
     public Attr1() {

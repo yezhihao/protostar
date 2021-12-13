@@ -53,16 +53,16 @@ public class Test {
 
     public static class Foo {
 
-        @Field(index = 0, lengthSize = 1, desc = "名称", version = 0)
-        @Field(index = 0, length = 10, desc = "名称", version = 1)
+        @Field(lengthUnit = 1, desc = "名称", version = 0)
+        @Field(length = 10, desc = "名称", version = 1)
         private String name;
-        @Field(index = 1, length = 2, desc = "ID", version = 0)
-        @Field(index = 1, length = 4, desc = "ID", version = 1)
+        @Field(length = 2, desc = "ID", version = 0)
+        @Field(length = 4, desc = "ID", version = 1)
         private int id;
-        @Field(index = 3, charset = "BCD", desc = "日期", version = {0, 1})
+        @Field(charset = "BCD", desc = "日期", version = {0, 1})
         private LocalDateTime dateTime;
-        @Field(index = 4, desc = "属性", version = 0, converter = AttributeSchema.class)
-        @Field(index = 4, desc = "属性", version = 1, converter = AttributeSchemaV2.class)
+        @Field(desc = "属性", version = 0, converter = AttributeSchema.class)
+        @Field(desc = "属性", version = 1, converter = AttributeSchemaV2.class)
         private Map<Integer, Object> attributes;
 
         public String getName() {
