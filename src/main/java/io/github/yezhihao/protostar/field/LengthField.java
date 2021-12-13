@@ -33,9 +33,11 @@ public class LengthField<T> extends BasicField<T> {
 
         T value = schema.readFrom(input, length, explain);
 
-        int end = input.readerIndex();
-        String raw = ByteBufUtil.hexDump(input, begin, end - begin);
-        explain.add(Info.field(begin, field, value, raw));
+        if (notRs) {
+            int end = input.readerIndex();
+            String raw = ByteBufUtil.hexDump(input, begin, end - begin);
+            explain.add(Info.field(begin, field, value, raw));
+        }
         return value;
     }
 
@@ -45,10 +47,11 @@ public class LengthField<T> extends BasicField<T> {
 
         if (value != null) {
             schema.writeTo(output, length, value);
-
-            int end = output.writerIndex();
-            String raw = ByteBufUtil.hexDump(output, begin, end - begin);
-            explain.add(Info.field(begin, field, value, raw));
+            if (notRs) {
+                int end = output.writerIndex();
+                String raw = ByteBufUtil.hexDump(output, begin, end - begin);
+                explain.add(Info.field(begin, field, value, raw));
+            }
         }
     }
 }

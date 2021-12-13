@@ -2,6 +2,7 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
+import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.Info;
 import io.netty.buffer.ByteBuf;
@@ -18,6 +19,7 @@ public class BasicField<T> implements Schema<T>, Comparable<BasicField> {
     protected final Field field;
     protected final Schema<T> schema;
     protected final java.lang.reflect.Field f;
+    protected final boolean notRs;
 
     public BasicField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
         this.schema = schema;
@@ -28,6 +30,7 @@ public class BasicField<T> implements Schema<T>, Comparable<BasicField> {
             f.setAccessible(true);
         } catch (Exception e) {
         }
+        this.notRs = !(schema instanceof RuntimeSchema);
     }
 
     public void set(Object message, Object value) throws IllegalAccessException {

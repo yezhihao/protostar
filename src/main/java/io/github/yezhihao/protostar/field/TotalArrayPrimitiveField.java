@@ -5,7 +5,9 @@ import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.Info;
 import io.github.yezhihao.protostar.util.IntTool;
+import io.github.yezhihao.protostar.util.StrUtils;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 
 import java.lang.reflect.Array;
 
@@ -52,7 +54,12 @@ public class TotalArrayPrimitiveField extends BasicField {
         if (total <= 0)
             return null;
         int length = valueUnit * total;
-        return schema.readFrom(input, length, explain);
+        Object array = schema.readFrom(input, length);
+
+        int end = input.readerIndex();
+        String raw = ByteBufUtil.hexDump(input, begin + field.totalUnit(), end - begin - field.totalUnit());
+        explain.add(Info.field(begin + field.totalUnit(), field, StrUtils.toString(array), raw));
+        return array;
     }
 
     @Override
