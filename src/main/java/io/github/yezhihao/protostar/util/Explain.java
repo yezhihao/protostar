@@ -24,6 +24,10 @@ public class Explain {
         return list;
     }
 
+    public void setLastDesc(String desc) {
+        list.get(list.size() - 1).desc = desc;
+    }
+
     public void setList(List<Info> list) {
         this.list = list;
     }
@@ -32,7 +36,7 @@ public class Explain {
         for (Info info : list) {
             Object value = info.getValue();
             if (value != null)
-                System.out.println(info.getIndex() + "\t" + "[" + info.getRaw() + "] " + info.getField().desc() + ": " + StrUtils.toString(value));
+                System.out.println(info.getIndex() + "\t" + "[" + info.getRaw() + "] " + info.getDesc() + ": " + StrUtils.toString(value));
         }
     }
 }

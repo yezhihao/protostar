@@ -27,12 +27,12 @@ public class TotalArrayObjectField extends BasicField {
         int total = intTool.read(input);
         if (total <= 0)
             return null;
-        Object array = Array.newInstance(schema.getClass(), total);
+        Object value = Array.newInstance(schema.getClass(), total);
         for (int i = 0; i < total; i++) {
             Object t = schema.readFrom(input);
-            Array.set(array, i, t);
+            Array.set(value, i, t);
         }
-        return array;
+        return value;
     }
 
     public void writeTo(ByteBuf output, Object value) {
@@ -52,32 +52,15 @@ public class TotalArrayObjectField extends BasicField {
     public Object readFrom(ByteBuf input, Explain explain) {
         int begin = input.readerIndex();
         int total = intTool.read(input);
-        explain.add(Info.lengthField(begin, field, total));
+        explain.add(Info.lengthField(begin, desc, total));
 
         if (total <= 0)
             return null;
-        Object array = Array.newInstance(schema.getClass(), total);
+        Object value = Array.newInstance(schema.getClass(), total);
         for (int i = 0; i < total; i++) {
             Object t = schema.readFrom(input, explain);
-            Array.set(array, i, t);
+            Array.set(value, i, t);
         }
-        return array;
-    }
-
-    @Override
-    public void writeTo(ByteBuf output, Object value, Explain explain) {
-        int begin = output.readerIndex();
-        if (value == null) {
-            explain.add(Info.lengthField(begin, field, 0));
-            intTool.write(output, 0);
-        } else {
-            int length = Array.getLength(value);
-            explain.add(Info.lengthField(begin, field, length));
-            intTool.write(output, length);
-            for (int i = 0; i < length; i++) {
-                Object t = Array.get(value, i);
-                schema.writeTo(output, t, explain);
-            }
-        }
+        return value;
     }
 }

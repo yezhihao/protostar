@@ -37,10 +37,10 @@ public class TotalCollectionField extends BasicField {
     }
 
     public void writeTo(ByteBuf output, Object value) {
-        Collection list = (Collection) value;
-        if (list == null || list.isEmpty()) {
+        if (value == null) {
             intTool.write(output, 0);
         } else {
+            Collection list = (Collection) value;
             intTool.write(output, list.size());
             for (Object t : list) {
                 schema.writeTo(output, t);
@@ -52,7 +52,7 @@ public class TotalCollectionField extends BasicField {
     public Object readFrom(ByteBuf input, Explain explain) {
         int begin = input.readerIndex();
         int total = intTool.read(input);
-        explain.add(Info.lengthField(begin, field, total));
+        explain.add(Info.lengthField(begin, desc, total));
 
         if (total <= 0)
             return null;
@@ -62,19 +62,5 @@ public class TotalCollectionField extends BasicField {
             value.add(t);
         }
         return value;
-    }
-
-    @Override
-    public void writeTo(ByteBuf output, Object value, Explain explain) {
-        int begin = output.readerIndex();
-        Collection list = (Collection) value;
-        int total = list == null ? 0 : list.size();
-        explain.add(Info.lengthField(begin, field, total));
-
-        if (list != null) {
-            for (Object t : list) {
-                schema.writeTo(output, t, explain);
-            }
-        }
     }
 }

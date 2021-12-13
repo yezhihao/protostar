@@ -2,11 +2,7 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.schema.RuntimeSchema;
-import io.github.yezhihao.protostar.util.Explain;
-import io.github.yezhihao.protostar.util.Info;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 
 /**
  * 固定长度域
@@ -19,7 +15,7 @@ public class BasicField<T> implements Schema<T>, Comparable<BasicField> {
     protected final Field field;
     protected final Schema<T> schema;
     protected final java.lang.reflect.Field f;
-    protected final boolean notRs;
+    protected final String desc;
 
     public BasicField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
         this.schema = schema;
@@ -30,7 +26,10 @@ public class BasicField<T> implements Schema<T>, Comparable<BasicField> {
             f.setAccessible(true);
         } catch (Exception e) {
         }
-        this.notRs = !(schema instanceof RuntimeSchema);
+        String t = field.desc();
+        if (t.length() == 0)
+            t = f.getName();
+        this.desc = t;
     }
 
     public void set(Object message, Object value) throws IllegalAccessException {
@@ -52,29 +51,12 @@ public class BasicField<T> implements Schema<T>, Comparable<BasicField> {
             schema.writeTo(output, value);
     }
 
-    public T readFrom(ByteBuf input, Explain explain) {
-        int begin = input.readerIndex();
-
-        T value = schema.readFrom(input, explain);
-
-        int end = input.readerIndex();
-        String raw = ByteBufUtil.hexDump(input, begin, end - begin);
-        explain.add(Info.field(begin, field, value, raw));
-        return value;
+    @Override
+    public String desc() {
+        return desc;
     }
 
-    public void writeTo(ByteBuf output, T value, Explain explain) {
-        int begin = output.writerIndex();
-
-        if (value != null) {
-            schema.writeTo(output, value);
-
-            int end = output.writerIndex();
-            String raw = ByteBufUtil.hexDump(output, begin, end - begin);
-            explain.add(Info.field(begin, field, value, raw));
-        }
-    }
-
+    @Override
     public int length() {
         return length;
     }

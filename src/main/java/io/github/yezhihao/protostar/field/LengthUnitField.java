@@ -6,7 +6,6 @@ import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.Info;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 
 /**
  * 指定长度单位域
@@ -44,34 +43,9 @@ public class LengthUnitField<T> extends BasicField<T> {
         int begin = input.readerIndex();
 
         int length = intTool.read(input);
-        explain.add(Info.lengthField(begin, field, length));
-
+        explain.add(Info.lengthField(begin, desc, length));
         T value = schema.readFrom(input, length, explain);
-
-        int end = input.readerIndex();
-        String raw = ByteBufUtil.hexDump(input, begin + lengthUnit, end - begin - lengthUnit);
-        explain.add(Info.field(begin + lengthUnit, field, value, raw));
+        explain.setLastDesc(desc);
         return value;
-    }
-
-    @Override
-    public void writeTo(ByteBuf output, T value, Explain explain) {
-        int begin = output.writerIndex();
-
-        intTool.write(output, 0);
-        if (value != null) {
-            schema.writeTo(output, value);
-            int length = output.writerIndex() - begin - lengthUnit;
-            intTool.set(output, begin, length);
-        }
-
-        int length = intTool.get(output, begin);
-        explain.add(Info.lengthField(begin, field, length));
-
-        if (value != null) {
-            int end = output.writerIndex();
-            String raw = ByteBufUtil.hexDump(output, begin + lengthUnit, end - begin - lengthUnit);
-            explain.add(Info.field(begin + lengthUnit, field, value, raw));
-        }
     }
 }

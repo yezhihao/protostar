@@ -129,30 +129,4 @@ public abstract class MapSchema<K, V> extends PrepareLoadStrategy implements Sch
             log.warn("未注册的信息:ID[{}], VALUE[{}]", key, value);
         }
     }
-
-    @Override
-    public void writeTo(ByteBuf output, Map<K, V> map, Explain explain) {
-
-        if (map == null || map.isEmpty())
-            return;
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            K key = entry.getKey();
-            V value = entry.getValue();
-            keySchema.writeTo(output, key, explain);
-            writeValue(key, output, value, explain);
-        }
-    }
-
-    public void writeValue(K key, ByteBuf output, Object value, Explain explain) {
-        Schema schema = getSchema(key);
-        if (schema != null) {
-            int begin = output.writerIndex();
-            intTool.write(output, 0);
-            schema.writeTo(output, value, explain);
-            int length = output.writerIndex() - begin - lengthSize;
-            intTool.set(output, begin, length);
-        } else {
-            log.warn("未注册的信息:ID[{}], VALUE[{}]", key, value);
-        }
-    }
 }
