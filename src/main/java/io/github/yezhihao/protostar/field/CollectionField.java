@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * 集合域
+ * 无界集合域，只能位于消息末尾
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */

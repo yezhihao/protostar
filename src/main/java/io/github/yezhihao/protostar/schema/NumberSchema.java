@@ -1,8 +1,13 @@
 package io.github.yezhihao.protostar.schema;
 
+import io.github.yezhihao.protostar.Fixed;
 import io.github.yezhihao.protostar.Schema;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * @author yezhihao
+ * https://gitee.com/yezhihao/jt808-server
+ */
 public final class NumberSchema {
 
     public static final Schema BOOL = new BOOL();
@@ -18,11 +23,7 @@ public final class NumberSchema {
     public static final Schema QWORD_LONG = new QWORD2Long();
     public static final Schema QWORD_DOUBLE = new QWORD2Double();
 
-    public static class BOOL implements Schema<Boolean> {
-
-        private BOOL() {
-        }
-
+    private static class BOOL implements Fixed.L1<Boolean> {
         public Boolean readFrom(ByteBuf input) {
             return input.readBoolean();
         }
@@ -32,10 +33,7 @@ public final class NumberSchema {
         }
     }
 
-    public static class CHAR implements Schema<Character> {
-        private CHAR() {
-        }
-
+    private static class CHAR implements Fixed.L2<Character> {
         public Character readFrom(ByteBuf input) {
             return input.readChar();
         }
@@ -45,10 +43,7 @@ public final class NumberSchema {
         }
     }
 
-    public static class BYTE2Byte implements Schema<Byte> {
-        private BYTE2Byte() {
-        }
-
+    private static class BYTE2Byte implements Fixed.L1<Byte> {
         public Byte readFrom(ByteBuf input) {
             return input.readByte();
         }
@@ -58,10 +53,7 @@ public final class NumberSchema {
         }
     }
 
-    public static class BYTE2Short implements Schema<Short> {
-        private BYTE2Short() {
-        }
-
+    private static class BYTE2Short implements Fixed.L1<Short> {
         public Short readFrom(ByteBuf input) {
             return input.readUnsignedByte();
         }
@@ -71,10 +63,7 @@ public final class NumberSchema {
         }
     }
 
-    public static class BYTE2Int implements Schema<Integer> {
-        private BYTE2Int() {
-        }
-
+    private static class BYTE2Int implements Fixed.L1<Integer> {
         public Integer readFrom(ByteBuf input) {
             return (int) input.readUnsignedByte();
         }
@@ -84,10 +73,7 @@ public final class NumberSchema {
         }
     }
 
-    public static class WORD2Short implements Schema<Short> {
-        private WORD2Short() {
-        }
-
+    private static class WORD2Short implements Fixed.L2<Short> {
         public Short readFrom(ByteBuf input) {
             return input.readShort();
         }
@@ -97,10 +83,7 @@ public final class NumberSchema {
         }
     }
 
-    public static class WORD2Int implements Schema<Integer> {
-        private WORD2Int() {
-        }
-
+    private static class WORD2Int implements Fixed.L2<Integer> {
         public Integer readFrom(ByteBuf input) {
             return input.readUnsignedShort();
         }
@@ -110,10 +93,7 @@ public final class NumberSchema {
         }
     }
 
-    public static class DWORD2Int implements Schema<Integer> {
-        private DWORD2Int() {
-        }
-
+    private static class DWORD2Int implements Fixed.L4<Integer> {
         public Integer readFrom(ByteBuf input) {
             return input.readInt();
         }
@@ -123,10 +103,7 @@ public final class NumberSchema {
         }
     }
 
-    public static class DWORD2Long implements Schema<Long> {
-        private DWORD2Long() {
-        }
-
+    private static class DWORD2Long implements Fixed.L4<Long> {
         public Long readFrom(ByteBuf input) {
             return input.readUnsignedInt();
         }
@@ -136,10 +113,7 @@ public final class NumberSchema {
         }
     }
 
-    public static class DWORD2Float implements Schema<Float> {
-        private DWORD2Float() {
-        }
-
+    private static class DWORD2Float implements Fixed.L4<Float> {
         public Float readFrom(ByteBuf input) {
             return input.readFloat();
         }
@@ -149,10 +123,7 @@ public final class NumberSchema {
         }
     }
 
-    public static class QWORD2Long implements Schema<Long> {
-        private QWORD2Long() {
-        }
-
+    private static class QWORD2Long implements Fixed.L8<Long> {
         public Long readFrom(ByteBuf input) {
             return input.readLong();
         }
@@ -162,10 +133,7 @@ public final class NumberSchema {
         }
     }
 
-    public static class QWORD2Double implements Schema<Double> {
-        private QWORD2Double() {
-        }
-
+    private static class QWORD2Double implements Fixed.L8<Double> {
         public Double readFrom(ByteBuf input) {
             return input.readDouble();
         }

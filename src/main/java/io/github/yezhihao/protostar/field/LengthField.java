@@ -8,13 +8,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 
 /**
- * 固定长度的字段
+ * 指定长度域
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */
-public class FixedLengthField<T> extends BasicField<T> {
+public class LengthField<T> extends BasicField<T> {
 
-    public FixedLengthField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
+    public LengthField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
         super(field, f, schema);
     }
 

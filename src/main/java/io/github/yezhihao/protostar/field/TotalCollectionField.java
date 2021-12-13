@@ -7,42 +7,42 @@ import io.github.yezhihao.protostar.util.Info;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
 
-import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
- * 前置数量的数组域
+ * 指定前置数量的集合域
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */
-public class ArrayTotalField extends BasicField {
+public class TotalCollectionField extends BasicField {
 
     protected final IntTool intTool;
 
-    public ArrayTotalField(Field field, java.lang.reflect.Field f, Schema schema) {
+    public TotalCollectionField(Field field, java.lang.reflect.Field f, Schema schema) {
         super(field, f, schema);
-        this.intTool = IntTool.getInstance(field.lengthSize());
+        this.intTool = IntTool.getInstance(field.totalUnit());
     }
 
     public Object readFrom(ByteBuf input) {
         int total = intTool.read(input);
         if (total <= 0)
             return null;
-        Object array = Array.newInstance(schema.getClass(), total);
+        ArrayList value = new ArrayList<>(total);
         for (int i = 0; i < total; i++) {
             Object t = schema.readFrom(input);
-            Array.set(array, i, t);
+            value.add(t);
         }
-        return array;
+        return value;
     }
 
     public void writeTo(ByteBuf output, Object value) {
-        if (value == null) {
+        Collection list = (Collection) value;
+        if (list == null || list.isEmpty()) {
             intTool.write(output, 0);
         } else {
-            int length = Array.getLength(value);
-            intTool.write(output, length);
-            for (int i = 0; i < length; i++) {
-                Object t = Array.get(value, i);
+            intTool.write(output, list.size());
+            for (Object t : list) {
                 schema.writeTo(output, t);
             }
         }
@@ -56,26 +56,23 @@ public class ArrayTotalField extends BasicField {
 
         if (total <= 0)
             return null;
-        Object array = Array.newInstance(schema.getClass(), total);
+        ArrayList value = new ArrayList<>(total);
         for (int i = 0; i < total; i++) {
             Object t = schema.readFrom(input, explain);
-            Array.set(array, i, t);
+            value.add(t);
         }
-        return array;
+        return value;
     }
 
     @Override
     public void writeTo(ByteBuf output, Object value, Explain explain) {
         int begin = output.readerIndex();
-        if (value == null) {
-            explain.add(Info.lengthField(begin, field, 0));
-            intTool.write(output, 0);
-        } else {
-            int length = Array.getLength(value);
-            explain.add(Info.lengthField(begin, field, length));
-            intTool.write(output, length);
-            for (int i = 0; i < length; i++) {
-                Object t = Array.get(value, i);
+        Collection list = (Collection) value;
+        int total = list == null ? 0 : list.size();
+        explain.add(Info.lengthField(begin, field, total));
+
+        if (list != null) {
+            for (Object t : list) {
                 schema.writeTo(output, t, explain);
             }
         }

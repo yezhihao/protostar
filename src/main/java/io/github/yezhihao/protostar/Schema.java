@@ -36,6 +36,6 @@ public interface Schema<T> {
 
     /** 用于预估内存分配，不需要精确值 */
     default int length() {
-        return 64;
+        return 32;
     }
 }

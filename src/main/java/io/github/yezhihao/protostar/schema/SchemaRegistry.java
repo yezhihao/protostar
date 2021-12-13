@@ -10,9 +10,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.Temporal;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class SchemaRegistry {
 
@@ -20,17 +18,17 @@ public class SchemaRegistry {
 
     private static final Map<String, Schema> SYS_SCHEMA = new HashMap<>(128);
 
-    private static final Set<String> NUMBER = new HashSet<>(12);
+    private static final Map<String, Integer> NUMBER = new HashMap<>(12);
 
     static {
-        NUMBER.add(byte.class.getName());
-        NUMBER.add(Byte.class.getName());
-        NUMBER.add(short.class.getName());
-        NUMBER.add(Short.class.getName());
-        NUMBER.add(int.class.getName());
-        NUMBER.add(Integer.class.getName());
-        NUMBER.add(long.class.getName());
-        NUMBER.add(Long.class.getName());
+        NUMBER.put(byte.class.getName(), 1);
+        NUMBER.put(Byte.class.getName(), 1);
+        NUMBER.put(short.class.getName(), 2);
+        NUMBER.put(Short.class.getName(), 2);
+        NUMBER.put(int.class.getName(), 4);
+        NUMBER.put(Integer.class.getName(), 4);
+        NUMBER.put(long.class.getName(), 8);
+        NUMBER.put(Long.class.getName(), 8);
 
         register(byte.class,         /**/NumberSchema.BYTE_BYTE, 1);
         register(Byte.class,         /**/NumberSchema.BYTE_BYTE, 1);
@@ -79,10 +77,14 @@ public class SchemaRegistry {
         register(float[].class,      /**/ArraySchema.FLOATS);
         register(double[].class,     /**/ArraySchema.DOUBLES);
 
-        register(LocalDateTime.class,/**/DateTimeSchema.BCD2DateTime, "BCD");
-        register(LocalDateTime.class,/**/DateTimeSchema.BYTES2DateTime);
-        register(LocalDate.class,    /**/DateTimeSchema.BYTES2Date);
-        register(LocalTime.class,    /**/DateTimeSchema.BYTES2Time);
+
+        register(LocalTime.class,    /**/DateTimeSchema.BYTE_TIME);
+        register(LocalDate.class,    /**/DateTimeSchema.BYTE_DATE);
+        register(LocalDateTime.class,/**/DateTimeSchema.BYTE_DATETIME);
+
+        register(LocalTime.class,    /**/DateTimeSchema.BCD_TIME, "BCD");
+        register(LocalDate.class,    /**/DateTimeSchema.BCD_DATE, "BCD");
+        register(LocalDateTime.class,/**/DateTimeSchema.BCD_DATETIME, "BCD");
 
         register(ByteBuffer.class,   /**/ByteBufferSchema.INSTANCE);
     }
@@ -115,7 +117,7 @@ public class SchemaRegistry {
 
         String name = typeClass.getName();
 
-        if (NUMBER.contains(name)) {
+        if (NUMBER.containsKey(name)) {
             int length = field.length();
             if (length > 0)
                 name = name + "/" + length;
@@ -132,5 +134,9 @@ public class SchemaRegistry {
             return SYS_SCHEMA.get(name);
         }
         return SYS_SCHEMA.get(name);
+    }
+
+    public static int getLength(Class aClass) {
+        return NUMBER.get(aClass.getName());
     }
 }

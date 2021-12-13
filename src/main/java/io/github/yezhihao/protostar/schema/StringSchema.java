@@ -26,7 +26,7 @@ public class StringSchema {
         return cache.get(charset.toUpperCase(), () -> new STR(charset));
     }
 
-    public static class STR implements Schema<String> {
+    private static class STR implements Schema<String> {
         private final byte pad = 0;
         private final Charset charset;
 
@@ -82,10 +82,7 @@ public class StringSchema {
         }
     }
 
-    public static class BCD implements Schema<String> {
-        private BCD() {
-        }
-
+    private static class BCD implements Schema<String> {
         @Override
         public String readFrom(ByteBuf input) {
             return readFrom(input, input.readableBytes());
@@ -124,10 +121,7 @@ public class StringSchema {
         }
     }
 
-    public static class HEX implements Schema<String> {
-        private HEX() {
-        }
-
+    private static class HEX implements Schema<String> {
         @Override
         public String readFrom(ByteBuf input) {
             return readFrom(input, input.readableBytes());

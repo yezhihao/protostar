@@ -3,6 +3,10 @@ package io.github.yezhihao.protostar.schema;
 import io.github.yezhihao.protostar.Schema;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * @author yezhihao
+ * https://gitee.com/yezhihao/jt808-server
+ */
 public class ArraySchema {
 
     public static final Schema CHARS = new CharArray();
@@ -13,10 +17,7 @@ public class ArraySchema {
     public static final Schema LONGS = new LongArray();
     public static final Schema DOUBLES = new DoubleArray();
 
-    public static class ByteArray implements Schema<byte[]> {
-        private ByteArray() {
-        }
-
+    private static class ByteArray implements Schema<byte[]> {
         @Override
         public byte[] readFrom(ByteBuf input) {
             byte[] array = new byte[input.readableBytes()];
@@ -44,10 +45,7 @@ public class ArraySchema {
         }
     }
 
-    public static class CharArray implements Schema<char[]> {
-        private CharArray() {
-        }
-
+    private static class CharArray implements Schema<char[]> {
         @Override
         public char[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 1;
@@ -83,10 +81,7 @@ public class ArraySchema {
         }
     }
 
-    public static class ShortArray implements Schema<short[]> {
-        private ShortArray() {
-        }
-
+    private static class ShortArray implements Schema<short[]> {
         @Override
         public short[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 1;
@@ -122,10 +117,7 @@ public class ArraySchema {
         }
     }
 
-    public static class IntArray implements Schema<int[]> {
-        private IntArray() {
-        }
-
+    private static class IntArray implements Schema<int[]> {
         @Override
         public int[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 2;
@@ -161,10 +153,7 @@ public class ArraySchema {
         }
     }
 
-    public static class LongArray implements Schema<long[]> {
-        private LongArray() {
-        }
-
+    private static class LongArray implements Schema<long[]> {
         @Override
         public long[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 3;
@@ -200,10 +189,7 @@ public class ArraySchema {
         }
     }
 
-    public static class FloatArray implements Schema<float[]> {
-        private FloatArray() {
-        }
-
+    private static class FloatArray implements Schema<float[]> {
         @Override
         public float[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 2;
@@ -239,10 +225,7 @@ public class ArraySchema {
         }
     }
 
-    public static class DoubleArray implements Schema<double[]> {
-        private DoubleArray() {
-        }
-
+    private static class DoubleArray implements Schema<double[]> {
         @Override
         public double[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 3;
