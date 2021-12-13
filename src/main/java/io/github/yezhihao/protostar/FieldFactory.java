@@ -21,7 +21,7 @@ public abstract class FieldFactory {
         if (schema == null)
             throw new IllegalArgumentException("不支持的类型转换 name:" + f.getName() + ",desc:" + field.desc() + "[" + field.length() + " to " + typeClass.getName() + "]");
 
-        if (Map.class.isAssignableFrom(typeClass) && !MapSchema.class.isAssignableFrom(schema.getClass())) {
+        if (Map.class.isAssignableFrom(typeClass) && !(schema instanceof MapSchema)) {
             Class keyClass = (Class) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
             Schema keySchema = SchemaRegistry.get(keyClass, null);
             if (keySchema != null) {
@@ -36,19 +36,30 @@ public abstract class FieldFactory {
         }
 
         if (field.length() > 0) {
-            return new FixedLengthField(field, f, schema);
-        } else if (field.lengthSize() > 0) {
-            if (Collection.class.isAssignableFrom(typeClass))
-                return new CollectionTotalField(field, f, schema);
-            else if (typeClass.isArray() && !typeClass.getComponentType().isPrimitive())
-                return new ArrayTotalField(field, f, schema);
-            else
-                return new DynamicLengthField(field, f, schema);
-        } else {
-            if (Collection.class.isAssignableFrom(typeClass))
-                return new CollectionField(field, f, schema);
-            else
+            if (schema instanceof Fixed)
                 return new BasicField(field, f, schema);
+            return new LengthField(field, f, schema);
+        }
+
+        if (field.lengthUnit() > 0) {
+            return new LengthUnitField(field, f, schema);
+        }
+
+        if (field.totalUnit() > 0) {
+            if (Collection.class.isAssignableFrom(typeClass))
+                return new TotalCollectionField(field, f, schema);
+            else if (typeClass.isArray()) {
+                typeClass = typeClass.getComponentType();
+                if (typeClass.isPrimitive())
+                    return new TotalArrayPrimitiveField(field, f, schema, SchemaRegistry.getLength(typeClass));
+                return new TotalArrayObjectField(field, f, schema);
+            }
+        }
+
+        if (Collection.class.isAssignableFrom(typeClass)) {
+            return new CollectionField(field, f, schema);
+        } else {
+            return new BasicField(field, f, schema);
         }
     }
 }
