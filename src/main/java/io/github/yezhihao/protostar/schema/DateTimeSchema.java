@@ -15,13 +15,13 @@ import java.time.LocalTime;
  */
 public class DateTimeSchema {
 
-    public static final Schema BYTE_TIME = new Time(DateTool.BYTE);
-    public static final Schema BYTE_DATE = new Date(DateTool.BYTE);
-    public static final Schema BYTE_DATETIME = new DateTime(DateTool.BYTE);
+    public static final Schema<LocalTime> BYTE_TIME = new Time(DateTool.BYTE);
+    public static final Schema<LocalDate> BYTE_DATE = new Date(DateTool.BYTE);
+    public static final Schema<LocalDateTime> BYTE_DATETIME = new DateTime(DateTool.BYTE);
 
-    public static final Schema BCD_TIME = new Time(DateTool.BCD);
-    public static final Schema BCD_DATE = new Date(DateTool.BCD);
-    public static final Schema BCD_DATETIME = new DateTime(DateTool.BCD);
+    public static final Schema<LocalTime> BCD_TIME = new Time(DateTool.BCD);
+    public static final Schema<LocalDate> BCD_DATE = new Date(DateTool.BCD);
+    public static final Schema<LocalDateTime> BCD_DATETIME = new DateTime(DateTool.BCD);
 
     private static class DateTime implements Fixed.L6<LocalDateTime> {
         private final DateTool tool;

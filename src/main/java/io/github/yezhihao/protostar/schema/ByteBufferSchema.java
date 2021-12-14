@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 
 public class ByteBufferSchema implements Schema<ByteBuffer> {
 
-    public static final Schema INSTANCE = new ByteBufferSchema();
+    public static final Schema<ByteBuffer> INSTANCE = new ByteBufferSchema();
 
     private ByteBufferSchema() {
     }

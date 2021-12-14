@@ -15,13 +15,13 @@ import java.util.*;
  */
 public abstract class SingleVersionUtil {
 
-    private static final Map<Object, Schema> CACHE = new WeakHashMap<>();
+    private static final Map<String, Schema> CACHE = new WeakHashMap<>();
 
     public static <T> Schema<T> getRuntimeSchema(Class typeClass) {
         return getRuntimeSchema(CACHE, typeClass);
     }
 
-    public static <T> Schema<T> getRuntimeSchema(Map<Object, Schema> root, Class<T> typeClass) {
+    public static <T> Schema<T> getRuntimeSchema(Map<String, Schema> root, Class<T> typeClass) {
         Schema schema = root.get(typeClass.getName());
         //不支持循环引用
         if (schema != null) return (Schema<T>) schema;
@@ -50,7 +50,7 @@ public abstract class SingleVersionUtil {
         return result;
     }
 
-    private static List<BasicField> findFields(Map<Object, Schema> root, List<java.lang.reflect.Field> fs) {
+    private static List<BasicField> findFields(Map<String, Schema> root, List<java.lang.reflect.Field> fs) {
         List<BasicField> fields = new ArrayList<>(fs.size());
 
         for (java.lang.reflect.Field f : fs) {
@@ -62,7 +62,7 @@ public abstract class SingleVersionUtil {
         return fields;
     }
 
-    private static void fillField(Map<Object, Schema> root, List<BasicField> fields, java.lang.reflect.Field f, Field field) {
+    private static void fillField(Map<String, Schema> root, List<BasicField> fields, java.lang.reflect.Field f, Field field) {
         Class typeClass = f.getType();
 
         Schema schema = SchemaRegistry.get(typeClass, field);

@@ -13,26 +13,26 @@ import java.util.Map;
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */
-public class MultiVersionSchemaManager {
+public class SchemaManager {
 
     private final Map<Integer, Map<Integer, RuntimeSchema>> typeIdMapping;
 
     private final Map<String, Map<Integer, RuntimeSchema>> typeClassMapping;
 
-    public MultiVersionSchemaManager() {
+    public SchemaManager() {
         this(128);
     }
 
-    public MultiVersionSchemaManager(int initialCapacity) {
+    public SchemaManager(int initialCapacity) {
         this.typeIdMapping = new HashMap<>(initialCapacity);
         this.typeClassMapping = new HashMap<>(initialCapacity);
     }
 
-    public MultiVersionSchemaManager(String... basePackages) {
+    public SchemaManager(String... basePackages) {
         this(256, basePackages);
     }
 
-    public MultiVersionSchemaManager(int initialCapacity, String... basePackages) {
+    public SchemaManager(int initialCapacity, String... basePackages) {
         this(initialCapacity);
         for (String basePackage : basePackages) {
             List<Class> types = ClassUtils.getClassList(basePackage);

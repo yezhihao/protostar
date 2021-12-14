@@ -9,20 +9,27 @@ import io.netty.buffer.ByteBuf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Map.Entry;
 
-public abstract class MapSchema<K, V> extends PrepareLoadStrategy implements Schema<Entry<K, V>> {
+public abstract class MapSchema<K, V> implements Schema<Entry<K, V>> {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
     protected final Schema<K> keySchema;
     protected final int lengthSize;
     protected final IntTool intTool;
+    protected final Map<K, Schema> valueSchema;
 
     public MapSchema(Schema<K> keySchema, int lengthSize) {
         this.keySchema = keySchema;
         this.lengthSize = lengthSize;
         this.intTool = IntTool.getInstance(lengthSize);
+        PrepareLoadStrategy<K> loadStrategy = new PrepareLoadStrategy<>();
+        addSchemas(loadStrategy);
+        this.valueSchema = loadStrategy.build();
     }
+
+    protected abstract void addSchemas(PrepareLoadStrategy<K> schemaRegistry);
 
     @Override
     public KeyValuePair<K, V> readFrom(ByteBuf input) {
@@ -34,10 +41,10 @@ public abstract class MapSchema<K, V> extends PrepareLoadStrategy implements Sch
             int writerIndex = input.writerIndex();
             input.writerIndex(input.readerIndex() + length);
 
-            Schema schema = getSchema(key);
+            Schema<V> schema = valueSchema.get(key);
             if (schema != null) {
-                Object value = schema.readFrom(input, length);
-                result.setValue((V) value);
+                V value = schema.readFrom(input, length);
+                result.setValue(value);
             } else {
                 byte[] bytes = new byte[length];
                 input.readBytes(bytes);
@@ -46,10 +53,10 @@ public abstract class MapSchema<K, V> extends PrepareLoadStrategy implements Sch
             input.writerIndex(writerIndex);
 
         } else if (length < 0) {
-            Schema schema = getSchema(key);
+            Schema<V> schema = valueSchema.get(key);
             if (schema != null) {
-                Object value = schema.readFrom(input);
-                result.setValue((V) value);
+                V value = schema.readFrom(input);
+                result.setValue(value);
             } else {
                 byte[] bytes = new byte[input.readableBytes()];
                 input.readBytes(bytes);
@@ -64,12 +71,12 @@ public abstract class MapSchema<K, V> extends PrepareLoadStrategy implements Sch
         K key = entry.getKey();
         keySchema.writeTo(output, key);
 
-        Schema schema = getSchema(key);
+        Schema<V> schema = valueSchema.get(key);
         if (schema != null) {
             int begin = output.writerIndex();
             intTool.write(output, 0);
 
-            Object value = entry.getValue();
+            V value = entry.getValue();
             if (value != null) {
                 schema.writeTo(output, value);
                 int length = output.writerIndex() - begin - lengthSize;
@@ -93,10 +100,10 @@ public abstract class MapSchema<K, V> extends PrepareLoadStrategy implements Sch
         int writerIndex = input.writerIndex();
         input.writerIndex(input.readerIndex() + length);
 
-        Schema schema = getSchema(key);
+        Schema<V> schema = valueSchema.get(key);
         if (schema != null) {
-            Object value = schema.readFrom(input, length, explain);
-            result.setValue((V) value);
+            V value = schema.readFrom(input, length, explain);
+            result.setValue(value);
         } else {
             byte[] bytes = new byte[length];
             input.readBytes(bytes);
@@ -112,7 +119,7 @@ public abstract class MapSchema<K, V> extends PrepareLoadStrategy implements Sch
         keySchema.writeTo(output, key, explain);
         explain.setLastDesc("key");
 
-        Schema schema = getSchema(key);
+        Schema schema = valueSchema.get(key);
         if (schema != null) {
             int begin = output.writerIndex();
             intTool.write(output, 0);

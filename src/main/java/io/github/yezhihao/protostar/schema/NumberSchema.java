@@ -10,18 +10,18 @@ import io.netty.buffer.ByteBuf;
  */
 public final class NumberSchema {
 
-    public static final Schema BOOL = new BOOL();
-    public static final Schema CHAR = new CHAR();
-    public static final Schema BYTE_BYTE = new BYTE2Byte();
-    public static final Schema BYTE_SHORT = new BYTE2Short();
-    public static final Schema BYTE_INT = new BYTE2Int();
-    public static final Schema WORD_SHORT = new WORD2Short();
-    public static final Schema WORD_INT = new WORD2Int();
-    public static final Schema DWORD_INT = new DWORD2Int();
-    public static final Schema DWORD_LONG = new DWORD2Long();
-    public static final Schema DWORD_FLOAT = new DWORD2Float();
-    public static final Schema QWORD_LONG = new QWORD2Long();
-    public static final Schema QWORD_DOUBLE = new QWORD2Double();
+    public static final Schema<Boolean> BOOL = new BOOL();
+    public static final Schema<Character> CHAR = new CHAR();
+    public static final Schema<Byte> BYTE_BYTE = new BYTE2Byte();
+    public static final Schema<Short> BYTE_SHORT = new BYTE2Short();
+    public static final Schema<Integer> BYTE_INT = new BYTE2Int();
+    public static final Schema<Short> WORD_SHORT = new WORD2Short();
+    public static final Schema<Integer> WORD_INT = new WORD2Int();
+    public static final Schema<Integer> DWORD_INT = new DWORD2Int();
+    public static final Schema<Long> DWORD_LONG = new DWORD2Long();
+    public static final Schema<Float> DWORD_FLOAT = new DWORD2Float();
+    public static final Schema<Long> QWORD_LONG = new QWORD2Long();
+    public static final Schema<Double> QWORD_DOUBLE = new QWORD2Double();
 
     private static class BOOL implements Fixed.L1<Boolean> {
         public Boolean readFrom(ByteBuf input) {

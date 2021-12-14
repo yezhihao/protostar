@@ -9,13 +9,13 @@ import io.netty.buffer.ByteBuf;
  */
 public class ArraySchema {
 
-    public static final Schema CHARS = new CharArray();
-    public static final Schema BYTES = new ByteArray();
-    public static final Schema SHORTS = new ShortArray();
-    public static final Schema INTS = new IntArray();
-    public static final Schema FLOATS = new FloatArray();
-    public static final Schema LONGS = new LongArray();
-    public static final Schema DOUBLES = new DoubleArray();
+    public static final Schema<char[]> CHARS = new CharArray();
+    public static final Schema<byte[]> BYTES = new ByteArray();
+    public static final Schema<short[]> SHORTS = new ShortArray();
+    public static final Schema<int[]> INTS = new IntArray();
+    public static final Schema<float[]> FLOATS = new FloatArray();
+    public static final Schema<long[]> LONGS = new LongArray();
+    public static final Schema<double[]> DOUBLES = new DoubleArray();
 
     private static class ByteArray implements Schema<byte[]> {
         @Override
