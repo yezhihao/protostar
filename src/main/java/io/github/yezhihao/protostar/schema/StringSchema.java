@@ -36,7 +36,8 @@ public class StringSchema {
 
         @Override
         public String readFrom(ByteBuf input) {
-            return readFrom(input, input.readableBytes());
+            int length = input.readUnsignedByte();
+            return readFrom(input, length);
         }
 
         @Override
@@ -56,7 +57,8 @@ public class StringSchema {
         @Override
         public void writeTo(ByteBuf output, String value) {
             byte[] bytes = value.getBytes(charset);
-            output.writeBytes(bytes);
+            int length = bytes.length > 255 ? 255 : bytes.length;
+            output.writeBytes(bytes, 0, length);
         }
 
         @Override

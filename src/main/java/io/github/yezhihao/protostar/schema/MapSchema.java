@@ -4,14 +4,14 @@ import io.github.yezhihao.protostar.PrepareLoadStrategy;
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.IntTool;
+import io.github.yezhihao.protostar.util.KeyValuePair;
 import io.netty.buffer.ByteBuf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.Map.Entry;
 
-public abstract class MapSchema<K, V> extends PrepareLoadStrategy implements Schema<Map<K, V>> {
+public abstract class MapSchema<K, V> extends PrepareLoadStrategy implements Schema<Entry<K, V>> {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
     protected final Schema<K> keySchema;
@@ -25,108 +25,96 @@ public abstract class MapSchema<K, V> extends PrepareLoadStrategy implements Sch
     }
 
     @Override
-    public Map<K, V> readFrom(ByteBuf input) {
-        if (!input.isReadable())
-            return null;
-        Map<K, V> map = new TreeMap<>();
-        K key = null;
-        int length = 0;
-        try {
-            do {
-                key = keySchema.readFrom(input);
-                length = intTool.read(input);
-                if (length <= 0)
-                    continue;
+    public KeyValuePair<K, V> readFrom(ByteBuf input) {
+        K key = keySchema.readFrom(input);
+        KeyValuePair<K, V> result = new KeyValuePair<>(key);
 
-                if (input.isReadable(length)) {
-                    int writerIndex = input.writerIndex();
-                    input.writerIndex(input.readerIndex() + length);
-                    map.put(key, (V) readValue(key, input));
-                    input.writerIndex(writerIndex);
-                } else {
-                    map.put(key, (V) readValue(key, input));
-                }
-            } while (input.isReadable());
-        } catch (Exception e) {
-            log.warn("解析出错:KEY[{}], LENGTH[{}]", key, length);
-        }
-        return map;
-    }
+        int length = intTool.read(input);
+        if (length <= 0)
+            return result;
 
-    public Object readValue(K key, ByteBuf input) {
-        if (!input.isReadable())
-            return null;
+        int writerIndex = input.writerIndex();
+        input.writerIndex(input.readerIndex() + length);
+
         Schema schema = getSchema(key);
-        if (schema != null)
-            return schema.readFrom(input);
-        byte[] bytes = new byte[input.readableBytes()];
-        input.readBytes(bytes);
-        return bytes;
+        if (schema != null) {
+            Object value = schema.readFrom(input, length);
+            result.setValue((V) value);
+        } else {
+            byte[] bytes = new byte[length];
+            input.readBytes(bytes);
+            result.setValue((V) bytes);
+        }
+        input.writerIndex(writerIndex);
+        return result;
     }
 
     @Override
-    public Map<K, V> readFrom(ByteBuf input, Explain explain) {
-        if (!input.isReadable())
-            return null;
-        Map<K, V> map = new TreeMap<>();
-        K key = null;
-        int length = 0;
-        try {
-            do {
-                key = keySchema.readFrom(input, explain);
-                length = intTool.read(input);
-                if (length <= 0)
-                    continue;
+    public void writeTo(ByteBuf output, Entry<K, V> entry) {
+        K key = entry.getKey();
+        keySchema.writeTo(output, key);
 
-                if (input.isReadable(length)) {
-                    int writerIndex = input.writerIndex();
-                    input.writerIndex(input.readerIndex() + length);
-                    map.put(key, (V) readValue(key, input, explain));
-                    input.writerIndex(writerIndex);
-                } else {
-                    map.put(key, (V) readValue(key, input, explain));
-                }
-            } while (input.isReadable());
-        } catch (Exception e) {
-            log.warn("解析出错:KEY[{}], LENGTH[{}]", key, length);
-        }
-        return map;
-    }
-
-    public Object readValue(K key, ByteBuf input, Explain explain) {
-        if (!input.isReadable())
-            return null;
-        Schema schema = getSchema(key);
-        if (schema != null)
-            return schema.readFrom(input, explain);
-        byte[] bytes = new byte[input.readableBytes()];
-        input.readBytes(bytes);
-        return bytes;
-    }
-
-    @Override
-    public void writeTo(ByteBuf output, Map<K, V> map) {
-
-        if (map == null || map.isEmpty())
-            return;
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            K key = entry.getKey();
-            V value = entry.getValue();
-            keySchema.writeTo(output, key);
-            writeValue(key, output, value);
-        }
-    }
-
-    public void writeValue(K key, ByteBuf output, Object value) {
         Schema schema = getSchema(key);
         if (schema != null) {
             int begin = output.writerIndex();
             intTool.write(output, 0);
-            schema.writeTo(output, value);
-            int length = output.writerIndex() - begin - lengthSize;
-            intTool.set(output, begin, length);
+
+            Object value = entry.getValue();
+            if (value != null) {
+                schema.writeTo(output, value);
+                int length = output.writerIndex() - begin - lengthSize;
+                intTool.set(output, begin, length);
+            }
         } else {
-            log.warn("未注册的信息:ID[{}], VALUE[{}]", key, value);
+            log.warn("未注册的信息:Key[{}], Value[{}]", key, entry.getValue());
+        }
+    }
+
+    @Override
+    public KeyValuePair<K, V> readFrom(ByteBuf input, Explain explain) {
+        K key = keySchema.readFrom(input, explain);
+        explain.setLastDesc("key");
+        KeyValuePair<K, V> result = new KeyValuePair<>(key);
+
+        int length = intTool.read(input);
+        if (length <= 0)
+            return result;
+
+        int writerIndex = input.writerIndex();
+        input.writerIndex(input.readerIndex() + length);
+
+        Schema schema = getSchema(key);
+        if (schema != null) {
+            Object value = schema.readFrom(input, length, explain);
+            result.setValue((V) value);
+        } else {
+            byte[] bytes = new byte[length];
+            input.readBytes(bytes);
+            result.setValue((V) bytes);
+        }
+        input.writerIndex(writerIndex);
+        return result;
+    }
+
+    @Override
+    public void writeTo(ByteBuf output, Entry<K, V> entry, Explain explain) {
+        K key = entry.getKey();
+        keySchema.writeTo(output, key, explain);
+        explain.setLastDesc("key");
+
+        Schema schema = getSchema(key);
+        if (schema != null) {
+            int begin = output.writerIndex();
+            intTool.write(output, 0);
+
+            Object value = entry.getValue();
+            if (value != null) {
+                schema.writeTo(output, value, explain);
+                int length = output.writerIndex() - begin - lengthSize;
+                intTool.set(output, begin, length);
+            }
+        } else {
+            log.warn("未注册的信息:Key[{}], Value[{}]", key, entry.getValue());
         }
     }
 }

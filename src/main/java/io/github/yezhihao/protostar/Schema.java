@@ -15,17 +15,25 @@ public interface Schema<T> {
     T readFrom(ByteBuf input);
 
     default T readFrom(ByteBuf input, int length) {
-        throw new RuntimeException("不支持长度读取");
+        return readFrom(input);
+//        throw new RuntimeException("不支持长度读取");
     }
 
     void writeTo(ByteBuf output, T value);
 
     default void writeTo(ByteBuf output, int length, T value) {
-        throw new RuntimeException("不支持长度写入");
+        writeTo(output, value);
+//        throw new RuntimeException("不支持长度写入");
     }
 
     default void writeTo(ByteBuf output, T value, Explain explain) {
+        int begin = output.readerIndex();
+
         writeTo(output, value);
+
+        int end = output.readerIndex();
+        String raw = ByteBufUtil.hexDump(output, begin, end - begin);
+        explain.add(Info.field(begin, desc(), value, raw));
     }
 
     default T readFrom(ByteBuf input, Explain explain) {
@@ -38,7 +46,6 @@ public interface Schema<T> {
         explain.add(Info.field(begin, desc(), value, raw));
         return value;
     }
-
 
     default T readFrom(ByteBuf input, int length, Explain explain) {
         int begin = input.readerIndex();

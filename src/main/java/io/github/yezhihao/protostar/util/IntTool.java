@@ -6,6 +6,8 @@ public interface IntTool {
 
     static IntTool getInstance(int length) {
         switch (length) {
+            case 0:
+                return ZERO;
             case 1:
                 return BYTE;
             case 2:
@@ -26,6 +28,27 @@ public interface IntTool {
     int read(ByteBuf in);
 
     void write(ByteBuf out, int n);
+
+
+    IntTool ZERO = new IntTool() {
+        @Override
+        public int get(ByteBuf in, int i) {
+            return 0;
+        }
+
+        @Override
+        public void set(ByteBuf out, int i, int n) {
+        }
+
+        @Override
+        public int read(ByteBuf in) {
+            return 0;
+        }
+
+        @Override
+        public void write(ByteBuf out, int n) {
+        }
+    };
 
     IntTool BYTE = new IntTool() {
         @Override

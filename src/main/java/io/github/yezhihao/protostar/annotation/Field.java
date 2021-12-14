@@ -16,8 +16,8 @@ public @interface Field {
     /** 排序,默认使用代码顺序 */
     int index() default -1;
 
-    /** 长度,默认使用类型长度 */
-    int length() default -1;
+    /** 长度,默认使用类型长度,-1读取剩余长度 */
+    int length() default 0;
 
     /** 该字段的前置长度单位 1.BYTE 2.WORD 3.MEDIUM 4.DWORD */
     int lengthUnit() default -1;

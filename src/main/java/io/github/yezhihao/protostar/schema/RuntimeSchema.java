@@ -26,7 +26,7 @@ public class RuntimeSchema<T> implements Schema<T> {
         this.fields = fields;
         int length = 0;
         for (BasicField field : fields) {
-            length += field.length();
+            length += field.length() > 0 ? field.length() : 32;
         }
         this.length = length;
         try {

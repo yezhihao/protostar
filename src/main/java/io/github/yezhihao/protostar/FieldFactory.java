@@ -5,7 +5,6 @@ import io.github.yezhihao.protostar.field.*;
 import io.github.yezhihao.protostar.schema.MapSchema;
 import io.github.yezhihao.protostar.schema.SchemaRegistry;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.Map;
 
@@ -21,27 +20,17 @@ public abstract class FieldFactory {
         if (schema == null)
             throw new IllegalArgumentException("不支持的类型转换 name:" + f.getName() + ",desc:" + field.desc() + "[" + field.length() + " to " + typeClass.getName() + "]");
 
-        if (Map.class.isAssignableFrom(typeClass) && !(schema instanceof MapSchema)) {
-            Class keyClass = (Class) ((ParameterizedType) f.getGenericType()).getActualTypeArguments()[0];
-            Schema keySchema = SchemaRegistry.get(keyClass, null);
-            if (keySchema != null) {
-                Schema valueSchema = schema;
-                schema = new MapSchema(keySchema, 1) {
-                    @Override
-                    public Schema getSchema(Object key) {
-                        return valueSchema;
-                    }
-                };
-            }
+        if ((schema instanceof MapSchema) && Map.class.isAssignableFrom(typeClass)) {
+            return new MapField(field, f, schema);
         }
 
-        if (field.length() > 0) {
+        if (field.length() != 0) {
             if (schema instanceof Fixed)
                 return new BasicField(field, f, schema);
             return new LengthField(field, f, schema);
         }
 
-        if (field.lengthUnit() > 0) {
+        if (field.lengthUnit() >= 0) {
             return new LengthUnitField(field, f, schema);
         }
 
