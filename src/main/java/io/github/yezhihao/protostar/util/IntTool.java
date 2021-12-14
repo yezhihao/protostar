@@ -6,8 +6,9 @@ public interface IntTool {
 
     static IntTool getInstance(int length) {
         switch (length) {
+            case -1:
             case 0:
-                return ZERO;
+                return ALL;
             case 1:
                 return BYTE;
             case 2:
@@ -29,11 +30,11 @@ public interface IntTool {
 
     void write(ByteBuf out, int n);
 
-
-    IntTool ZERO = new IntTool() {
+    /** -1读取剩余所有字节 */
+    IntTool ALL = new IntTool() {
         @Override
         public int get(ByteBuf in, int i) {
-            return 0;
+            return -1;
         }
 
         @Override
@@ -42,7 +43,7 @@ public interface IntTool {
 
         @Override
         public int read(ByteBuf in) {
-            return 0;
+            return -1;
         }
 
         @Override

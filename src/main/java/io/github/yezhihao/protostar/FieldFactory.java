@@ -2,7 +2,6 @@ package io.github.yezhihao.protostar;
 
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.field.*;
-import io.github.yezhihao.protostar.schema.MapSchema;
 import io.github.yezhihao.protostar.schema.SchemaRegistry;
 
 import java.util.Collection;
@@ -20,24 +19,24 @@ public abstract class FieldFactory {
         if (schema == null)
             throw new IllegalArgumentException("不支持的类型转换 name:" + f.getName() + ",desc:" + field.desc() + "[" + field.length() + " to " + typeClass.getName() + "]");
 
-        if ((schema instanceof MapSchema) && Map.class.isAssignableFrom(typeClass)) {
-            return new MapField(field, f, schema);
-        }
-
         if (field.length() != 0) {
             if (schema instanceof Fixed)
                 return new BasicField(field, f, schema);
             return new LengthField(field, f, schema);
         }
 
-        if (field.lengthUnit() >= 0) {
+        if (field.lengthUnit() > 0) {
             return new LengthUnitField(field, f, schema);
         }
 
         if (field.totalUnit() > 0) {
-            if (Collection.class.isAssignableFrom(typeClass))
+            if (Collection.class.isAssignableFrom(typeClass)) {
                 return new TotalCollectionField(field, f, schema);
-            else if (typeClass.isArray()) {
+            }
+            if (Map.class.isAssignableFrom(typeClass)) {
+                return new TotalMapField(field, f, schema);
+            }
+            if (typeClass.isArray()) {
                 typeClass = typeClass.getComponentType();
                 if (typeClass.isPrimitive())
                     return new TotalArrayPrimitiveField(field, f, schema, SchemaRegistry.getLength(typeClass));
@@ -47,6 +46,8 @@ public abstract class FieldFactory {
 
         if (Collection.class.isAssignableFrom(typeClass)) {
             return new CollectionField(field, f, schema);
+        } else if (Map.class.isAssignableFrom(typeClass)) {
+            return new MapField(field, f, schema);
         } else {
             return new BasicField(field, f, schema);
         }

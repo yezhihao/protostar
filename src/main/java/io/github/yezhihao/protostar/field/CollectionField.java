@@ -29,8 +29,8 @@ public class CollectionField extends BasicField {
     }
 
     public void writeTo(ByteBuf output, Object value) {
-        Collection list = (Collection) value;
-        if (list != null && !list.isEmpty()) {
+        if (value != null) {
+            Collection list = (Collection) value;
             for (Object t : list) {
                 schema.writeTo(output, t);
             }
@@ -49,8 +49,8 @@ public class CollectionField extends BasicField {
 
     @Override
     public void writeTo(ByteBuf output, Object value, Explain explain) {
-        Collection list = (Collection) value;
-        if (list != null && !list.isEmpty()) {
+        if (value != null) {
+            Collection list = (Collection) value;
             for (Object t : list) {
                 schema.writeTo(output, t, explain);
             }

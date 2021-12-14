@@ -37,14 +37,14 @@ public class TotalCollectionField extends BasicField {
     }
 
     public void writeTo(ByteBuf output, Object value) {
-        if (value == null) {
-            intTool.write(output, 0);
-        } else {
+        if (value != null) {
             Collection list = (Collection) value;
             intTool.write(output, list.size());
             for (Object t : list) {
                 schema.writeTo(output, t);
             }
+        } else {
+            intTool.write(output, 0);
         }
     }
 

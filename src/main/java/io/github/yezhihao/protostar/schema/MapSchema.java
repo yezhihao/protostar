@@ -30,22 +30,32 @@ public abstract class MapSchema<K, V> extends PrepareLoadStrategy implements Sch
         KeyValuePair<K, V> result = new KeyValuePair<>(key);
 
         int length = intTool.read(input);
-        if (length <= 0)
-            return result;
+        if (length > 0) {
+            int writerIndex = input.writerIndex();
+            input.writerIndex(input.readerIndex() + length);
 
-        int writerIndex = input.writerIndex();
-        input.writerIndex(input.readerIndex() + length);
+            Schema schema = getSchema(key);
+            if (schema != null) {
+                Object value = schema.readFrom(input, length);
+                result.setValue((V) value);
+            } else {
+                byte[] bytes = new byte[length];
+                input.readBytes(bytes);
+                result.setValue((V) bytes);
+            }
+            input.writerIndex(writerIndex);
 
-        Schema schema = getSchema(key);
-        if (schema != null) {
-            Object value = schema.readFrom(input, length);
-            result.setValue((V) value);
-        } else {
-            byte[] bytes = new byte[length];
-            input.readBytes(bytes);
-            result.setValue((V) bytes);
+        } else if (length < 0) {
+            Schema schema = getSchema(key);
+            if (schema != null) {
+                Object value = schema.readFrom(input);
+                result.setValue((V) value);
+            } else {
+                byte[] bytes = new byte[input.readableBytes()];
+                input.readBytes(bytes);
+                result.setValue((V) bytes);
+            }
         }
-        input.writerIndex(writerIndex);
         return result;
     }
 
