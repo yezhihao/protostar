@@ -30,6 +30,31 @@ public class SchemaRegistry {
         NUMBER.put(long.class.getName(), 8);
         NUMBER.put(Long.class.getName(), 8);
 
+        register(short.class,        /**/NumberLESchema.WORD_SHORT, 2, "LE");
+        register(Short.class,        /**/NumberLESchema.WORD_SHORT, 2, "LE");
+        register(int.class,          /**/NumberLESchema.WORD_INT, 2, "LE");
+        register(Integer.class,      /**/NumberLESchema.WORD_INT, 2, "LE");
+
+        register(int.class,          /**/NumberLESchema.DWORD_INT, 4, "LE");
+        register(Integer.class,      /**/NumberLESchema.DWORD_INT, 4, "LE");
+        register(long.class,         /**/NumberLESchema.DWORD_LONG, 4, "LE");
+        register(Long.class,         /**/NumberLESchema.DWORD_LONG, 4, "LE");
+
+        register(long.class,         /**/NumberLESchema.QWORD_LONG, 8, "LE");
+        register(Long.class,         /**/NumberLESchema.QWORD_LONG, 8, "LE");
+
+        register(short.class,        /**/NumberLESchema.WORD_SHORT, "LE");
+        register(Short.class,        /**/NumberLESchema.WORD_SHORT, "LE");
+        register(int.class,          /**/NumberLESchema.DWORD_INT, "LE");
+        register(Integer.class,      /**/NumberLESchema.DWORD_INT, "LE");
+        register(long.class,         /**/NumberLESchema.QWORD_LONG, "LE");
+        register(Long.class,         /**/NumberLESchema.QWORD_LONG, "LE");
+
+        register(float.class,        /**/NumberLESchema.DWORD_FLOAT, "LE");
+        register(Float.class,        /**/NumberLESchema.DWORD_FLOAT, "LE");
+        register(double.class,       /**/NumberLESchema.QWORD_DOUBLE, "LE");
+        register(Double.class,       /**/NumberLESchema.QWORD_DOUBLE, "LE");
+
         register(byte.class,         /**/NumberSchema.BYTE_BYTE, 1);
         register(Byte.class,         /**/NumberSchema.BYTE_BYTE, 1);
         register(short.class,        /**/NumberSchema.BYTE_SHORT, 1);
@@ -89,6 +114,10 @@ public class SchemaRegistry {
         register(ByteBuffer.class,   /**/ByteBufferSchema.INSTANCE);
     }
 
+    public static void register(Class typeClass, Schema schema, int length, String charset) {
+        SYS_SCHEMA.put(typeClass.getName() + "/" + length + "/" + charset, schema);
+    }
+
     public static void register(Class typeClass, Schema schema, int length) {
         SYS_SCHEMA.put(typeClass.getName() + "/" + length, schema);
     }
@@ -116,15 +145,17 @@ public class SchemaRegistry {
             return getCustom(field.converter());
 
         String name = typeClass.getName();
+        String charset = field.charset().toUpperCase();
 
         if (NUMBER.containsKey(name)) {
             int length = field.length();
             if (length > 0)
-                name = name + "/" + length;
+                name += "/" + length;
+            if (charset.equals("LE"))
+                name += "/LE";
             return SYS_SCHEMA.get(name);
         }
 
-        String charset = field.charset().toUpperCase();
         if (CharSequence.class.isAssignableFrom(typeClass)) {
             return StringSchema.getInstance(charset);
         }
