@@ -57,12 +57,20 @@ public class ProtostarUtil {
     }
 
     private static List<java.lang.reflect.Field> findFields(Class typeClass) {
-        List<java.lang.reflect.Field> fs = new LinkedList<>();
+        LinkedList<java.lang.reflect.Field> fs = new LinkedList<>();
 
-        Class temp = typeClass;
+        boolean addFirst = false;
+        Class<?> temp = typeClass;
+
         while (temp != null) {
-            fs.addAll(Arrays.asList(temp.getDeclaredFields()));
-            if (!temp.isAnnotationPresent(MergeSuperclass.class)) break;
+            if (addFirst)
+                fs.addAll(0, Arrays.asList(temp.getDeclaredFields()));
+            else
+                fs.addAll(Arrays.asList(temp.getDeclaredFields()));
+            MergeSuperclass marge = temp.getAnnotation(MergeSuperclass.class);
+            if (marge == null)
+                break;
+            addFirst = marge.addFirst();
             temp = typeClass.getSuperclass();
         }
 
