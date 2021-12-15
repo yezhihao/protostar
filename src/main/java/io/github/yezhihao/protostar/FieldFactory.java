@@ -26,6 +26,8 @@ public abstract class FieldFactory {
         }
 
         if (field.lengthUnit() > 0) {
+            if (Collection.class.isAssignableFrom(typeClass))
+                return new LengthUnitCollectionField(field, f, schema);
             return new LengthUnitField(field, f, schema);
         }
 
