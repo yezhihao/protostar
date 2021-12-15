@@ -145,6 +145,20 @@ public class RuntimeSchema<T> implements Schema<T> {
     }
 
     @Override
+    public void writeTo(ByteBuf output, T message, Explain explain) {
+        BasicField field = null;
+        try {
+            for (int i = 0; i < fields.length; i++) {
+                field = fields[i];
+                Object value = field.get(message);
+                field.writeTo(output, value, explain);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Write failed " + typeClass.getName() + field, e);
+        }
+    }
+
+    @Override
     public void writeTo(ByteBuf output, int length, T message) {
         int writerIndex = output.writerIndex();
         writeTo(output, message);

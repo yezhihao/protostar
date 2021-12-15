@@ -24,10 +24,10 @@ public class T0200 {
     protected int serialNo;
     @Field(length = 2, desc = "消息包总数", version = {-1, 0})
     @Field(length = 2, desc = "消息包总数", version = 1)
-    protected Integer packageTotal;
+    protected int packageTotal;
     @Field(length = 2, desc = "包序号", version = {-1, 0})
     @Field(length = 2, desc = "包序号", version = 1)
-    protected Integer packageNo;
+    protected int packageNo;
     @Field(length = 4, desc = "报警标志")
     private int warnBit;
     @Field(length = 4, desc = "状态")
@@ -44,8 +44,8 @@ public class T0200 {
     private int direction;
     @Field(length = 6, charset = "BCD", desc = "时间(YYMMDDHHMMSS)")
     private String dateTime;
-    @Field(index = 4, desc = "属性", version = 0, converter = AttributeSchema.class)
-    @Field(index = 4, desc = "属性", version = 1, converter = AttributeSchemaV2.class)
+    @Field(desc = "属性", version = 0, converter = AttributeSchema.class)
+    @Field(desc = "属性", version = 1, converter = AttributeSchemaV2.class)
     private Map<Integer, Object> attributes;
 
     public int getMessageId() {

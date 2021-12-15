@@ -27,11 +27,11 @@ public interface Schema<T> {
     }
 
     default void writeTo(ByteBuf output, T value, Explain explain) {
-        int begin = output.readerIndex();
+        int begin = output.writerIndex();
 
         writeTo(output, value);
 
-        int end = output.readerIndex();
+        int end = output.writerIndex();
         String raw = ByteBufUtil.hexDump(output, begin, end - begin);
         explain.add(Info.field(begin, desc(), value, raw));
     }

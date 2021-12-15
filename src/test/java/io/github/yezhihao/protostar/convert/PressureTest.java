@@ -37,7 +37,9 @@ public class PressureTest {
         bean.setProperties(2);
         bean.setProtocolVersion(3);
         bean.setClientId("210987654321");
-        bean.setSerialNo(Short.MAX_VALUE);
+        bean.setSerialNo(0);
+        bean.setPackageNo(1);
+        bean.setPackageTotal(1);
         bean.setWarnBit(0);
         bean.setStatusBit(2048);
         bean.setLatitude(116307629);
