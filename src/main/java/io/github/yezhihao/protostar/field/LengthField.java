@@ -19,9 +19,9 @@ public class LengthField<T> extends BasicField<T> {
     }
 
     public T readFrom(ByteBuf input) {
-        if (!input.isReadable(length))
-            return null;
-        return schema.readFrom(input, length);
+        if (input.isReadable(length))
+            return schema.readFrom(input, length);
+        return null;
     }
 
     public void writeTo(ByteBuf output, T value) {

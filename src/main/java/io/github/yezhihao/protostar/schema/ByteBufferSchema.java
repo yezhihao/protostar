@@ -15,23 +15,7 @@ public class ByteBufferSchema extends BasicField<ByteBuffer> {
     }
 
     @Override
-    public ByteBuffer readFrom(ByteBuf input, int length) {
-        if (length < 0)
-            length = input.readableBytes();
-        ByteBuffer byteBuffer = input.nioBuffer(input.readerIndex(), length);
-        input.skipBytes(length);
-        return byteBuffer;
-    }
-
-    @Override
     public void writeTo(ByteBuf output, ByteBuffer value) {
-        output.writeBytes(value);
-    }
-
-    @Override
-    public void writeTo(ByteBuf output, int length, ByteBuffer value) {
-        if (length > 0)
-            value.position(value.limit() - length);
         output.writeBytes(value);
     }
 }

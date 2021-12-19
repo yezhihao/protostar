@@ -10,18 +10,23 @@ import io.netty.buffer.ByteBuf;
  */
 public interface Schema<T> {
 
-    default T readFrom(ByteBuf input) {
-        return readFrom(input, null);
-    }
+    T readFrom(ByteBuf input);
 
     default T readFrom(ByteBuf input, int length) {
-        throw new RuntimeException("不支持长度读取");
+        int readerLength = input.readerIndex() + length;
+        int writerIndex = input.writerIndex();
+        input.writerIndex(readerLength);
+        T value = readFrom(input);
+        input.setIndex(readerLength, writerIndex);
+        return value;
     }
 
     void writeTo(ByteBuf output, T value);
 
     default void writeTo(ByteBuf output, int length, T value) {
-        throw new RuntimeException("不支持长度写入");
+        int writerLength = output.writerIndex() + length;
+        writeTo(output, value);
+        output.writerIndex(writerLength);
     }
 
     default String desc() {

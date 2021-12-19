@@ -99,15 +99,6 @@ public class RuntimeSchema<T> extends BasicField<T> {
     }
 
     @Override
-    public T readFrom(ByteBuf input, int length) {
-        int writerIndex = input.writerIndex();
-        input.writerIndex(input.readerIndex() + length);
-        T result = readFrom(input);
-        input.writerIndex(writerIndex);
-        return result;
-    }
-
-    @Override
     public void writeTo(ByteBuf output, T message) {
         int i = 0;
         try {
@@ -131,13 +122,6 @@ public class RuntimeSchema<T> extends BasicField<T> {
         } catch (Exception e) {
             throw new RuntimeException("Write failed " + i + " " + typeClass.getName() + " " + schemas[i].f.getName(), e);
         }
-    }
-
-    @Override
-    public void writeTo(ByteBuf output, int length, T message) {
-        int writerIndex = output.writerIndex();
-        writeTo(output, message);
-        output.writerIndex(writerIndex + length);
     }
 
     public int length() {
