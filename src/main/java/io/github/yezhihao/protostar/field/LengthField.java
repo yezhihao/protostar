@@ -1,7 +1,6 @@
 package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
-import io.github.yezhihao.protostar.annotation.Field;
 import io.netty.buffer.ByteBuf;
 
 /**
@@ -11,11 +10,17 @@ import io.netty.buffer.ByteBuf;
  */
 public class LengthField<T> extends BasicField<T> {
 
-    public LengthField(Field field, java.lang.reflect.Field f, Schema<T> schema) {
-        super(field, f, schema);
+    private Schema<T> schema;
+    private int length;
+
+    public LengthField(Schema<T> schema, int length) {
+        this.schema = schema;
+        this.length = length;
     }
 
     public T readFrom(ByteBuf input) {
+        if (!input.isReadable(length))
+            return null;
         return schema.readFrom(input, length);
     }
 

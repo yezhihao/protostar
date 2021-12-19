@@ -1,7 +1,7 @@
 package io.github.yezhihao.protostar.schema;
 
-import io.github.yezhihao.protostar.Fixed;
 import io.github.yezhihao.protostar.Schema;
+import io.github.yezhihao.protostar.field.BasicField;
 import io.github.yezhihao.protostar.util.DateTool;
 import io.netty.buffer.ByteBuf;
 
@@ -23,10 +23,10 @@ public class DateTimeSchema {
     public static final Schema<LocalDate> BCD_DATE = new Date(DateTool.BCD);
     public static final Schema<LocalDateTime> BCD_DATETIME = new DateTime(DateTool.BCD);
 
-    private static class DateTime implements Fixed.L6<LocalDateTime> {
-        private final DateTool tool;
+    protected static class DateTime extends BasicField<LocalDateTime> {
+        protected final DateTool tool;
 
-        private DateTime(DateTool tool) {
+        protected DateTime(DateTool tool) {
             this.tool = tool;
         }
 
@@ -43,10 +43,10 @@ public class DateTimeSchema {
         }
     }
 
-    private static class Date implements Fixed.L3<LocalDate> {
-        private final DateTool tool;
+    protected static class Date extends BasicField<LocalDate> {
+        protected final DateTool tool;
 
-        private Date(DateTool tool) {
+        protected Date(DateTool tool) {
             this.tool = tool;
         }
 
@@ -63,10 +63,10 @@ public class DateTimeSchema {
         }
     }
 
-    private static class Time implements Fixed.L3<LocalTime> {
-        private final DateTool tool;
+    protected static class Time extends BasicField<LocalTime> {
+        protected final DateTool tool;
 
-        private Time(DateTool tool) {
+        protected Time(DateTool tool) {
             this.tool = tool;
         }
 

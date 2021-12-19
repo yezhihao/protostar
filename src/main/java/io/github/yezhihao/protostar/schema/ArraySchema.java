@@ -1,6 +1,7 @@
 package io.github.yezhihao.protostar.schema;
 
 import io.github.yezhihao.protostar.Schema;
+import io.github.yezhihao.protostar.field.BasicField;
 import io.netty.buffer.ByteBuf;
 
 /**
@@ -17,7 +18,7 @@ public class ArraySchema {
     public static final Schema<long[]> LONGS = new LongArray();
     public static final Schema<double[]> DOUBLES = new DoubleArray();
 
-    private static class ByteArray implements Schema<byte[]> {
+    protected static class ByteArray extends BasicField<byte[]> {
         @Override
         public byte[] readFrom(ByteBuf input) {
             byte[] array = new byte[input.readableBytes()];
@@ -45,7 +46,7 @@ public class ArraySchema {
         }
     }
 
-    private static class CharArray implements Schema<char[]> {
+    protected static class CharArray extends BasicField<char[]> {
         @Override
         public char[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 1;
@@ -81,7 +82,7 @@ public class ArraySchema {
         }
     }
 
-    private static class ShortArray implements Schema<short[]> {
+    protected static class ShortArray extends BasicField<short[]> {
         @Override
         public short[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 1;
@@ -117,7 +118,7 @@ public class ArraySchema {
         }
     }
 
-    private static class IntArray implements Schema<int[]> {
+    protected static class IntArray extends BasicField<int[]> {
         @Override
         public int[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 2;
@@ -153,7 +154,7 @@ public class ArraySchema {
         }
     }
 
-    private static class LongArray implements Schema<long[]> {
+    protected static class LongArray extends BasicField<long[]> {
         @Override
         public long[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 3;
@@ -189,7 +190,7 @@ public class ArraySchema {
         }
     }
 
-    private static class FloatArray implements Schema<float[]> {
+    protected static class FloatArray extends BasicField<float[]> {
         @Override
         public float[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 2;
@@ -225,7 +226,7 @@ public class ArraySchema {
         }
     }
 
-    private static class DoubleArray implements Schema<double[]> {
+    protected static class DoubleArray extends BasicField<double[]> {
         @Override
         public double[] readFrom(ByteBuf input) {
             int total = input.readableBytes() >> 3;

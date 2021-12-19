@@ -2,8 +2,6 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.util.Explain;
-import io.github.yezhihao.protostar.util.Info;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
 
@@ -16,11 +14,12 @@ import java.lang.reflect.Array;
  */
 public class TotalArrayPrimitiveField extends BasicField {
 
+    private Schema schema;
     protected final IntTool intTool;
     protected final int valueUnit;
 
-    public TotalArrayPrimitiveField(Field field, java.lang.reflect.Field f, Schema schema, int valueUnit) {
-        super(field, f, schema);
+    public TotalArrayPrimitiveField(Schema schema, Field field, int valueUnit) {
+        this.schema = schema;
         this.intTool = IntTool.getInstance(field.totalUnit());
         this.valueUnit = valueUnit;
     }
@@ -41,20 +40,5 @@ public class TotalArrayPrimitiveField extends BasicField {
             intTool.write(output, total);
             schema.writeTo(output, value);
         }
-    }
-
-    @Override
-    public Object readFrom(ByteBuf input, Explain explain) {
-        int begin = input.readerIndex();
-        int total = intTool.read(input);
-        explain.add(Info.lengthField(begin, desc, total));
-
-        if (total <= 0)
-            return null;
-
-        int length = valueUnit * total;
-        Object value = schema.readFrom(input, length, explain);
-        explain.setLastDesc(desc);
-        return value;
     }
 }

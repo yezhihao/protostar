@@ -1,7 +1,8 @@
 package io.github.yezhihao.protostar.schema;
 
 import io.github.yezhihao.protostar.Schema;
-import io.github.yezhihao.protostar.util.Cache;
+import io.github.yezhihao.protostar.field.BasicField;
+import io.github.yezhihao.protostar.field.LengthUnitField;
 import io.github.yezhihao.protostar.util.CharsBuilder;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.internal.StringUtil;
@@ -11,38 +12,58 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-public class StringSchema {
+public interface StringSchema {
 
-    private static final Logger log = LoggerFactory.getLogger(StringSchema.class.getSimpleName());
-    private static final Cache<String, Schema> cache = new Cache<>();
+    Logger log = LoggerFactory.getLogger(StringSchema.class.getSimpleName());
 
-    public static final Schema<String> ASCII = StringSchema.getInstance("US-ASCII");
-    public static final Schema<String> UTF8 = StringSchema.getInstance("UTF-8");
-    public static final Schema<String> GBK = StringSchema.getInstance("GBK");
-    public static final Schema<String> BCD = cache.put("BCD", new BCD());
-    public static final Schema<String> HEX = cache.put("HEX", new HEX());
+    Schema<String> HEX = new HEX(-1);
+    Schema<String> BCD = new BCD(-1);
+    Schema<String> GBK = new STR(Charset.forName("GBK"), -1);
+    Schema<String> UTF8 = new STR(Charset.forName("UTF-8"), -1);
+    Schema<String> ASCII = new STR(Charset.forName("US-ASCII"), -1);
 
-    public static Schema<String> getInstance(final String charset) {
-        return cache.get(charset.toUpperCase(), () -> new STR(charset));
-    }
+    BasicField<String> getInstance(String charset, int length, int lengthUnit);
 
-    private static class STR implements Schema<String> {
+    StringSchema SCHEMA = new StringSchema() {
+        @Override
+        public BasicField<String> getInstance(String charset, int length, int lengthUnit) {
+            final String cs = charset.toUpperCase();
+            BasicField<String> schema;
+            if ("BCD".equals(cs))
+                schema = new BCD(length);
+            else if ("HEX".equals(cs))
+                schema = new HEX(length);
+            else
+                schema = new STR(Charset.forName(charset), length);
+
+            if (lengthUnit > 0)
+                schema = new LengthUnitField(schema, lengthUnit);
+
+            return schema;
+        }
+    };
+
+
+    class STR extends BasicField<String> {
         private final byte pad = 0;
         private final Charset charset;
+        private final int length;
 
-        private STR(String charset) {
-            this.charset = Charset.forName(charset);
+        private STR(Charset charset, int length) {
+            this.charset = charset;
+            this.length = length;
         }
 
         @Override
         public String readFrom(ByteBuf input) {
-            int length = input.readUnsignedByte();
             return readFrom(input, length);
         }
 
         @Override
         public String readFrom(ByteBuf input, int length) {
-            int len = length > 0 ? length : input.readableBytes();
+            int len = length >= 0 ? length : input.readableBytes();
+            if (!input.isReadable(len))
+                return null;
             byte[] bytes = new byte[len];
             input.readBytes(bytes);
 
@@ -56,13 +77,13 @@ public class StringSchema {
 
         @Override
         public void writeTo(ByteBuf output, String value) {
-            byte[] bytes = value.getBytes(charset);
-            int length = bytes.length > 255 ? 255 : bytes.length;
-            output.writeBytes(bytes, 0, length);
+            writeTo(output, length, value);
         }
 
         @Override
         public void writeTo(ByteBuf output, int length, String value) {
+            if (value == null)
+                return;
             ByteBuffer buffer = charset.encode(value);
             if (length > 0) {
                 int srcPos = length - buffer.limit();
@@ -84,15 +105,22 @@ public class StringSchema {
         }
     }
 
-    private static class BCD implements Schema<String> {
+    class BCD extends BasicField<String> {
+        private final int length;
+
+        public BCD(int length) {
+            this.length = length;
+        }
+
         @Override
         public String readFrom(ByteBuf input) {
-            return readFrom(input, input.readableBytes());
+            return readFrom(input, length);
         }
 
         @Override
         public String readFrom(ByteBuf input, int length) {
-            byte[] bytes = new byte[length];
+            int len = length >= 0 ? length : input.readableBytes();
+            byte[] bytes = new byte[len];
             input.readBytes(bytes);
 
             CharsBuilder cb = new CharsBuilder(length << 1);
@@ -102,7 +130,7 @@ public class StringSchema {
 
         @Override
         public void writeTo(ByteBuf output, String value) {
-            writeTo(output, value.length() >> 1, value);
+            writeTo(output, length, value);
         }
 
         @Override
@@ -123,15 +151,22 @@ public class StringSchema {
         }
     }
 
-    private static class HEX implements Schema<String> {
+    class HEX extends BasicField<String> {
+        private final int length;
+
+        public HEX(int length) {
+            this.length = length;
+        }
+
         @Override
         public String readFrom(ByteBuf input) {
-            return readFrom(input, input.readableBytes());
+            return readFrom(input, length);
         }
 
         @Override
         public String readFrom(ByteBuf input, int length) {
-            byte[] bytes = new byte[length];
+            int len = length >= 0 ? length : input.readableBytes();
+            byte[] bytes = new byte[len];
             input.readBytes(bytes);
 
             CharsBuilder cb = new CharsBuilder(length << 1);
@@ -141,7 +176,7 @@ public class StringSchema {
 
         @Override
         public void writeTo(ByteBuf output, String value) {
-            writeTo(output, value.length() >> 1, value);
+            writeTo(output, length, value);
         }
 
         @Override

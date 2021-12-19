@@ -3,7 +3,6 @@ package io.github.yezhihao.protostar.simple;
 import io.github.yezhihao.protostar.ProtostarUtil;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
-import io.github.yezhihao.protostar.util.Explain;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -31,10 +30,8 @@ public class Test {
 
         Foo foo1 = new Foo();
 
-        Explain explain = new Explain();
-        headSchema.mergeFrom(buffer, foo1, explain);
+        headSchema.mergeFrom(buffer, foo1);
         bodySchema.mergeFrom(buffer, foo1);
-        explain.println();
         System.out.println(foo);
     }
 

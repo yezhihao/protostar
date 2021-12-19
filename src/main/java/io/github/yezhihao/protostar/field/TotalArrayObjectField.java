@@ -2,8 +2,6 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.util.Explain;
-import io.github.yezhihao.protostar.util.Info;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
 
@@ -14,53 +12,38 @@ import java.lang.reflect.Array;
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */
-public class TotalArrayObjectField extends BasicField {
+public class TotalArrayObjectField<T> extends BasicField<T[]> {
 
     protected final IntTool intTool;
+    private Schema<T> schema;
 
-    public TotalArrayObjectField(Field field, java.lang.reflect.Field f, Schema schema) {
-        super(field, f, schema);
+    public TotalArrayObjectField(Schema<T> schema, Field field) {
+        this.schema = schema;
         this.intTool = IntTool.getInstance(field.totalUnit());
     }
 
-    public Object readFrom(ByteBuf input) {
+    public T[] readFrom(ByteBuf input) {
         int total = intTool.read(input);
         if (total <= 0)
             return null;
-        Object value = Array.newInstance(schema.getClass(), total);
+        T[] value = (T[]) Array.newInstance(schema.getClass(), total);
         for (int i = 0; i < total; i++) {
-            Object t = schema.readFrom(input);
-            Array.set(value, i, t);
+            T t = schema.readFrom(input);
+            value[i] = t;
         }
         return value;
     }
 
-    public void writeTo(ByteBuf output, Object value) {
+    public void writeTo(ByteBuf output, T[] value) {
         if (value == null) {
             intTool.write(output, 0);
         } else {
-            int length = Array.getLength(value);
+            int length = value.length;
             intTool.write(output, length);
             for (int i = 0; i < length; i++) {
-                Object t = Array.get(value, i);
+                T t = value[i];
                 schema.writeTo(output, t);
             }
         }
-    }
-
-    @Override
-    public Object readFrom(ByteBuf input, Explain explain) {
-        int begin = input.readerIndex();
-        int total = intTool.read(input);
-        explain.add(Info.lengthField(begin, desc, total));
-
-        if (total <= 0)
-            return null;
-        Object value = Array.newInstance(schema.getClass(), total);
-        for (int i = 0; i < total; i++) {
-            Object t = schema.readFrom(input, explain);
-            Array.set(value, i, t);
-        }
-        return value;
     }
 }

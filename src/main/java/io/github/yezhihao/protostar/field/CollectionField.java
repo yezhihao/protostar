@@ -1,8 +1,6 @@
 package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
-import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.util.Explain;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
@@ -13,46 +11,29 @@ import java.util.Collection;
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */
-public class CollectionField extends BasicField {
+public class CollectionField<T> extends BasicField<Collection<T>> {
 
-    public CollectionField(Field field, java.lang.reflect.Field f, Schema schema) {
-        super(field, f, schema);
+    private final Schema<T> schema;
+
+    public CollectionField(Schema<T> schema) {
+        this.schema = schema;
     }
 
-    public Object readFrom(ByteBuf input) {
-        Collection value = new ArrayList<>();
+    @Override
+    public Collection<T> readFrom(ByteBuf input) {
+        Collection list = new ArrayList<>();
         while (input.isReadable()) {
-            Object t = schema.readFrom(input);
-            value.add(t);
+            T t = schema.readFrom(input);
+            list.add(t);
         }
-        return value;
+        return list;
     }
 
-    public void writeTo(ByteBuf output, Object value) {
-        if (value != null) {
-            Collection list = (Collection) value;
-            for (Object t : list) {
+    @Override
+    public void writeTo(ByteBuf output, Collection<T> list) {
+        if (list != null) {
+            for (T t : list) {
                 schema.writeTo(output, t);
-            }
-        }
-    }
-
-    @Override
-    public Object readFrom(ByteBuf input, Explain explain) {
-        Collection value = new ArrayList<>();
-        while (input.isReadable()) {
-            Object t = schema.readFrom(input, explain);
-            value.add(t);
-        }
-        return value;
-    }
-
-    @Override
-    public void writeTo(ByteBuf output, Object value, Explain explain) {
-        if (value != null) {
-            Collection list = (Collection) value;
-            for (Object t : list) {
-                schema.writeTo(output, t, explain);
             }
         }
     }
