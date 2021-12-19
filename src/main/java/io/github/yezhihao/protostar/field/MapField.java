@@ -2,6 +2,7 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.schema.MapSchema;
+import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
 import org.slf4j.Logger;
@@ -38,6 +39,53 @@ public class MapField<K, V> extends BasicField<Map<K, V>> {
             this.supplier = HashMap::new;
         else
             this.supplier = TreeMap::new;
+    }
+
+    @Override
+    public Map<K, V> readFrom(ByteBuf input, Explain explain) {
+        if (!input.isReadable())
+            return null;
+        Map map = supplier.get();
+        K key = null;
+        int length = 0;
+        try {
+            do {
+                key = schema.readFrom(input, explain);
+                explain.setLastDesc("key");
+
+                length = valueIntTool.read(input);
+                if (length <= 0)
+                    continue;
+
+                int writerIndex = input.writerIndex();
+                int readerIndex = input.readerIndex() + length;
+                if (writerIndex > readerIndex) {
+                    input.writerIndex(readerIndex);
+                    Object value = readValue(key, input, explain);
+                    map.put(key, value);
+                    input.setIndex(readerIndex, writerIndex);
+                } else {
+                    Object value = readValue(key, input, explain);
+                    map.put(key, value);
+                    break;
+                }
+            } while (input.isReadable());
+        } catch (Exception e) {
+            log.warn("解析出错:KEY[{}], LENGTH[{}], {}", key, length, e.getMessage());
+        }
+        return map;
+    }
+
+    public Object readValue(Object key, ByteBuf input, Explain explain) {
+        Schema schema = valueSchema.get(key);
+        if (schema != null) {
+            Object o = schema.readFrom(input, explain);
+            explain.setLastDesc("Value");
+            return o;
+        }
+        byte[] bytes = new byte[input.readableBytes()];
+        input.readBytes(bytes);
+        return bytes;
     }
 
     @Override
@@ -99,6 +147,31 @@ public class MapField<K, V> extends BasicField<Map<K, V>> {
                 int begin = output.writerIndex();
                 valueIntTool.write(output, 0);
                 schema.writeTo(output, value);
+                int length = output.writerIndex() - begin - lengthUnit;
+                valueIntTool.set(output, begin, length);
+            } else {
+                log.warn("未注册的信息:ID[{}], VALUE[{}]", key, value);
+            }
+        }
+    }
+
+    @Override
+    public void writeTo(ByteBuf output, Map<K, V> map, Explain explain) {
+        if (map == null)
+            return;
+
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            K key = entry.getKey();
+            schema.writeTo(output, key, explain);
+            explain.setLastDesc("Key");
+
+            V value = entry.getValue();
+            Schema<V> schema = valueSchema.get(key);
+            if (schema != null) {
+                int begin = output.writerIndex();
+                valueIntTool.write(output, 0);
+                schema.writeTo(output, value, explain);
+                explain.setLastDesc("Value");
                 int length = output.writerIndex() - begin - lengthUnit;
                 valueIntTool.set(output, begin, length);
             } else {

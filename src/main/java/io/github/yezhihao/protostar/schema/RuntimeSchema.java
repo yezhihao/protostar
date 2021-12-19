@@ -58,8 +58,12 @@ public class RuntimeSchema<T> extends BasicField<T> {
     public T mergeFrom(ByteBuf input, T result, Explain explain) {
         int i = 0;
         try {
-            for (; i < schemas.length; i++)
-                schemas[i].readAndSet(input, result);
+            if (explain == null)
+                for (; i < schemas.length; i++)
+                    schemas[i].readAndSet(input, result);
+            else
+                for (; i < schemas.length; i++)
+                    schemas[i].readAndSet(input, result, explain);
             return result;
         } catch (Exception e) {
             throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + schemas[i].field.desc(), e);
@@ -82,8 +86,12 @@ public class RuntimeSchema<T> extends BasicField<T> {
         int i = 0;
         try {
             T result = constructor.newInstance((Object[]) null);
-            for (; i < schemas.length; i++)
-                schemas[i].readAndSet(input, result);
+            if (explain == null)
+                for (; i < schemas.length; i++)
+                    schemas[i].readAndSet(input, result);
+            else
+                for (; i < schemas.length; i++)
+                    schemas[i].readAndSet(input, result, explain);
             return result;
         } catch (Exception e) {
             throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + schemas[i].f.getName(), e);
@@ -105,6 +113,21 @@ public class RuntimeSchema<T> extends BasicField<T> {
         try {
             for (; i < schemas.length; i++)
                 schemas[i].getAndWrite(output, message);
+        } catch (Exception e) {
+            throw new RuntimeException("Write failed " + i + " " + typeClass.getName() + " " + schemas[i].f.getName(), e);
+        }
+    }
+
+    @Override
+    public void writeTo(ByteBuf output, T message, Explain explain) {
+        int i = 0;
+        try {
+            if (explain == null)
+                for (; i < schemas.length; i++)
+                    schemas[i].getAndWrite(output, message);
+            else
+                for (; i < schemas.length; i++)
+                    schemas[i].getAndWrite(output, message, explain);
         } catch (Exception e) {
             throw new RuntimeException("Write failed " + i + " " + typeClass.getName() + " " + schemas[i].f.getName(), e);
         }
