@@ -111,17 +111,17 @@ public class ProtostarUtil {
     private static void fillField(Map<String, Map<Integer, RuntimeSchema>> root, Map<Integer, List<BasicField>> multiVersionFields, java.lang.reflect.Field f, Field field) {
         Class typeClass = f.getType();
 
-        BasicField schema = SchemaRegistry.get(typeClass, field);
-        if (schema != null) {
+        BasicField basicField = SchemaRegistry.get(typeClass, field);
+        if (basicField != null) {
             for (int ver : field.version()) {
-                multiVersionFields.get(ver).add(schema.build(f, field));
+                multiVersionFields.get(ver).add(basicField.build(f, field));
             }
         } else {
             Map<Integer, RuntimeSchema> schemaMap = Optional.ofNullable(getRuntimeSchema(root, ClassUtils.getGenericType(f))).orElse(Collections.EMPTY_MAP);
             for (int ver : field.version()) {
-                schema = schemaMap.get(ver);
-                BasicField value = SchemaRegistry.get(typeClass, field, schema);
-                multiVersionFields.get(ver).add(value.build(f, field));
+                Schema schema = schemaMap.get(ver);
+                basicField = SchemaRegistry.get(typeClass, field, schema);
+                multiVersionFields.get(ver).add(basicField.build(f, field));
             }
         }
     }

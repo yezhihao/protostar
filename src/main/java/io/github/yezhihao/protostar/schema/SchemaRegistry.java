@@ -143,7 +143,7 @@ public class SchemaRegistry {
         }
 
         if (CharSequence.class.isAssignableFrom(typeClass)) {
-            return StringSchema.SCHEMA.getInstance(charset, length, field.lengthUnit());
+            return StringSchema.getInstance(charset, length, field.lengthUnit());
         }
         if (Temporal.class.isAssignableFrom(typeClass)) {
             Function<DateTool, BasicField> function = TIME_SCHEMA.get(name);
@@ -193,7 +193,7 @@ public class SchemaRegistry {
         return (BasicField) schema;
     }
 
-    public static int getLength(Class aClass) {
-        return NUMBER.get(aClass.getName());
+    public static Integer getLength(Class typeClass) {
+        return NUMBER.get(typeClass.getName());
     }
 }

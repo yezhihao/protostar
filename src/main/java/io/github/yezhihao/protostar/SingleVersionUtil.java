@@ -15,16 +15,16 @@ import java.util.*;
  */
 public abstract class SingleVersionUtil {
 
-    private static final Map<String, BasicField> CACHE = new WeakHashMap<>();
+    private static final Map<String, Schema> CACHE = new WeakHashMap<>();
 
-    public static <T> BasicField<T> getRuntimeSchema(Class typeClass) {
+    public static <T> Schema<T> getRuntimeSchema(Class typeClass) {
         return getRuntimeSchema(CACHE, typeClass);
     }
 
-    public static <T> BasicField<T> getRuntimeSchema(Map<String, BasicField> root, Class<T> typeClass) {
-        BasicField schema = root.get(typeClass.getName());
+    public static <T> Schema<T> getRuntimeSchema(Map<String, Schema> root, Class<T> typeClass) {
+        Schema schema = root.get(typeClass.getName());
         //不支持循环引用
-        if (schema != null) return (BasicField<T>) schema;
+        if (schema != null) return (Schema<T>) schema;
 
         List<java.lang.reflect.Field> fs = findFields(typeClass);
         if (fs.isEmpty()) return null;
@@ -35,7 +35,7 @@ public abstract class SingleVersionUtil {
 
         schema = new RuntimeSchema(typeClass, 0, fields);
         root.put(typeClass.getName(), schema);
-        return (BasicField<T>) schema;
+        return (Schema<T>) schema;
     }
 
     private static List<java.lang.reflect.Field> findFields(Class typeClass) {
@@ -50,7 +50,7 @@ public abstract class SingleVersionUtil {
         return result;
     }
 
-    private static List<BasicField> findFields(Map<String, BasicField> root, List<java.lang.reflect.Field> fs) {
+    private static List<BasicField> findFields(Map<String, Schema> root, List<java.lang.reflect.Field> fs) {
         List<BasicField> fields = new ArrayList<>(fs.size());
 
         for (java.lang.reflect.Field f : fs) {
@@ -63,16 +63,16 @@ public abstract class SingleVersionUtil {
         return fields;
     }
 
-    private static void fillField(Map<String, BasicField> root, List<BasicField> fields, java.lang.reflect.Field f, Field field) {
+    private static void fillField(Map<String, Schema> root, List<BasicField> fields, java.lang.reflect.Field f, Field field) {
         Class typeClass = f.getType();
 
-        BasicField schema = SchemaRegistry.get(typeClass, field);
-        if (schema != null) {
-            fields.add(schema.build(f, field));
+        BasicField basicField = SchemaRegistry.get(typeClass, field);
+        if (basicField != null) {
+            fields.add(basicField.build(f, field));
         } else {
-            schema = getRuntimeSchema(root, ClassUtils.getGenericType(f));
-            BasicField value = SchemaRegistry.get(typeClass, field, schema);
-            fields.add(value.build(f, field));
+            Schema schema = getRuntimeSchema(root, ClassUtils.getGenericType(f));
+            basicField = SchemaRegistry.get(typeClass, field, schema);
+            fields.add(basicField.build(f, field));
         }
     }
 }

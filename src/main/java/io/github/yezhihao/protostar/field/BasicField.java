@@ -2,6 +2,7 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
+import io.github.yezhihao.protostar.schema.SchemaRegistry;
 import io.github.yezhihao.protostar.util.Explain;
 import io.netty.buffer.ByteBuf;
 
@@ -12,8 +13,10 @@ import io.netty.buffer.ByteBuf;
  */
 public abstract class BasicField<T> implements Schema<T>, Comparable<BasicField> {
 
-    public java.lang.reflect.Field f;
-    public Field field;
+    protected java.lang.reflect.Field f;
+    protected Field field;
+    protected int length;
+    protected String desc;
 
     public void readAndSet(ByteBuf input, Object obj) throws Exception {
         T value = readFrom(input);
@@ -39,14 +42,21 @@ public abstract class BasicField<T> implements Schema<T>, Comparable<BasicField>
         if (this.f == null && this.field == null) {
             this.f = f;
             this.field = field;
+            Integer len = SchemaRegistry.getLength(f.getType());
+            length = len != null ? len : 16;
+            desc = field.desc();
+            if (desc.isEmpty())
+                desc = f.getName();
         }
         return this;
     }
 
+    public String fieldName() {
+        return f.getName();
+    }
+
     public String desc() {
-        if (field == null)
-            return "";
-        return field.desc();
+        return desc;
     }
 
     /** 用于预估内存分配，不需要精确值 */
@@ -62,7 +72,7 @@ public abstract class BasicField<T> implements Schema<T>, Comparable<BasicField>
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder(12);
-        sb.append(f).append(' ').append(field);
+        sb.append(desc).append(' ').append(field);
         return sb.toString();
     }
 }

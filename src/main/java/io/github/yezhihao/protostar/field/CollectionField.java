@@ -1,6 +1,7 @@
 package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
+import io.github.yezhihao.protostar.util.Explain;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
@@ -34,6 +35,25 @@ public class CollectionField<T> extends BasicField<Collection<T>> {
         if (list != null) {
             for (T t : list) {
                 schema.writeTo(output, t);
+            }
+        }
+    }
+
+    @Override
+    public Collection<T> readFrom(ByteBuf input, Explain explain) {
+        Collection list = new ArrayList<>();
+        while (input.isReadable()) {
+            T t = schema.readFrom(input, explain);
+            list.add(t);
+        }
+        return list;
+    }
+
+    @Override
+    public void writeTo(ByteBuf output, Collection<T> list, Explain explain) {
+        if (list != null) {
+            for (T t : list) {
+                schema.writeTo(output, t, explain);
             }
         }
     }

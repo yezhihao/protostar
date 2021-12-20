@@ -1,6 +1,7 @@
 package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
+import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
 
@@ -14,9 +15,9 @@ import java.util.Collection;
  */
 public class LengthUnitCollectionField<T> extends BasicField<Collection<T>> {
 
-    private Schema<T> schema;
-    private final IntTool intTool;
+    private final Schema<T> schema;
     private final int lengthUnit;
+    private final IntTool intTool;
 
     public LengthUnitCollectionField(Schema<T> schema, int lengthUnit) {
         this.schema = schema;
@@ -45,6 +46,34 @@ public class LengthUnitCollectionField<T> extends BasicField<Collection<T>> {
                     schema.writeTo(output, t);
                     int length = output.writerIndex() - begin - lengthUnit;
                     intTool.set(output, begin, length);
+                }
+            }
+        }
+    }
+
+    @Override
+    public Collection<T> readFrom(ByteBuf input, Explain explain) {
+        Collection list = new ArrayList<>();
+        while (input.isReadable()) {
+            int length = intTool.read(input);
+            explain.lengthField(input.readerIndex() - lengthUnit, desc + "长度", length, lengthUnit);
+            T t = schema.readFrom(input, length, explain);
+            list.add(t);
+        }
+        return list;
+    }
+
+    @Override
+    public void writeTo(ByteBuf output, Collection<T> list, Explain explain) {
+        if (list != null) {
+            for (T t : list) {
+                if (t != null) {
+                    int begin = output.writerIndex();
+                    intTool.write(output, 0);
+                    schema.writeTo(output, t, explain);
+                    int length = output.writerIndex() - begin - lengthUnit;
+                    intTool.set(output, begin, length);
+                    explain.lengthFieldPrevious(begin, desc + "长度", length, lengthUnit);
                 }
             }
         }

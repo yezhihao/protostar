@@ -1,5 +1,6 @@
 package io.github.yezhihao.protostar.schema;
 
+import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.field.BasicField;
 import io.github.yezhihao.protostar.util.Explain;
 import io.netty.buffer.ByteBuf;
@@ -11,23 +12,21 @@ import java.lang.reflect.Constructor;
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
  */
-public class RuntimeSchema<T> extends BasicField<T> {
+public class RuntimeSchema<T> implements Schema<T> {
 
     protected int version;
     protected int length;
     protected Class<T> typeClass;
-    protected BasicField[] schemas;
+    protected BasicField[] fields;
     protected Constructor<T> constructor;
 
-    public RuntimeSchema(Class<T> typeClass, int version, BasicField[] schemas) {
+    public RuntimeSchema(Class<T> typeClass, int version, BasicField[] fields) {
         this.typeClass = typeClass;
         this.version = version;
-        this.schemas = schemas;
+        this.fields = fields;
         int length = 0;
-        for (BasicField schema : schemas) {
-            if (field != null)
-                length += schema.length() > 0 ? schema.length() : 32;
-        }
+        for (BasicField field : fields)
+            length += field.length();
         this.length = length;
         try {
             this.constructor = typeClass.getDeclaredConstructor((Class[]) null);
@@ -47,11 +46,11 @@ public class RuntimeSchema<T> extends BasicField<T> {
     public T mergeFrom(ByteBuf input, T result) {
         int i = 0;
         try {
-            for (; i < schemas.length; i++)
-                schemas[i].readAndSet(input, result);
+            for (; i < fields.length; i++)
+                fields[i].readAndSet(input, result);
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + schemas[i].field.desc(), e);
+            throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);
         }
     }
 
@@ -59,14 +58,14 @@ public class RuntimeSchema<T> extends BasicField<T> {
         int i = 0;
         try {
             if (explain == null)
-                for (; i < schemas.length; i++)
-                    schemas[i].readAndSet(input, result);
+                for (; i < fields.length; i++)
+                    fields[i].readAndSet(input, result);
             else
-                for (; i < schemas.length; i++)
-                    schemas[i].readAndSet(input, result, explain);
+                for (; i < fields.length; i++)
+                    fields[i].readAndSet(input, result, explain);
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + schemas[i].field.desc(), e);
+            throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);
         }
     }
 
@@ -74,11 +73,11 @@ public class RuntimeSchema<T> extends BasicField<T> {
         int i = 0;
         try {
             T result = constructor.newInstance((Object[]) null);
-            for (; i < schemas.length; i++)
-                schemas[i].readAndSet(input, result);
+            for (; i < fields.length; i++)
+                fields[i].readAndSet(input, result);
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + schemas[i].f.getName(), e);
+            throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);
         }
     }
 
@@ -87,14 +86,14 @@ public class RuntimeSchema<T> extends BasicField<T> {
         try {
             T result = constructor.newInstance((Object[]) null);
             if (explain == null)
-                for (; i < schemas.length; i++)
-                    schemas[i].readAndSet(input, result);
+                for (; i < fields.length; i++)
+                    fields[i].readAndSet(input, result);
             else
-                for (; i < schemas.length; i++)
-                    schemas[i].readAndSet(input, result, explain);
+                for (; i < fields.length; i++)
+                    fields[i].readAndSet(input, result, explain);
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + schemas[i].f.getName(), e);
+            throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);
         }
     }
 
@@ -102,10 +101,10 @@ public class RuntimeSchema<T> extends BasicField<T> {
     public void writeTo(ByteBuf output, T message) {
         int i = 0;
         try {
-            for (; i < schemas.length; i++)
-                schemas[i].getAndWrite(output, message);
+            for (; i < fields.length; i++)
+                fields[i].getAndWrite(output, message);
         } catch (Exception e) {
-            throw new RuntimeException("Write failed " + i + " " + typeClass.getName() + " " + schemas[i].f.getName(), e);
+            throw new RuntimeException("Write failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);
         }
     }
 
@@ -114,14 +113,22 @@ public class RuntimeSchema<T> extends BasicField<T> {
         int i = 0;
         try {
             if (explain == null)
-                for (; i < schemas.length; i++)
-                    schemas[i].getAndWrite(output, message);
+                for (; i < fields.length; i++)
+                    fields[i].getAndWrite(output, message);
             else
-                for (; i < schemas.length; i++)
-                    schemas[i].getAndWrite(output, message, explain);
+                for (; i < fields.length; i++)
+                    fields[i].getAndWrite(output, message, explain);
         } catch (Exception e) {
-            throw new RuntimeException("Write failed " + i + " " + typeClass.getName() + " " + schemas[i].f.getName(), e);
+            throw new RuntimeException("Write failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);
         }
+    }
+
+    public Class<T> typeClass() {
+        return typeClass;
+    }
+
+    public int version() {
+        return version;
     }
 
     public int length() {

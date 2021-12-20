@@ -12,39 +12,33 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-public interface StringSchema {
+public class StringSchema {
 
-    Logger log = LoggerFactory.getLogger(StringSchema.class.getSimpleName());
+    private static final Logger log = LoggerFactory.getLogger(StringSchema.class.getSimpleName());
 
-    Schema<String> HEX = new HEX(-1);
-    Schema<String> BCD = new BCD(-1);
-    Schema<String> GBK = new STR(Charset.forName("GBK"), -1);
-    Schema<String> UTF8 = new STR(Charset.forName("UTF-8"), -1);
-    Schema<String> ASCII = new STR(Charset.forName("US-ASCII"), -1);
+    public static final Schema<String> HEX = new HEX(-1);
+    public static final Schema<String> BCD = new BCD(-1);
+    public static final Schema<String> GBK = new STR(Charset.forName("GBK"), -1);
+    public static final Schema<String> UTF8 = new STR(Charset.forName("UTF-8"), -1);
+    public static final Schema<String> ASCII = new STR(Charset.forName("US-ASCII"), -1);
 
-    BasicField<String> getInstance(String charset, int length, int lengthUnit);
+    public static BasicField<String> getInstance(String charset, int length, int lengthUnit) {
+        final String cs = charset.toUpperCase();
+        BasicField<String> schema;
+        if ("BCD".equals(cs))
+            schema = new BCD(length);
+        else if ("HEX".equals(cs))
+            schema = new HEX(length);
+        else
+            schema = new STR(Charset.forName(charset), length);
 
-    StringSchema SCHEMA = new StringSchema() {
-        @Override
-        public BasicField<String> getInstance(String charset, int length, int lengthUnit) {
-            final String cs = charset.toUpperCase();
-            BasicField<String> schema;
-            if ("BCD".equals(cs))
-                schema = new BCD(length);
-            else if ("HEX".equals(cs))
-                schema = new HEX(length);
-            else
-                schema = new STR(Charset.forName(charset), length);
+        if (lengthUnit > 0)
+            schema = new LengthUnitField(schema, lengthUnit);
 
-            if (lengthUnit > 0)
-                schema = new LengthUnitField(schema, lengthUnit);
+        return schema;
+    }
 
-            return schema;
-        }
-    };
-
-
-    class STR extends BasicField<String> {
+    public static class STR extends BasicField<String> {
         private final byte pad = 0;
         private final Charset charset;
         private final int length;
@@ -105,7 +99,7 @@ public interface StringSchema {
         }
     }
 
-    class BCD extends BasicField<String> {
+    public static class BCD extends BasicField<String> {
         private final int length;
 
         public BCD(int length) {
@@ -151,7 +145,7 @@ public interface StringSchema {
         }
     }
 
-    class HEX extends BasicField<String> {
+    public static class HEX extends BasicField<String> {
         private final int length;
 
         public HEX(int length) {

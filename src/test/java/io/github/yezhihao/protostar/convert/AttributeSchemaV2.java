@@ -12,7 +12,7 @@ public class AttributeSchemaV2 extends MapSchema<Integer, Object> {
     }
 
     @Override
-    protected void addSchemas(PrepareLoadStrategy schemaRegistry) {
+    protected void addSchemas(PrepareLoadStrategy<Integer> schemaRegistry) {
         schemaRegistry
                 .addSchema(1, NumberSchema.DWORD_INT)
                 .addSchema(2, StringSchema.UTF8)

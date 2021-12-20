@@ -20,8 +20,8 @@ public class Info {
         return new Info(index, desc, value, raw, false);
     }
 
-    public static Info lengthField(int index, String desc, int value) {
-        return new Info(index, desc, value, StrUtils.leftPad(Integer.toHexString(value), 1 << 1, '0'), true);
+    public static Info lengthField(int index, String desc, int value, int lengthUnit) {
+        return new Info(index, desc, value, StrUtils.leftPad(Integer.toHexString(value), 1 << lengthUnit, '0'), true);
     }
 
     public int getIndex() {
