@@ -2,6 +2,7 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.util.Explain;
+import io.github.yezhihao.protostar.util.Info;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
 
@@ -51,13 +52,13 @@ public class LengthUnitField<T> extends BasicField<T> {
     @Override
     public void writeTo(ByteBuf output, T value, Explain explain) {
         int begin = output.writerIndex();
-        int length = 0;
-        intTool.write(output, length);
+        Info info = explain.lengthField(begin, desc + "长度", 0, lengthUnit);
+        intTool.write(output, 0);
         if (value != null) {
             schema.writeTo(output, value, explain);
-            length = output.writerIndex() - begin - lengthUnit;
+            int length = output.writerIndex() - begin - lengthUnit;
             intTool.set(output, begin, length);
+            info.setLength(length, lengthUnit);
         }
-        explain.lengthFieldPrevious(begin, desc + "长度", length, lengthUnit);
     }
 }

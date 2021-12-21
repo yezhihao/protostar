@@ -2,6 +2,7 @@ package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.util.Explain;
+import io.github.yezhihao.protostar.util.Info;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
 
@@ -69,11 +70,12 @@ public class LengthUnitCollectionField<T> extends BasicField<Collection<T>> {
             for (T t : list) {
                 if (t != null) {
                     int begin = output.writerIndex();
+                    Info info = explain.lengthField(begin, desc + "长度", 0, lengthUnit);
                     intTool.write(output, 0);
                     schema.writeTo(output, t, explain);
                     int length = output.writerIndex() - begin - lengthUnit;
                     intTool.set(output, begin, length);
-                    explain.lengthFieldPrevious(begin, desc + "长度", length, lengthUnit);
+                    info.setLength(length, lengthUnit);
                 }
             }
         }

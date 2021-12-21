@@ -6,22 +6,20 @@ public class Info {
     protected String desc;
     protected Object value;
     protected String raw;
-    protected boolean lengthField;
 
-    private Info(int index, String desc, Object value, String raw, boolean lengthField) {
+    private Info(int index, String desc, Object value, String raw) {
         this.index = index;
         this.desc = desc;
         this.value = value;
         this.raw = raw;
-        this.lengthField = lengthField;
     }
 
     public static Info field(int index, String desc, Object value, String raw) {
-        return new Info(index, desc, value, raw, false);
+        return new Info(index, desc, value, raw);
     }
 
     public static Info lengthField(int index, String desc, int value, int lengthUnit) {
-        return new Info(index, desc, value, StrUtils.leftPad(Integer.toHexString(value), 1 << lengthUnit, '0'), true);
+        return new Info(index, desc, value, StrUtils.leftPad(Integer.toHexString(value), 1 << lengthUnit, '0'));
     }
 
     public int getIndex() {
@@ -40,17 +38,13 @@ public class Info {
         return value;
     }
 
-    public boolean isLengthField() {
-        return lengthField;
+    public void setLength(int length, int lengthUnit) {
+        this.value = length;
+        this.raw = StrUtils.leftPad(Integer.toHexString(length), 1 << lengthUnit, '0');
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Info{");
-        sb.append("desc='").append(desc).append('\'');
-        sb.append(", value=").append(value);
-        sb.append(", raw='").append(raw).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return index + "\t[" + raw + "] [" + StrUtils.toString(value) + "] " + desc;
     }
 }

@@ -13,19 +13,19 @@ import java.util.LinkedList;
 public class Explain extends LinkedList<Info> {
 
     public void readField(int index, String desc, Object value, ByteBuf input) {
-        this.add(Info.field(index, desc, value, ByteBufUtil.hexDump(input, index, input.readerIndex() - index)));
+        if (value != null)
+            this.add(Info.field(index, desc, value, ByteBufUtil.hexDump(input, index, input.readerIndex() - index)));
     }
 
     public void writeField(int index, String desc, Object value, ByteBuf output) {
-        this.add(Info.field(index, desc, value, ByteBufUtil.hexDump(output, index, output.writerIndex() - index)));
+        if (value != null)
+            this.add(Info.field(index, desc, value, ByteBufUtil.hexDump(output, index, output.writerIndex() - index)));
     }
 
-    public void lengthField(int index, String desc, int value, int lengthUnit) {
-        this.add(Info.lengthField(index, desc, value, lengthUnit));
-    }
-
-    public void lengthFieldPrevious(int index, String desc, int value, int lengthUnit) {
-        this.add(this.size() - 1, Info.lengthField(index, desc, value, lengthUnit));
+    public Info lengthField(int index, String desc, int length, int lengthUnit) {
+        Info info = Info.lengthField(index, desc, length, lengthUnit);
+        this.add(info);
+        return info;
     }
 
     public void setLastDesc(String desc) {
@@ -33,10 +33,7 @@ public class Explain extends LinkedList<Info> {
     }
 
     public void println() {
-        for (Info info : this) {
-            Object value = info.getValue();
-            if (value != null)
-                System.out.println(info.getIndex() + "\t" + "[" + info.getRaw() + "] > [" + StrUtils.toString(value) + "] " + info.getDesc());
-        }
+        for (Info info : this)
+            System.out.println(info);
     }
 }

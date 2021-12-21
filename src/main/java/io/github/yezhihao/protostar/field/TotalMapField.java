@@ -3,6 +3,7 @@ package io.github.yezhihao.protostar.field;
 import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.schema.MapSchema;
 import io.github.yezhihao.protostar.util.Explain;
+import io.github.yezhihao.protostar.util.Info;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
 import org.slf4j.Logger;
@@ -133,10 +134,10 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
         try {
             for (int i = 0; i < total; i++) {
                 key = schema.readFrom(input, explain);
-                explain.setLastDesc("key");
+                explain.setLastDesc(desc + "ID");
 
                 length = valueIntTool.read(input);
-                explain.lengthField(input.readerIndex() - lengthUnit, desc + "数量", length, lengthUnit);
+                explain.lengthField(input.readerIndex() - lengthUnit, desc + "长度", length, lengthUnit);
                 if (length <= 0)
                     continue;
 
@@ -163,7 +164,6 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
         Schema schema = valueSchema.get(key);
         if (schema != null) {
             Object value = schema.readFrom(input, explain);
-            explain.setLastDesc("Value");
             return value;
         }
         byte[] bytes = new byte[input.readableBytes()];
@@ -180,18 +180,18 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
         for (Map.Entry<K, V> entry : map.entrySet()) {
             K key = entry.getKey();
             schema.writeTo(output, key, explain);
-            explain.setLastDesc("Key");
+            explain.setLastDesc(desc + "ID");
 
             V value = entry.getValue();
             Schema<V> schema = valueSchema.get(key);
             if (schema != null) {
                 int begin = output.writerIndex();
+                Info info = explain.lengthField(begin, desc + "长度", 0, lengthUnit);
                 valueIntTool.write(output, 0);
                 schema.writeTo(output, value, explain);
-                explain.setLastDesc("Value");
                 int length = output.writerIndex() - begin - lengthUnit;
                 valueIntTool.set(output, begin, length);
-                explain.lengthFieldPrevious(begin, desc + "长度", length, lengthUnit);
+                info.setLength(length, lengthUnit);
             } else {
                 log.warn("未注册的信息:ID[{}], VALUE[{}]", key, value);
             }

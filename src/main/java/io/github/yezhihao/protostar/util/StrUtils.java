@@ -7,6 +7,8 @@ package io.github.yezhihao.protostar.util;
 public class StrUtils {
 
     public static String toString(Object value) {
+        if (value == null)
+            return "null";
         if (!value.getClass().isArray())
             return value.toString();
 
