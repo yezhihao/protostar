@@ -18,21 +18,30 @@ import java.util.function.Supplier;
 
 public class SchemaRegistry {
 
-    private static final Map<String, Function<DateTool, BasicField>> TIME_SCHEMA = new HashMap<>(128);
+    private static final Map<String, Function<DateTool, BasicField>> TIME_SCHEMA = new HashMap<>(6);
 
     private static final Map<String, Supplier<BasicField>> NO_ARGS = new HashMap<>(128);
 
     private static final Map<String, Integer> NUMBER = new HashMap<>(12);
 
     static {
+        NUMBER.put(boolean.class.getName(), 1);
+        NUMBER.put(char.class.getName(), 2);
         NUMBER.put(byte.class.getName(), 1);
-        NUMBER.put(Byte.class.getName(), 1);
         NUMBER.put(short.class.getName(), 2);
-        NUMBER.put(Short.class.getName(), 2);
         NUMBER.put(int.class.getName(), 4);
-        NUMBER.put(Integer.class.getName(), 4);
         NUMBER.put(long.class.getName(), 8);
+        NUMBER.put(float.class.getName(), 4);
+        NUMBER.put(double.class.getName(), 8);
+
+        NUMBER.put(Boolean.class.getName(), 1);
+        NUMBER.put(Character.class.getName(), 2);
+        NUMBER.put(Byte.class.getName(), 1);
+        NUMBER.put(Short.class.getName(), 2);
+        NUMBER.put(Integer.class.getName(), 4);
         NUMBER.put(Long.class.getName(), 8);
+        NUMBER.put(Float.class.getName(), 4);
+        NUMBER.put(Double.class.getName(), 8);
 
         register(short.class,        /**/NumberPSchema.WORD2ShortLE::new, 2, "LE");
         register(int.class,          /**/NumberPSchema.WORD2IntLE::new, 2, "LE");
@@ -52,14 +61,14 @@ public class SchemaRegistry {
         register(int.class,          /**/NumberPSchema.DWORD2Int::new, 4);
         register(long.class,         /**/NumberPSchema.DWORD2Long::new, 4);
         register(long.class,         /**/NumberPSchema.QWORD2Long::new, 8);
+        register(boolean.class,      /**/NumberPSchema.BOOL::new);
+        register(char.class,         /**/NumberPSchema.CHAR::new);
         register(byte.class,         /**/NumberPSchema.BYTE2Byte::new);
         register(short.class,        /**/NumberPSchema.WORD2Short::new);
         register(int.class,          /**/NumberPSchema.DWORD2Int::new);
         register(long.class,         /**/NumberPSchema.QWORD2Long::new);
         register(float.class,        /**/NumberPSchema.DWORD2Float::new);
         register(double.class,       /**/NumberPSchema.QWORD2Double::new);
-        register(boolean.class,      /**/NumberPSchema.BOOL::new);
-        register(char.class,         /**/NumberPSchema.CHAR::new);
 
         register(Short.class,        /**/NumberSchema.WORD2ShortLE::new, 2, "LE");
         register(Integer.class,      /**/NumberSchema.WORD2IntLE::new, 2, "LE");
@@ -79,14 +88,14 @@ public class SchemaRegistry {
         register(Integer.class,      /**/NumberSchema.DWORD2Int::new, 4);
         register(Long.class,         /**/NumberSchema.DWORD2Long::new, 4);
         register(Long.class,         /**/NumberSchema.QWORD2Long::new, 8);
+        register(Boolean.class,      /**/NumberSchema.BOOL::new);
+        register(Character.class,    /**/NumberSchema.CHAR::new);
         register(Byte.class,         /**/NumberSchema.BYTE2Byte::new);
         register(Short.class,        /**/NumberSchema.WORD2Short::new);
         register(Integer.class,      /**/NumberSchema.DWORD2Int::new);
         register(Long.class,         /**/NumberSchema.QWORD2Long::new);
         register(Float.class,        /**/NumberSchema.DWORD2Float::new);
         register(Double.class,       /**/NumberSchema.QWORD2Double::new);
-        register(Boolean.class,      /**/NumberSchema.BOOL::new);
-        register(Character.class,    /**/NumberSchema.CHAR::new);
 
         register(byte[].class,       /**/ArraySchema.ByteArray::new);
         register(char[].class,       /**/ArraySchema.CharArray::new);
@@ -100,8 +109,6 @@ public class SchemaRegistry {
         TIME_SCHEMA.put(LocalTime.class.getName(),    /**/DateTimeSchema.Time::new);
         TIME_SCHEMA.put(LocalDate.class.getName(),    /**/DateTimeSchema.Date::new);
         TIME_SCHEMA.put(LocalDateTime.class.getName(),/**/DateTimeSchema.DateTime::new);
-
-        register(ByteBuffer.class,   /**/ByteBufferSchema::new);
     }
 
     public static void register(Class typeClass, Supplier<BasicField> supplier, int length, String charset) {
@@ -129,7 +136,8 @@ public class SchemaRegistry {
     }
 
 
-    public static BasicField get(Class typeClass, Field field) {
+    public static BasicField get(Field field, java.lang.reflect.Field f) {
+        Class typeClass = f.getType();
         String name = typeClass.getName();
         String charset = field.charset().toUpperCase();
         int length = field.length();
@@ -142,37 +150,37 @@ public class SchemaRegistry {
             return NO_ARGS.get(name).get();
         }
 
-        if (CharSequence.class.isAssignableFrom(typeClass)) {
+        if (String.class.isAssignableFrom(typeClass)) {
             return StringSchema.getInstance(charset, length, field.lengthUnit());
         }
         if (Temporal.class.isAssignableFrom(typeClass)) {
-            Function<DateTool, BasicField> function = TIME_SCHEMA.get(name);
-            if (charset.equals("BCD"))
-                return function.apply(DateTool.BCD);
-            return function.apply(DateTool.BYTE);
+            return TIME_SCHEMA.get(name).apply(charset.equals("BCD") ? DateTool.BCD : DateTool.BYTE);
         }
-        if (Schema.class != field.converter())
-            return get(typeClass, field, getCustom(field.converter()));
+
+        if (Schema.class != field.converter()) {
+            return get(field, f, getCustom(field.converter()));
+        }
 
         Supplier<BasicField> supplier = NO_ARGS.get(name);
-        if (supplier == null)
-            return null;
-        return get(typeClass, field, supplier.get());
+        if (supplier != null)
+            return get(field, f, supplier.get());
+        return null;
     }
 
-    public static BasicField get(Class<?> typeClass, Field field, Schema schema) {
+    public static BasicField get(Field field, java.lang.reflect.Field f, Schema schema) {
+        Class typeClass = f.getType();
         if (field.totalUnit() > 0) {
             if (Collection.class.isAssignableFrom(typeClass)) {
                 return new TotalCollectionField(schema, field.totalUnit());
             }
             if (Map.class.isAssignableFrom(typeClass)) {
-                return new TotalMapField(schema, typeClass, field.totalUnit());
+                return new TotalMapField((MapSchema) schema, field.totalUnit(), typeClass);
             }
             if (typeClass.isArray()) {
                 typeClass = typeClass.getComponentType();
                 if (typeClass.isPrimitive())
-                    return new TotalArrayPrimitiveField(schema, field, SchemaRegistry.getLength(typeClass));
-                return new TotalArrayObjectField(schema, field);
+                    return new TotalArrayPrimitiveField(schema, field.totalUnit(), typeClass);
+                return new TotalArrayObjectField(schema, field.totalUnit(), typeClass);
             }
         }
 
@@ -188,12 +196,15 @@ public class SchemaRegistry {
         if (Collection.class.isAssignableFrom(typeClass)) {
             return new CollectionField(schema);
         } else if (Map.class.isAssignableFrom(typeClass)) {
-            return new MapField(schema, typeClass);
+            return new MapField((MapSchema) schema, typeClass);
         }
         return (BasicField) schema;
     }
 
-    public static Integer getLength(Class typeClass) {
-        return NUMBER.get(typeClass.getName());
+    public static int getLength(Class typeClass) {
+        Integer len = NUMBER.get(typeClass.getName());
+        if (len == null)
+            return -1;
+        return len;
     }
 }

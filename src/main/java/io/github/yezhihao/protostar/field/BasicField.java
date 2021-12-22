@@ -38,12 +38,12 @@ public abstract class BasicField<T> implements Schema<T>, Comparable<BasicField>
         writeTo(output, value, explain);
     }
 
-    public BasicField build(java.lang.reflect.Field f, Field field) {
+    public BasicField init(Field field, java.lang.reflect.Field f) {
         if (this.f == null && this.field == null) {
             this.f = f;
             this.field = field;
-            Integer len = SchemaRegistry.getLength(f.getType());
-            length = len != null ? len : 16;
+            length = field.length() > 0 ? field.length() : SchemaRegistry.getLength(f.getType());
+            length = length > 0 ? length : 16;
             desc = field.desc();
             if (desc.isEmpty())
                 desc = f.getName();
@@ -61,7 +61,7 @@ public abstract class BasicField<T> implements Schema<T>, Comparable<BasicField>
 
     /** 用于预估内存分配，不需要精确值 */
     public int length() {
-        return 32;
+        return length;
     }
 
     @Override

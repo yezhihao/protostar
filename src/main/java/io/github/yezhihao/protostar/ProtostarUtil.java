@@ -98,30 +98,28 @@ public class ProtostarUtil {
 
             Field field = f.getDeclaredAnnotation(Field.class);
             if (field != null) {
-                fillField(root, multiVersionFields, f, field);
+                fillField(root, multiVersionFields, field, f);
             } else {
                 Field[] fields = f.getDeclaredAnnotation(Fs.class).value();
                 for (int i = 0; i < fields.length; i++)
-                    fillField(root, multiVersionFields, f, fields[i]);
+                    fillField(root, multiVersionFields, fields[i], f);
             }
         }
         return multiVersionFields;
     }
 
-    private static void fillField(Map<String, Map<Integer, RuntimeSchema>> root, Map<Integer, List<BasicField>> multiVersionFields, java.lang.reflect.Field f, Field field) {
-        Class typeClass = f.getType();
-
-        BasicField basicField = SchemaRegistry.get(typeClass, field);
+    private static void fillField(Map<String, Map<Integer, RuntimeSchema>> root, Map<Integer, List<BasicField>> multiVersionFields, Field field, java.lang.reflect.Field f) {
+        BasicField basicField = SchemaRegistry.get(field, f);
         if (basicField != null) {
             for (int ver : field.version()) {
-                multiVersionFields.get(ver).add(basicField.build(f, field));
+                multiVersionFields.get(ver).add(basicField.init(field, f));
             }
         } else {
             Map<Integer, RuntimeSchema> schemaMap = Optional.ofNullable(getRuntimeSchema(root, ClassUtils.getGenericType(f))).orElse(Collections.EMPTY_MAP);
             for (int ver : field.version()) {
                 Schema schema = schemaMap.get(ver);
-                basicField = SchemaRegistry.get(typeClass, field, schema);
-                multiVersionFields.get(ver).add(basicField.build(f, field));
+                basicField = SchemaRegistry.get(field, f, schema);
+                multiVersionFields.get(ver).add(basicField.init(field, f));
             }
         }
     }

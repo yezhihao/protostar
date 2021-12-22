@@ -22,23 +22,22 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
 
     private static final Logger log = LoggerFactory.getLogger(TotalMapField.class.getSimpleName());
 
-    private Schema<K> schema;
+    private final Schema<K> keySchema;
     private final Map<K, Schema<V>> valueSchema;
     private final int lengthUnit;
     private final IntTool valueIntTool;
-    private final boolean treeMap;
     private final int totalUnit;
     private final IntTool totalIntTool;
+    private final boolean treeMap;
 
-    public TotalMapField(Schema schema, Class typeClass, int totalUnit) {
-        MapSchema mapSchema = (MapSchema) schema;
+    public TotalMapField(MapSchema mapSchema, int totalUnit, Class typeClass) {
+        this.keySchema = mapSchema.keySchema;
         this.valueSchema = mapSchema.valueSchema;
         this.lengthUnit = mapSchema.lengthUnit;
         this.valueIntTool = mapSchema.intTool;
-        this.schema = ((MapSchema) schema).keySchema;
-        this.treeMap = !HashMap.class.isAssignableFrom(typeClass);
         this.totalUnit = totalUnit;
         this.totalIntTool = IntTool.getInstance(totalUnit);
+        this.treeMap = !HashMap.class.isAssignableFrom(typeClass);
     }
 
     @Override
@@ -57,7 +56,7 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
         int length = 0;
         try {
             for (int i = 0; i < total; i++) {
-                key = schema.readFrom(input);
+                key = keySchema.readFrom(input);
 
                 length = valueIntTool.read(input);
                 if (length <= 0)
@@ -100,7 +99,7 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
 
         for (Map.Entry<K, V> entry : map.entrySet()) {
             K key = entry.getKey();
-            schema.writeTo(output, key);
+            keySchema.writeTo(output, key);
 
             V value = entry.getValue();
             Schema<V> schema = valueSchema.get(key);
@@ -133,7 +132,7 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
         int length = 0;
         try {
             for (int i = 0; i < total; i++) {
-                key = schema.readFrom(input, explain);
+                key = keySchema.readFrom(input, explain);
                 explain.setLastDesc(desc + "ID");
 
                 length = valueIntTool.read(input);
@@ -179,7 +178,7 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
 
         for (Map.Entry<K, V> entry : map.entrySet()) {
             K key = entry.getKey();
-            schema.writeTo(output, key, explain);
+            keySchema.writeTo(output, key, explain);
             explain.setLastDesc(desc + "ID");
 
             V value = entry.getValue();

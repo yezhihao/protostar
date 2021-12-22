@@ -36,4 +36,12 @@ public class Explain extends LinkedList<Info> {
         for (Info info : this)
             System.out.println(info);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(this.size() << 5);
+        for (Info info : this)
+            sb.append(info);
+        return sb.toString();
+    }
 }

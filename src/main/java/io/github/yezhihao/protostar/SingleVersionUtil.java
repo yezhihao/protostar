@@ -57,22 +57,20 @@ public abstract class SingleVersionUtil {
             Field field = f.getDeclaredAnnotation(Field.class);
             if (field != null) {
                 f.setAccessible(true);
-                fillField(root, fields, f, field);
+                fillField(root, fields, field, f);
             }
         }
         return fields;
     }
 
-    private static void fillField(Map<String, Schema> root, List<BasicField> fields, java.lang.reflect.Field f, Field field) {
-        Class typeClass = f.getType();
-
-        BasicField basicField = SchemaRegistry.get(typeClass, field);
+    private static void fillField(Map<String, Schema> root, List<BasicField> fields, Field field, java.lang.reflect.Field f) {
+        BasicField basicField = SchemaRegistry.get(field, f);
         if (basicField != null) {
-            fields.add(basicField.build(f, field));
+            fields.add(basicField.init(field, f));
         } else {
             Schema schema = getRuntimeSchema(root, ClassUtils.getGenericType(f));
-            basicField = SchemaRegistry.get(typeClass, field, schema);
-            fields.add(basicField.build(f, field));
+            basicField = SchemaRegistry.get(field, f, schema);
+            fields.add(basicField.init(field, f));
         }
     }
 }

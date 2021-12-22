@@ -22,18 +22,17 @@ public class MapField<K, V> extends BasicField<Map<K, V>> {
 
     private static final Logger log = LoggerFactory.getLogger(MapField.class.getSimpleName());
 
-    private Schema<K> schema;
+    private final Schema<K> keySchema;
     private final Map<K, Schema<V>> valueSchema;
     private final int lengthUnit;
     private final IntTool valueIntTool;
     private final boolean treeMap;
 
-    public MapField(Schema schema, Class typeClass) {
-        MapSchema mapSchema = (MapSchema) schema;
+    public MapField(MapSchema mapSchema, Class typeClass) {
+        this.keySchema = mapSchema.keySchema;
         this.valueSchema = mapSchema.valueSchema;
         this.lengthUnit = mapSchema.lengthUnit;
         this.valueIntTool = mapSchema.intTool;
-        this.schema = ((MapSchema) schema).keySchema;
         this.treeMap = !HashMap.class.isAssignableFrom(typeClass);
     }
 
@@ -50,7 +49,7 @@ public class MapField<K, V> extends BasicField<Map<K, V>> {
         int length = 0;
         try {
             do {
-                key = schema.readFrom(input);
+                key = keySchema.readFrom(input);
 
                 length = valueIntTool.read(input);
                 if (length <= 0)
@@ -92,7 +91,7 @@ public class MapField<K, V> extends BasicField<Map<K, V>> {
 
         for (Map.Entry<K, V> entry : map.entrySet()) {
             K key = entry.getKey();
-            schema.writeTo(output, key);
+            keySchema.writeTo(output, key);
 
             V value = entry.getValue();
             Schema<V> schema = valueSchema.get(key);
@@ -121,7 +120,7 @@ public class MapField<K, V> extends BasicField<Map<K, V>> {
         int length = 0;
         try {
             do {
-                key = schema.readFrom(input, explain);
+                key = keySchema.readFrom(input, explain);
                 explain.setLastDesc(desc + "ID");
 
                 length = valueIntTool.read(input);
@@ -166,7 +165,7 @@ public class MapField<K, V> extends BasicField<Map<K, V>> {
 
         for (Map.Entry<K, V> entry : map.entrySet()) {
             K key = entry.getKey();
-            schema.writeTo(output, key, explain);
+            keySchema.writeTo(output, key, explain);
             explain.setLastDesc(desc + "ID");
 
             V value = entry.getValue();

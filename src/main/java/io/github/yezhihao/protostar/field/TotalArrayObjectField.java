@@ -1,7 +1,6 @@
 package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
-import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
@@ -18,11 +17,13 @@ public class TotalArrayObjectField<T> extends BasicField<T[]> {
     private final Schema<T> schema;
     private final int totalUnit;
     private final IntTool intTool;
+    private final Class<T> arrayClass;
 
-    public TotalArrayObjectField(Schema<T> schema, Field field) {
+    public TotalArrayObjectField(Schema<T> schema, int totalUnit, Class<T> arrayClass) {
         this.schema = schema;
-        this.totalUnit = field.totalUnit();
-        this.intTool = IntTool.getInstance(field.totalUnit());
+        this.totalUnit = totalUnit;
+        this.intTool = IntTool.getInstance(totalUnit);
+        this.arrayClass = arrayClass;
     }
 
     @Override
@@ -30,7 +31,7 @@ public class TotalArrayObjectField<T> extends BasicField<T[]> {
         int total = intTool.read(input);
         if (total <= 0)
             return null;
-        T[] value = (T[]) Array.newInstance(schema.getClass(), total);
+        T[] value = (T[]) Array.newInstance(arrayClass, total);
         for (int i = 0; i < total; i++) {
             T t = schema.readFrom(input);
             value[i] = t;
@@ -58,7 +59,7 @@ public class TotalArrayObjectField<T> extends BasicField<T[]> {
         explain.lengthField(input.readerIndex() - totalUnit, desc + "数量", total, totalUnit);
         if (total <= 0)
             return null;
-        T[] value = (T[]) Array.newInstance(schema.getClass(), total);
+        T[] value = (T[]) Array.newInstance(arrayClass, total);
         for (int i = 0; i < total; i++) {
             T t = schema.readFrom(input, explain);
             value[i] = t;

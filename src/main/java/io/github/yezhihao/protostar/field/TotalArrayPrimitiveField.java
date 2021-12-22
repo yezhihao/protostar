@@ -1,7 +1,7 @@
 package io.github.yezhihao.protostar.field;
 
 import io.github.yezhihao.protostar.Schema;
-import io.github.yezhihao.protostar.annotation.Field;
+import io.github.yezhihao.protostar.schema.SchemaRegistry;
 import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
@@ -16,14 +16,14 @@ import java.lang.reflect.Array;
 public class TotalArrayPrimitiveField extends BasicField {
 
     private final Schema schema;
-    private final int valueUnit;
     private final int totalUnit;
+    private final int valueUnit;
     private final IntTool intTool;
 
-    public TotalArrayPrimitiveField(Schema schema, Field field, int valueUnit) {
+    public TotalArrayPrimitiveField(Schema schema, int totalUnit, Class arrayClass) {
         this.schema = schema;
-        this.valueUnit = valueUnit;
-        this.totalUnit = field.totalUnit();
+        this.totalUnit = totalUnit;
+        this.valueUnit = SchemaRegistry.getLength(arrayClass);
         this.intTool = IntTool.getInstance(totalUnit);
     }
 
