@@ -52,7 +52,7 @@ public class SchemaManager {
         if (schemaMap != null) typeIdMapping.put(typeId, schemaMap);
     }
 
-    public <T> RuntimeSchema<T> getRuntimeSchema(Class<T> typeClass, Integer version) {
+    public <T> RuntimeSchema<T> getRuntimeSchema(Class<T> typeClass, int version) {
         Map<Integer, RuntimeSchema> schemaMap = ProtostarUtil.getRuntimeSchema(typeClassMapping, typeClass);
         if (schemaMap == null) return null;
         return schemaMap.get(version);
@@ -62,7 +62,7 @@ public class SchemaManager {
         return ProtostarUtil.getRuntimeSchema(typeClassMapping, typeClass);
     }
 
-    public RuntimeSchema getRuntimeSchema(Integer typeId, Integer version) {
+    public RuntimeSchema getRuntimeSchema(Integer typeId, int version) {
         Map<Integer, RuntimeSchema> schemaMap = typeIdMapping.get(typeId);
         if (schemaMap == null) return null;
         return schemaMap.get(version);
