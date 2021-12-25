@@ -2,6 +2,7 @@ package io.github.yezhihao.protostar;
 
 import io.github.yezhihao.protostar.annotation.Message;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
+import io.github.yezhihao.protostar.util.ArrayMap;
 import io.github.yezhihao.protostar.util.ClassUtils;
 
 import java.util.HashMap;
@@ -15,9 +16,9 @@ import java.util.Map;
  */
 public class SchemaManager {
 
-    private final Map<Integer, Map<Integer, RuntimeSchema>> typeIdMapping;
+    private final Map<Integer, ArrayMap<RuntimeSchema>> typeIdMapping;
 
-    private final Map<String, Map<Integer, RuntimeSchema>> typeClassMapping;
+    private final Map<String, ArrayMap<RuntimeSchema>> typeClassMapping;
 
     public SchemaManager() {
         this(128);
@@ -48,27 +49,27 @@ public class SchemaManager {
     }
 
     public void loadRuntimeSchema(Integer typeId, Class typeClass) {
-        Map<Integer, RuntimeSchema> schemaMap = ProtostarUtil.getRuntimeSchema(typeClassMapping, typeClass);
+        ArrayMap<RuntimeSchema> schemaMap = ProtostarUtil.getRuntimeSchema(typeClassMapping, typeClass);
         if (schemaMap != null) typeIdMapping.put(typeId, schemaMap);
     }
 
     public <T> RuntimeSchema<T> getRuntimeSchema(Class<T> typeClass, int version) {
-        Map<Integer, RuntimeSchema> schemaMap = ProtostarUtil.getRuntimeSchema(typeClassMapping, typeClass);
+        ArrayMap<RuntimeSchema> schemaMap = ProtostarUtil.getRuntimeSchema(typeClassMapping, typeClass);
         if (schemaMap == null) return null;
-        return schemaMap.get(version);
+        return schemaMap.getOrDefault(version);
     }
 
-    public Map<Integer, RuntimeSchema> getRuntimeSchema(Class typeClass) {
+    public ArrayMap<RuntimeSchema> getRuntimeSchema(Class typeClass) {
         return ProtostarUtil.getRuntimeSchema(typeClassMapping, typeClass);
     }
 
     public RuntimeSchema getRuntimeSchema(Integer typeId, int version) {
-        Map<Integer, RuntimeSchema> schemaMap = typeIdMapping.get(typeId);
+        ArrayMap<RuntimeSchema> schemaMap = typeIdMapping.get(typeId);
         if (schemaMap == null) return null;
-        return schemaMap.get(version);
+        return schemaMap.getOrDefault(version);
     }
 
-    public Map<Integer, RuntimeSchema> getRuntimeSchema(Integer typeId) {
+    public ArrayMap<RuntimeSchema> getRuntimeSchema(Integer typeId) {
         return typeIdMapping.get(typeId);
     }
 }

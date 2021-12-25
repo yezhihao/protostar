@@ -15,6 +15,7 @@ public abstract class BasicField<T> implements Schema<T>, Comparable<BasicField>
 
     protected java.lang.reflect.Field f;
     protected Field field;
+    protected int index;
     protected int length;
     protected String desc;
 
@@ -38,7 +39,7 @@ public abstract class BasicField<T> implements Schema<T>, Comparable<BasicField>
         writeTo(output, value, explain);
     }
 
-    public BasicField init(Field field, java.lang.reflect.Field f) {
+    public BasicField init(Field field, java.lang.reflect.Field f, int position) {
         if (this.f == null && this.field == null) {
             this.f = f;
             this.field = field;
@@ -47,6 +48,9 @@ public abstract class BasicField<T> implements Schema<T>, Comparable<BasicField>
             desc = field.desc();
             if (desc.isEmpty())
                 desc = f.getName();
+            index = field.index();
+            if (index == 0)
+                index = position;
         }
         return this;
     }
@@ -66,7 +70,21 @@ public abstract class BasicField<T> implements Schema<T>, Comparable<BasicField>
 
     @Override
     public int compareTo(BasicField that) {
-        return Integer.compare(this.field.index(), that.field.index());
+        return Integer.compare(this.index, that.index);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (!(other instanceof BasicField)) return false;
+
+        BasicField that = (BasicField) other;
+        return f.equals(that.f);
+    }
+
+    @Override
+    public int hashCode() {
+        return f.hashCode();
     }
 
     @Override
