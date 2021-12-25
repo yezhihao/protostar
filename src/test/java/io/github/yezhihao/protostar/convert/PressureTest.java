@@ -1,6 +1,7 @@
 package io.github.yezhihao.protostar.convert;
 
 import io.github.yezhihao.protostar.ProtostarUtil;
+import io.github.yezhihao.protostar.util.ArrayMap;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -12,7 +13,7 @@ public class PressureTest {
 
     //1100
     public static void main(String[] args) {
-        Map<Integer, RuntimeSchema> multiVersionSchema = ProtostarUtil.getRuntimeSchema(T0200.class);
+        ArrayMap<RuntimeSchema> multiVersionSchema = ProtostarUtil.getRuntimeSchema(T0200.class);
         RuntimeSchema<T0200> schema = multiVersionSchema.get(0);
 
         ByteBuf buf = Unpooled.buffer(128);

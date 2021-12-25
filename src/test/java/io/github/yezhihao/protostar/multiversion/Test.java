@@ -2,18 +2,18 @@ package io.github.yezhihao.protostar.multiversion;
 
 import io.github.yezhihao.protostar.ProtostarUtil;
 import io.github.yezhihao.protostar.annotation.Field;
+import io.github.yezhihao.protostar.util.ArrayMap;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 public class Test {
 
     public static void main(String[] args) {
-        Map<Integer, RuntimeSchema> multiVersionSchema = ProtostarUtil.getRuntimeSchema(Foo.class);
+        ArrayMap<RuntimeSchema> multiVersionSchema = ProtostarUtil.getRuntimeSchema(Foo.class);
         RuntimeSchema<Foo> schema_v0 = multiVersionSchema.get(0);
         RuntimeSchema<Foo> schema_v1 = multiVersionSchema.get(1);
 
