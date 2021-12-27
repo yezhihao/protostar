@@ -4,6 +4,7 @@ import io.github.yezhihao.protostar.Schema;
 import io.github.yezhihao.protostar.annotation.Field;
 import io.github.yezhihao.protostar.field.*;
 import io.github.yezhihao.protostar.util.DateTool;
+import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
@@ -104,7 +105,8 @@ public class SchemaRegistry {
         register(long[].class,       /**/ArraySchema.LongArray::new);
         register(float[].class,      /**/ArraySchema.FloatArray::new);
         register(double[].class,     /**/ArraySchema.DoubleArray::new);
-        register(ByteBuffer.class,   /**/ByteBufferSchema::new);
+        register(ByteBuffer.class,   /**/BufferSchema.ByteBufferSchema::new);
+        register(ByteBuf.class,      /**/BufferSchema.ByteBufSchema::new);
 
         TIME_SCHEMA.put(LocalTime.class.getName(),    /**/DateTimeSchema.Time::new);
         TIME_SCHEMA.put(LocalDate.class.getName(),    /**/DateTimeSchema.Date::new);
