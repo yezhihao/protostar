@@ -28,6 +28,7 @@ public class ArraySchema {
 
         @Override
         public void writeTo(ByteBuf output, byte[] array) {
+            if (array == null) return;
             output.writeBytes(array);
         }
     }
@@ -44,6 +45,7 @@ public class ArraySchema {
 
         @Override
         public void writeTo(ByteBuf output, char[] array) {
+            if (array == null) return;
             for (int i = 0; i < array.length; i++) {
                 output.writeChar(array[i]);
             }
@@ -62,6 +64,7 @@ public class ArraySchema {
 
         @Override
         public void writeTo(ByteBuf output, short[] array) {
+            if (array == null) return;
             for (int i = 0; i < array.length; i++) {
                 output.writeShort(array[i]);
             }
@@ -80,6 +83,7 @@ public class ArraySchema {
 
         @Override
         public void writeTo(ByteBuf output, int[] array) {
+            if (array == null) return;
             for (int i = 0; i < array.length; i++) {
                 output.writeInt(array[i]);
             }
@@ -98,6 +102,7 @@ public class ArraySchema {
 
         @Override
         public void writeTo(ByteBuf output, long[] array) {
+            if (array == null) return;
             for (int i = 0; i < array.length; i++) {
                 output.writeLong(array[i]);
             }
@@ -117,6 +122,7 @@ public class ArraySchema {
 
         @Override
         public void writeTo(ByteBuf output, float[] array) {
+            if (array == null) return;
             for (int i = 0; i < array.length; i++) {
                 output.writeFloat(array[i]);
             }
@@ -135,6 +141,7 @@ public class ArraySchema {
 
         @Override
         public void writeTo(ByteBuf output, double[] array) {
+            if (array == null) return;
             for (int i = 0; i < array.length; i++) {
                 output.writeDouble(array[i]);
             }

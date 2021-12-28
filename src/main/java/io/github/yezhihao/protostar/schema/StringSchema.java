@@ -83,9 +83,8 @@ public class StringSchema {
                 int srcPos = length - buffer.limit();
 
                 if (srcPos > 0) {
-                    byte[] pads = new byte[srcPos];
-                    output.writeBytes(pads);
                     output.writeBytes(buffer);
+                    output.writeBytes(new byte[srcPos]);
                 } else if (srcPos < 0) {
                     buffer.position(-srcPos);
                     output.writeBytes(buffer);

@@ -9,7 +9,7 @@ public abstract class BufferSchema {
     public static class ByteBufSchema extends BasicField<ByteBuf> {
         @Override
         public ByteBuf readFrom(ByteBuf input) {
-            return input;
+            return input.readSlice(input.readableBytes());
         }
 
         @Override

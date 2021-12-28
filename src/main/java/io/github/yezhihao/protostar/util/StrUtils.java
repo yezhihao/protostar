@@ -1,5 +1,8 @@
 package io.github.yezhihao.protostar.util;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+
 /**
  * @author yezhihao
  * https://gitee.com/yezhihao/jt808-server
@@ -9,6 +12,8 @@ public class StrUtils {
     public static String toString(Object value) {
         if (value == null)
             return "null";
+        if (value instanceof ByteBuf)
+            return ByteBufUtil.hexDump((ByteBuf) value);
         if (!value.getClass().isArray())
             return value.toString();
 
