@@ -56,6 +56,7 @@ public class LengthUnitField<T> extends BasicField<T> {
         intTool.write(output, 0);
         if (value != null) {
             schema.writeTo(output, value, explain);
+            explain.setLastDesc(desc);
             int length = output.writerIndex() - begin - lengthUnit;
             intTool.set(output, begin, length);
             info.setLength(length, lengthUnit);
