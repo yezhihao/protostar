@@ -45,6 +45,8 @@ public class Info {
 
     @Override
     public String toString() {
+        if (desc == null)
+            return index + "\t[" + raw + "] [" + StrUtils.toString(value) + "]";
         return index + "\t[" + raw + "] [" + StrUtils.toString(value) + "] " + desc;
     }
 }
