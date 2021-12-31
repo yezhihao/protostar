@@ -70,7 +70,7 @@ public class MapField<K, V> extends BasicField<Map<K, V>> {
                 }
             } while (input.isReadable());
         } catch (Exception e) {
-            log.warn("解析出错:KEY[{}], LENGTH[{}], {}", key, length, e.getMessage());
+            log.warn("解析出错:ID[{}], LENGTH[{}], {}", key, length, e.getMessage());
         }
         return map;
     }
@@ -143,7 +143,7 @@ public class MapField<K, V> extends BasicField<Map<K, V>> {
                 }
             } while (input.isReadable());
         } catch (Exception e) {
-            log.warn("解析出错:KEY[{}], LENGTH[{}], {}", key, length, e.getMessage());
+            log.warn("解析出错:ID[{}], LENGTH[{}], {}", key, length, e.getMessage());
         }
         return map;
     }

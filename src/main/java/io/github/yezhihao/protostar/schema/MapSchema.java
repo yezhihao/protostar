@@ -85,7 +85,7 @@ public abstract class MapSchema<K, V> extends BasicField<Entry<K, V>> {
                 intTool.set(output, begin, length);
             }
         } else {
-            log.warn("未注册的信息:Key[{}], Value[{}]", key, entry.getValue());
+            log.warn("未注册的信息:ID[{}], Value[{}]", key, entry.getValue());
         }
     }
 }

@@ -6,6 +6,7 @@ import io.github.yezhihao.protostar.util.Explain;
 import io.github.yezhihao.protostar.util.Info;
 import io.github.yezhihao.protostar.util.IntTool;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,7 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
                 }
             }
         } catch (Exception e) {
-            log.warn("解析出错:KEY[{}], LENGTH[{}], {}", key, length, e.getMessage());
+            log.warn("解析出错:ID[{}], LENGTH[{}], {}", key, length, e.getMessage());
         }
         return map;
     }
@@ -154,7 +155,7 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
                 }
             }
         } catch (Exception e) {
-            log.warn("解析出错:KEY[{}], LENGTH[{}], {}", key, length, e.getMessage());
+            log.warn("解析出错:ID[{}], LENGTH[{}], {}", key, length, e.getMessage());
         }
         return map;
     }
@@ -165,8 +166,10 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
             Object value = schema.readFrom(input, explain);
             return value;
         }
+        int begin = input.readerIndex();
         byte[] bytes = new byte[input.readableBytes()];
         input.readBytes(bytes);
+        explain.readField(begin, desc, ByteBufUtil.hexDump(bytes), input);
         return bytes;
     }
 
