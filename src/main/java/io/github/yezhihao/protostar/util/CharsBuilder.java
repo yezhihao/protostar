@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class CharsBuilder implements CharSequence, Appendable {
 
-    private char[] value;
+    private final char[] value;
     private int pos;
 
     public CharsBuilder(int length) {

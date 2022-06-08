@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
  */
 public class ToStringBuilder {
 
-    private static Cache<String, Builder[]> CACHE = new Cache<>(new WeakHashMap<>());
+    private static final Cache<String, Builder[]> CACHE = new Cache<>(new WeakHashMap<>());
 
     public static String toString(Object object) {
         return toString(null, object, true, (String[]) null);
