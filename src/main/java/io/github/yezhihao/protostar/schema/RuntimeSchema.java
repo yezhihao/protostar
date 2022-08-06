@@ -47,7 +47,8 @@ public class RuntimeSchema<T> implements Schema<T> {
         int i = 0;
         try {
             for (; i < fields.length; i++)
-                fields[i].readAndSet(input, result);
+                if (input.isReadable())
+                    fields[i].readAndSet(input, result);
             return result;
         } catch (Exception e) {
             throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);
@@ -57,12 +58,15 @@ public class RuntimeSchema<T> implements Schema<T> {
     public T mergeFrom(ByteBuf input, T result, Explain explain) {
         int i = 0;
         try {
-            if (explain == null)
+            if (explain == null) {
                 for (; i < fields.length; i++)
-                    fields[i].readAndSet(input, result);
-            else
+                    if (input.isReadable())
+                        fields[i].readAndSet(input, result);
+            } else {
                 for (; i < fields.length; i++)
-                    fields[i].readAndSet(input, result, explain);
+                    if (input.isReadable())
+                        fields[i].readAndSet(input, result, explain);
+            }
             return result;
         } catch (Exception e) {
             throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);
@@ -74,7 +78,8 @@ public class RuntimeSchema<T> implements Schema<T> {
         try {
             T result = constructor.newInstance((Object[]) null);
             for (; i < fields.length; i++)
-                fields[i].readAndSet(input, result);
+                if (input.isReadable())
+                    fields[i].readAndSet(input, result);
             return result;
         } catch (Exception e) {
             throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);
@@ -85,12 +90,15 @@ public class RuntimeSchema<T> implements Schema<T> {
         int i = 0;
         try {
             T result = constructor.newInstance((Object[]) null);
-            if (explain == null)
+            if (explain == null) {
                 for (; i < fields.length; i++)
-                    fields[i].readAndSet(input, result);
-            else
+                    if (input.isReadable())
+                        fields[i].readAndSet(input, result);
+            } else {
                 for (; i < fields.length; i++)
-                    fields[i].readAndSet(input, result, explain);
+                    if (input.isReadable())
+                        fields[i].readAndSet(input, result, explain);
+            }
             return result;
         } catch (Exception e) {
             throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);

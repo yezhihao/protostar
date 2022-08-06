@@ -34,7 +34,7 @@ public interface IntTool {
     IntTool ALL = new IntTool() {
         @Override
         public int get(ByteBuf in, int i) {
-            return -1;
+            return in.readableBytes();
         }
 
         @Override
@@ -43,7 +43,7 @@ public interface IntTool {
 
         @Override
         public int read(ByteBuf in) {
-            return -1;
+            return in.readableBytes();
         }
 
         @Override

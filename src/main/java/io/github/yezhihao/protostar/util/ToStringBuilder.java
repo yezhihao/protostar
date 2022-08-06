@@ -55,13 +55,13 @@ public class ToStringBuilder {
             ArrayList<Builder> result = new ArrayList<>(methods.length);
 
             for (Method method : methods) {
-                String mName = method.getName();
-                String name = getName(mName);
-                if ((mName.startsWith("get") || mName.startsWith("is")) &&
-                        !"class".equals(name) &&
-                        !contains(ignores, name) &&
-                        method.getParameterCount() == 0 && !method.isAnnotationPresent(Transient.class))
-                    result.add(new Builder(name, method, !typeClass.equals(method.getDeclaringClass())));
+                String methodName = method.getName();
+                if (isProperty(methodName)) {
+                    String name = getName(methodName);
+                    if (!"class".equals(name) && !contains(ignores, name) &&
+                            method.getParameterCount() == 0 && !method.isAnnotationPresent(Transient.class))
+                        result.add(new Builder(name, method, !typeClass.equals(method.getDeclaringClass())));
+                }
             }
 
             Builder[] temp = new Builder[result.size()];
@@ -79,6 +79,12 @@ public class ToStringBuilder {
                 return true;
         }
         return false;
+    }
+
+    private static boolean isProperty(String methodName) {
+        int nameLength = methodName.length();
+        return (methodName.startsWith("get") && nameLength > 3) ||
+                (methodName.startsWith("is") && nameLength > 2);
     }
 
     private static String getName(String methodName) {

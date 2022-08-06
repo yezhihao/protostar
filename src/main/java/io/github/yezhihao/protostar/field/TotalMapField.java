@@ -43,8 +43,6 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
 
     @Override
     public Map<K, V> readFrom(ByteBuf input) {
-        if (!input.isReadable())
-            return null;
         int total = totalIntTool.read(input);
         if (total <= 0)
             return null;
@@ -118,8 +116,6 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
 
     @Override
     public Map<K, V> readFrom(ByteBuf input, Explain explain) {
-        if (!input.isReadable())
-            return null;
         int total = totalIntTool.read(input);
         explain.lengthField(input.readerIndex() - totalUnit, desc + "数量", total, totalUnit);
         if (total <= 0)

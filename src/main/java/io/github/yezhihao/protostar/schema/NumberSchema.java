@@ -34,7 +34,6 @@ public final class NumberSchema {
 
     protected static class BOOL extends BasicField<Boolean> {
         public Boolean readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readBoolean();
         }
 
@@ -45,7 +44,6 @@ public final class NumberSchema {
 
     protected static class CHAR extends BasicField<Character> {
         public Character readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readChar();
         }
 
@@ -56,7 +54,6 @@ public final class NumberSchema {
 
     protected static class BYTE2Byte extends BasicField<Byte> {
         public Byte readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readByte();
         }
 
@@ -67,7 +64,6 @@ public final class NumberSchema {
 
     protected static class BYTE2Short extends BasicField<Short> {
         public Short readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readUnsignedByte();
         }
 
@@ -78,7 +74,6 @@ public final class NumberSchema {
 
     protected static class BYTE2Int extends BasicField<Integer> {
         public Integer readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return (int) input.readUnsignedByte();
         }
 
@@ -89,7 +84,6 @@ public final class NumberSchema {
 
     protected static class WORD2Short extends BasicField<Short> {
         public Short readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readShort();
         }
 
@@ -99,19 +93,7 @@ public final class NumberSchema {
     }
 
     protected static class WORD2Int extends BasicField<Integer> {
-
-        @Override
-        public void readAndSet(ByteBuf input, Object obj) throws Exception {
-            super.readAndSet(input, obj);
-        }
-
-        @Override
-        public void getAndWrite(ByteBuf output, Object obj) throws Exception {
-            super.getAndWrite(output, obj);
-        }
-
         public Integer readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readUnsignedShort();
         }
 
@@ -122,7 +104,6 @@ public final class NumberSchema {
 
     protected static class DWORD2Int extends BasicField<Integer> {
         public Integer readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readInt();
         }
 
@@ -133,7 +114,6 @@ public final class NumberSchema {
 
     protected static class DWORD2Long extends BasicField<Long> {
         public Long readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readUnsignedInt();
         }
 
@@ -144,7 +124,6 @@ public final class NumberSchema {
 
     protected static class DWORD2Float extends BasicField<Float> {
         public Float readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readFloat();
         }
 
@@ -155,7 +134,6 @@ public final class NumberSchema {
 
     protected static class QWORD2Long extends BasicField<Long> {
         public Long readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readLong();
         }
 
@@ -166,7 +144,6 @@ public final class NumberSchema {
 
     protected static class QWORD2Double extends BasicField<Double> {
         public Double readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readDouble();
         }
 
@@ -177,7 +154,6 @@ public final class NumberSchema {
 
     protected static class WORD2ShortLE extends BasicField<Short> {
         public Short readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readShortLE();
         }
 
@@ -188,7 +164,6 @@ public final class NumberSchema {
 
     protected static class WORD2IntLE extends BasicField<Integer> {
         public Integer readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readUnsignedShortLE();
         }
 
@@ -199,7 +174,6 @@ public final class NumberSchema {
 
     protected static class DWORD2IntLE extends BasicField<Integer> {
         public Integer readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readIntLE();
         }
 
@@ -210,7 +184,6 @@ public final class NumberSchema {
 
     protected static class DWORD2LongLE extends BasicField<Long> {
         public Long readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readUnsignedIntLE();
         }
 
@@ -221,7 +194,6 @@ public final class NumberSchema {
 
     protected static class DWORD2FloatLE extends BasicField<Float> {
         public Float readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readFloatLE();
         }
 
@@ -232,7 +204,6 @@ public final class NumberSchema {
 
     protected static class QWORD2LongLE extends BasicField<Long> {
         public Long readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readLongLE();
         }
 
@@ -243,7 +214,6 @@ public final class NumberSchema {
 
     protected static class QWORD2DoubleLE extends BasicField<Double> {
         public Double readFrom(ByteBuf input) {
-            if (!input.isReadable()) return null;
             return input.readDoubleLE();
         }
 
