@@ -13,12 +13,11 @@ import java.util.LinkedList;
 public class Explain extends LinkedList<Info> {
 
     public void readField(int index, String desc, Object value, ByteBuf input) {
-        if (value != null)
-            this.add(Info.field(index, desc, value, ByteBufUtil.hexDump(input, index, input.readerIndex() - index)));
+        this.add(Info.field(index, desc, value, ByteBufUtil.hexDump(input, index, input.readerIndex() - index)));
     }
 
     public void writeField(int index, String desc, Object value, ByteBuf output) {
-        if (value != null)
+        if (output.writerIndex() != index)
             this.add(Info.field(index, desc, value, ByteBufUtil.hexDump(output, index, output.writerIndex() - index)));
     }
 

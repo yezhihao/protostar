@@ -30,12 +30,14 @@ public class DateTool {
     /** 时间转byte[] (yyMMddHHmmss) */
     public final byte[] from(LocalDateTime dateTime) {
         byte[] bytes = new byte[6];
-        bytes[0] = toByte(dateTime.getYear() % 100);
-        bytes[1] = toByte(dateTime.getMonthValue());
-        bytes[2] = toByte(dateTime.getDayOfMonth());
-        bytes[3] = toByte(dateTime.getHour());
-        bytes[4] = toByte(dateTime.getMinute());
-        bytes[5] = toByte(dateTime.getSecond());
+        if (dateTime != null) {
+            bytes[0] = toByte(dateTime.getYear() % 100);
+            bytes[1] = toByte(dateTime.getMonthValue());
+            bytes[2] = toByte(dateTime.getDayOfMonth());
+            bytes[3] = toByte(dateTime.getHour());
+            bytes[4] = toByte(dateTime.getMinute());
+            bytes[5] = toByte(dateTime.getSecond());
+        }
         return bytes;
     }
 
