@@ -49,6 +49,7 @@ public class RuntimeSchema<T> implements Schema<T> {
             for (; i < fields.length; i++)
                 if (input.isReadable())
                     fields[i].readAndSet(input, result);
+                else break;
             return result;
         } catch (Exception e) {
             throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);
@@ -62,10 +63,12 @@ public class RuntimeSchema<T> implements Schema<T> {
                 for (; i < fields.length; i++)
                     if (input.isReadable())
                         fields[i].readAndSet(input, result);
+                    else break;
             } else {
                 for (; i < fields.length; i++)
                     if (input.isReadable())
                         fields[i].readAndSet(input, result, explain);
+                    else break;
             }
             return result;
         } catch (Exception e) {
@@ -74,12 +77,16 @@ public class RuntimeSchema<T> implements Schema<T> {
     }
 
     public T readFrom(ByteBuf input) {
+        if (!input.isReadable())
+            return null;
         int i = 0;
         try {
             T result = constructor.newInstance((Object[]) null);
-            for (; i < fields.length; i++)
-                if (input.isReadable())
-                    fields[i].readAndSet(input, result);
+            for (; i < fields.length; i++) {
+                fields[i].readAndSet(input, result);
+                if (!input.isReadable())
+                    break;
+            }
             return result;
         } catch (Exception e) {
             throw new RuntimeException("Read failed " + i + " " + typeClass.getName() + " " + fields[i].fieldName(), e);
@@ -87,17 +94,23 @@ public class RuntimeSchema<T> implements Schema<T> {
     }
 
     public T readFrom(ByteBuf input, Explain explain) {
+        if (!input.isReadable())
+            return null;
         int i = 0;
         try {
             T result = constructor.newInstance((Object[]) null);
             if (explain == null) {
-                for (; i < fields.length; i++)
-                    if (input.isReadable())
-                        fields[i].readAndSet(input, result);
+                for (; i < fields.length; i++) {
+                    fields[i].readAndSet(input, result);
+                    if (!input.isReadable())
+                        break;
+                }
             } else {
-                for (; i < fields.length; i++)
-                    if (input.isReadable())
-                        fields[i].readAndSet(input, result, explain);
+                for (; i < fields.length; i++) {
+                    fields[i].readAndSet(input, result, explain);
+                    if (!input.isReadable())
+                        break;
+                }
             }
             return result;
         } catch (Exception e) {

@@ -40,8 +40,8 @@ public class MapField<K, V> extends BasicField<Map<K, V>> {
     @Override
     public Map<K, V> readFrom(ByteBuf input) {
         Map map;
-        if (treeMap) map = new TreeMap();
-        else map = new HashMap(8);
+        if (treeMap) map = new TreeMap<>();
+        else map = new HashMap<>(8);
 
         K key = null;
         int length = 0;
@@ -108,8 +108,8 @@ public class MapField<K, V> extends BasicField<Map<K, V>> {
     @Override
     public Map<K, V> readFrom(ByteBuf input, Explain explain) {
         Map map;
-        if (treeMap) map = new TreeMap();
-        else map = new HashMap(8);
+        if (treeMap) map = new TreeMap<>();
+        else map = new HashMap<>(8);
 
         K key = null;
         int length = 0;

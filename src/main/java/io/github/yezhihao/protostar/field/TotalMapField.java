@@ -48,8 +48,8 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
             return null;
 
         Map map;
-        if (treeMap) map = new TreeMap();
-        else map = new HashMap((int) (total / 0.75) + 1);
+        if (treeMap) map = new TreeMap<>();
+        else map = new HashMap<>(total > 255 ? 255 : (int) (total / 0.75) + 1);
 
         K key = null;
         int length = 0;
@@ -122,8 +122,8 @@ public class TotalMapField<K, V> extends BasicField<Map<K, V>> {
             return null;
 
         Map map;
-        if (treeMap) map = new TreeMap();
-        else map = new HashMap((int) (total / 0.75) + 1);
+        if (treeMap) map = new TreeMap<>();
+        else map = new HashMap<>(total > 255 ? 255 : (int) (total / 0.75) + 1);
 
         K key = null;
         int length = 0;

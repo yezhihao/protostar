@@ -22,9 +22,9 @@ public class CollectionField<T> extends BasicField<Collection<T>> {
 
     @Override
     public Collection<T> readFrom(ByteBuf input) {
-        Collection list = new ArrayList<>();
-        while (input.isReadable()) {
-            T t = schema.readFrom(input);
+        Collection<T> list = new ArrayList<>();
+        T t;
+        while (input.isReadable() && (t = schema.readFrom(input)) != null) {
             list.add(t);
         }
         return list;
@@ -41,9 +41,9 @@ public class CollectionField<T> extends BasicField<Collection<T>> {
 
     @Override
     public Collection<T> readFrom(ByteBuf input, Explain explain) {
-        Collection list = new ArrayList<>();
-        while (input.isReadable()) {
-            T t = schema.readFrom(input, explain);
+        Collection<T> list = new ArrayList<>();
+        T t;
+        while (input.isReadable() && (t = schema.readFrom(input, explain)) != null) {
             list.add(t);
         }
         return list;

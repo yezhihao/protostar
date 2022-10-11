@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 指定前置数量的集合域
@@ -30,9 +31,11 @@ public class TotalCollectionField<T> extends BasicField<Collection<T>> {
         int total = intTool.read(input);
         if (total <= 0)
             return null;
-        ArrayList<T> list = new ArrayList<>(total);
+        List<T> list = new ArrayList<>(Math.min(total, 255));
         for (int i = 0; i < total; i++) {
             T t = schema.readFrom(input);
+            if (t == null)
+                break;
             list.add(t);
         }
         return list;
@@ -56,9 +59,11 @@ public class TotalCollectionField<T> extends BasicField<Collection<T>> {
         explain.lengthField(input.readerIndex() - totalUnit, desc + "数量", total, totalUnit);
         if (total <= 0)
             return null;
-        ArrayList<T> list = new ArrayList<>(total);
+        List<T> list = new ArrayList<>(Math.min(total, 255));
         for (int i = 0; i < total; i++) {
             T t = schema.readFrom(input, explain);
+            if (t == null)
+                break;
             list.add(t);
         }
         return list;
