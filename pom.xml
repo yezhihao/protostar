@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.yezhihao</groupId>
     <artifactId>protostar</artifactId>
-    <version>3.0.4</version>
+    <version>3.0.5</version>
     <packaging>jar</packaging>
 
     <name>Protostar</name>
@@ -61,13 +61,13 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
-            <version>4.1.82.Final</version>
+            <version>4.1.89.Final</version>
         </dependency>
     </dependencies>
 
     <profiles>
         <profile>
-            <id>nexus-release</id>
+            <id>gpg</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -148,7 +148,7 @@
                         <version>1.6.8</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <serverId>central-nexus</serverId>
+                            <serverId>ossrh</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         </configuration>
@@ -162,11 +162,11 @@
             </build>
             <distributionManagement>
                 <repository>
-                    <id>nexus-release</id>
+                    <id>ossrh</id>
                     <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
                 </repository>
                 <snapshotRepository>
-                    <id>nexus-snapshot</id>
+                    <id>ossrh</id>
                     <url>https://oss.sonatype.org/content/repositories/snapshots</url>
                 </snapshotRepository>
             </distributionManagement>
