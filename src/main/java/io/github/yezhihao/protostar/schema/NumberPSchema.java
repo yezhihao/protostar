@@ -11,25 +11,25 @@ public final class NumberPSchema {
 
     public static final Schema<Boolean> BOOL = new BOOL();
     public static final Schema<Character> CHAR = new CHAR();
-    public static final Schema<Byte> BYTE_BYTE = new BYTE2Byte();
-    public static final Schema<Short> BYTE_SHORT = new BYTE2Short();
-    public static final Schema<Integer> BYTE_INT = new BYTE2Int();
+    public static final Schema<Number> BYTE_BYTE = new BYTE2Byte();
+    public static final Schema<Number> BYTE_SHORT = new BYTE2Short();
+    public static final Schema<Number> BYTE_INT = new BYTE2Int();
 
-    public static final Schema<Short> WORD_SHORT = new WORD2Short();
-    public static final Schema<Integer> WORD_INT = new WORD2Int();
-    public static final Schema<Integer> DWORD_INT = new DWORD2Int();
-    public static final Schema<Long> DWORD_LONG = new DWORD2Long();
-    public static final Schema<Float> DWORD_FLOAT = new DWORD2Float();
-    public static final Schema<Long> QWORD_LONG = new QWORD2Long();
-    public static final Schema<Double> QWORD_DOUBLE = new QWORD2Double();
+    public static final Schema<Number> WORD_SHORT = new WORD2Short();
+    public static final Schema<Number> WORD_INT = new WORD2Int();
+    public static final Schema<Number> DWORD_INT = new DWORD2Int();
+    public static final Schema<Number> DWORD_LONG = new DWORD2Long();
+    public static final Schema<Number> DWORD_FLOAT = new DWORD2Float();
+    public static final Schema<Number> QWORD_LONG = new QWORD2Long();
+    public static final Schema<Number> QWORD_DOUBLE = new QWORD2Double();
 
-    public static final Schema<Short> WORD_SHORT_LE = new WORD2ShortLE();
-    public static final Schema<Integer> WORD_INT_LE = new WORD2IntLE();
-    public static final Schema<Integer> DWORD_INT_LE = new DWORD2IntLE();
-    public static final Schema<Long> DWORD_LONG_LE = new DWORD2LongLE();
-    public static final Schema<Float> DWORD_FLOAT_LE = new DWORD2FloatLE();
-    public static final Schema<Long> QWORD_LONG_LE = new QWORD2LongLE();
-    public static final Schema<Double> QWORD_DOUBLE_LE = new QWORD2DoubleLE();
+    public static final Schema<Number> WORD_SHORT_LE = new WORD2ShortLE();
+    public static final Schema<Number> WORD_INT_LE = new WORD2IntLE();
+    public static final Schema<Number> DWORD_INT_LE = new DWORD2IntLE();
+    public static final Schema<Number> DWORD_LONG_LE = new DWORD2LongLE();
+    public static final Schema<Number> DWORD_FLOAT_LE = new DWORD2FloatLE();
+    public static final Schema<Number> QWORD_LONG_LE = new QWORD2LongLE();
+    public static final Schema<Number> QWORD_DOUBLE_LE = new QWORD2DoubleLE();
 
     protected static class BOOL extends NumberSchema.BOOL {
         public void readAndSet(ByteBuf input, Object obj) throws Exception {
