@@ -92,12 +92,10 @@ public class StringSchema {
 
     public static class HEX extends BasicField<String> {
         protected final int length;
-        protected final int charSize;
         protected final boolean fixed;
 
         public HEX(int length) {
             this.length = length;
-            this.charSize = length << 1;
             this.fixed = length > -1;
         }
 
@@ -111,7 +109,7 @@ public class StringSchema {
             byte[] bytes = new byte[len];
             input.readBytes(bytes);
 
-            CharsBuilder cb = new CharsBuilder(charSize);
+            CharsBuilder cb = new CharsBuilder(len << 1);
             StringUtil.toHexStringPadded(cb, bytes);
             return cb;
         }
@@ -123,7 +121,7 @@ public class StringSchema {
                 return;
             }
 
-            int charSize = this.charSize;
+            int charSize = length << 1;
             int strLength = value.length();
 
             if (!fixed) charSize = strLength + (strLength & 1);
