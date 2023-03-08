@@ -46,6 +46,7 @@ public class SchemaRegistry {
 
         register(short.class,        /**/NumberPSchema.WORD2ShortLE::new, 2, "LE");
         register(int.class,          /**/NumberPSchema.WORD2IntLE::new, 2, "LE");
+        register(int.class,          /**/NumberPSchema.MEDIUM2IntLE::new, 3, "LE");
         register(int.class,          /**/NumberPSchema.DWORD2IntLE::new, 4, "LE");
         register(long.class,         /**/NumberPSchema.DWORD2LongLE::new, 4, "LE");
         register(long.class,         /**/NumberPSchema.QWORD2LongLE::new, 8, "LE");
@@ -59,6 +60,7 @@ public class SchemaRegistry {
         register(int.class,          /**/NumberPSchema.BYTE2Int::new, 1);
         register(short.class,        /**/NumberPSchema.WORD2Short::new, 2);
         register(int.class,          /**/NumberPSchema.WORD2Int::new, 2);
+        register(int.class,          /**/NumberPSchema.MEDIUM2Int::new, 3);
         register(int.class,          /**/NumberPSchema.DWORD2Int::new, 4);
         register(long.class,         /**/NumberPSchema.DWORD2Long::new, 4);
         register(long.class,         /**/NumberPSchema.QWORD2Long::new, 8);
@@ -73,6 +75,7 @@ public class SchemaRegistry {
 
         register(Short.class,        /**/NumberSchema.WORD2ShortLE::new, 2, "LE");
         register(Integer.class,      /**/NumberSchema.WORD2IntLE::new, 2, "LE");
+        register(Integer.class,      /**/NumberSchema.MEDIUM2IntLE::new, 3, "LE");
         register(Integer.class,      /**/NumberSchema.DWORD2IntLE::new, 4, "LE");
         register(Long.class,         /**/NumberSchema.DWORD2LongLE::new, 4, "LE");
         register(Long.class,         /**/NumberSchema.QWORD2LongLE::new, 8, "LE");
@@ -86,6 +89,7 @@ public class SchemaRegistry {
         register(Integer.class,      /**/NumberSchema.BYTE2Int::new, 1);
         register(Short.class,        /**/NumberSchema.WORD2Short::new, 2);
         register(Integer.class,      /**/NumberSchema.WORD2Int::new, 2);
+        register(Integer.class,      /**/NumberSchema.MEDIUM2Int::new, 3);
         register(Integer.class,      /**/NumberSchema.DWORD2Int::new, 4);
         register(Long.class,         /**/NumberSchema.DWORD2Long::new, 4);
         register(Long.class,         /**/NumberSchema.QWORD2Long::new, 8);
@@ -108,9 +112,15 @@ public class SchemaRegistry {
         register(ByteBuffer.class,   /**/BufferSchema.ByteBufferSchema::new);
         register(ByteBuf.class,      /**/BufferSchema.ByteBufSchema::new);
 
-        TIME_SCHEMA.put(LocalTime.class.getName(),    /**/DateTimeSchema.Time::new);
-        TIME_SCHEMA.put(LocalDate.class.getName(),    /**/DateTimeSchema.Date::new);
-        TIME_SCHEMA.put(LocalDateTime.class.getName(),/**/DateTimeSchema.DateTime::new);
+        register(LocalTime.class,    /**/DateTimeSchema.Time2::new, 2);
+        register(LocalTime.class,    /**/DateTimeSchema.Time3::new);
+        register(LocalTime.class,    /**/DateTimeSchema.Time3::new, 3);
+        register(LocalDate.class,    /**/DateTimeSchema.Date3::new);
+        register(LocalDate.class,    /**/DateTimeSchema.Date3::new, 3);
+        register(LocalDate.class,    /**/DateTimeSchema.Date4::new, 4);
+        register(LocalDateTime.class,/**/DateTimeSchema.DateTime6::new);
+        register(LocalDateTime.class,/**/DateTimeSchema.DateTime6::new, 6);
+        register(LocalDateTime.class,/**/DateTimeSchema.DateTime7::new, 7);
     }
 
     public static void register(Class typeClass, Supplier<BasicField> supplier, int length, String charset) {
@@ -127,6 +137,14 @@ public class SchemaRegistry {
 
     public static void register(Class typeClass, Supplier schema) {
         NO_ARGS.put(typeClass.getName(), schema);
+    }
+
+    public static void register(Class typeClass, Function<DateTool, BasicField> field) {
+        TIME_SCHEMA.put(typeClass.getName(), field);
+    }
+
+    public static void register(Class typeClass, Function<DateTool, BasicField> field, int length) {
+        TIME_SCHEMA.put(typeClass.getName() + "/" + length, field);
     }
 
     public static Schema getCustom(Class<? extends Schema> clazz) {
@@ -156,6 +174,8 @@ public class SchemaRegistry {
             return StringSchema.getInstance(charset, length, field.lengthUnit());
         }
         if (Temporal.class.isAssignableFrom(typeClass)) {
+            if (length > 0)
+                name += "/" + length;
             return TIME_SCHEMA.get(name).apply(charset.equals("BCD") ? DateTool.BCD : DateTool.BYTE);
         }
 

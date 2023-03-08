@@ -92,14 +92,66 @@ public class DateTool {
         );
     }
 
-    /** 写入2位时间(HHmm) */
+    /** 写入2字节时间(HHmm) */
     public final void writeTime2(ByteBuf output, LocalTime time) {
         output.writeByte(toByte(time.getHour())).writeByte(toByte(time.getMinute()));
     }
 
-    /** 读取2位时间(HHmm) */
+    /** 读取2字节时间(HHmm) */
     public final LocalTime readTime2(ByteBuf input) {
         return LocalTime.of(toInt(input.readByte()), toInt(input.readByte()));
+    }
+
+    /** 写入3字节时间(HHmmss) */
+    public final void writeTime3(ByteBuf output, LocalTime time) {
+        output.writeByte(toByte(time.getHour())).writeByte(toByte(time.getMinute())).writeByte(toByte(time.getSecond()));
+    }
+
+    /** 读取3字节时间(HHmmss) */
+    public final LocalTime readTime3(ByteBuf input) {
+        return LocalTime.of(toInt(input.readByte()), toInt(input.readByte()), toInt(input.readByte()));
+    }
+
+    /** 写入3字节日期(yyMMdd) */
+    public final void writeDate3(ByteBuf output, LocalDate time) {
+        output.writeByte(toByte(time.getYear() % 100)).writeByte(toByte(time.getMonthValue())).writeByte(toByte(time.getDayOfMonth()));
+    }
+
+    /** 读取3字节日期(yyMMdd) */
+    public final LocalDate readDate3(ByteBuf input) {
+        return LocalDate.of(getYear(toInt(input.readByte())), toInt(input.readByte()), toInt(input.readByte()));
+    }
+
+    /** 写入4字节日期(yyyyMMdd) */
+    public final void writeDate4(ByteBuf output, LocalDate time) {
+        output.writeByte(toByte(time.getYear() / 100)).writeByte(toByte(time.getYear() % 100)).writeByte(toByte(time.getMonthValue())).writeByte(toByte(time.getDayOfMonth()));
+    }
+
+    /** 读取4字节日期(yyyyMMdd) */
+    public final LocalDate readDate4(ByteBuf input) {
+        return LocalDate.of((toInt(input.readByte()) * 100) + toInt(input.readByte()), toInt(input.readByte()), toInt(input.readByte()));
+    }
+
+    /** 写入6字节时间(yyMMddHHmmss) */
+    public final void writeDateTime6(ByteBuf output, LocalDateTime dateTime) {
+        writeDate3(output, dateTime.toLocalDate());
+        writeTime3(output, dateTime.toLocalTime());
+    }
+
+    /** 读取6字节时间(yyMMdddHHmmss) */
+    public final LocalDateTime readDateTime6(ByteBuf input) {
+        return LocalDateTime.of(readDate3(input), readTime3(input));
+    }
+
+    /** 写入7字节时间(yyyyMMddHHmmss) */
+    public final void writeDateTime7(ByteBuf output, LocalDateTime dateTime) {
+        writeDate4(output, dateTime.toLocalDate());
+        writeTime3(output, dateTime.toLocalTime());
+    }
+
+    /** 读取7字节时间(yyyyMMdddHHmmss) */
+    public final LocalDateTime readDateTime7(ByteBuf input) {
+        return LocalDateTime.of(readDate4(input), readTime3(input));
     }
 
     private DateTool() {
