@@ -18,6 +18,7 @@ public final class NumberSchema {
 
     public static final Schema<Number> WORD_SHORT = new WORD2Short();
     public static final Schema<Number> WORD_INT = new WORD2Int();
+    public static final Schema<Number> MEDIUM_INT = new MEDIUM2Int();
     public static final Schema<Number> DWORD_INT = new DWORD2Int();
     public static final Schema<Number> DWORD_LONG = new DWORD2Long();
     public static final Schema<Number> DWORD_FLOAT = new DWORD2Float();
@@ -26,6 +27,7 @@ public final class NumberSchema {
 
     public static final Schema<Number> WORD_SHORT_LE = new WORD2ShortLE();
     public static final Schema<Number> WORD_INT_LE = new WORD2IntLE();
+    public static final Schema<Number> MEDIUM_INT_LE = new MEDIUM2IntLE();
     public static final Schema<Number> DWORD_INT_LE = new DWORD2IntLE();
     public static final Schema<Number> DWORD_LONG_LE = new DWORD2LongLE();
     public static final Schema<Number> DWORD_FLOAT_LE = new DWORD2FloatLE();
@@ -102,6 +104,16 @@ public final class NumberSchema {
         }
     }
 
+    protected static class MEDIUM2Int extends BasicField<Number> {
+        public Number readFrom(ByteBuf input) {
+            return input.readMedium();
+        }
+
+        public void writeTo(ByteBuf output, Number value) {
+            if (value != null) output.writeMedium(value.intValue());
+        }
+    }
+
     protected static class DWORD2Int extends BasicField<Number> {
         public Number readFrom(ByteBuf input) {
             return input.readInt();
@@ -169,6 +181,16 @@ public final class NumberSchema {
 
         public void writeTo(ByteBuf output, Number value) {
             if (value != null) output.writeShortLE(value.shortValue());
+        }
+    }
+
+    protected static class MEDIUM2IntLE extends BasicField<Number> {
+        public Number readFrom(ByteBuf input) {
+            return input.readMediumLE();
+        }
+
+        public void writeTo(ByteBuf output, Number value) {
+            if (value != null) output.writeMediumLE(value.intValue());
         }
     }
 

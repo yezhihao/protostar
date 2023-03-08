@@ -18,6 +18,7 @@ public final class NumberPSchema {
     public static final Schema<Number> WORD_SHORT = new WORD2Short();
     public static final Schema<Number> WORD_INT = new WORD2Int();
     public static final Schema<Number> DWORD_INT = new DWORD2Int();
+    public static final Schema<Number> MEDIUM_INT = new MEDIUM2Int();
     public static final Schema<Number> DWORD_LONG = new DWORD2Long();
     public static final Schema<Number> DWORD_FLOAT = new DWORD2Float();
     public static final Schema<Number> QWORD_LONG = new QWORD2Long();
@@ -25,6 +26,7 @@ public final class NumberPSchema {
 
     public static final Schema<Number> WORD_SHORT_LE = new WORD2ShortLE();
     public static final Schema<Number> WORD_INT_LE = new WORD2IntLE();
+    public static final Schema<Number> MEDIUM_INT_LE = new MEDIUM2IntLE();
     public static final Schema<Number> DWORD_INT_LE = new DWORD2IntLE();
     public static final Schema<Number> DWORD_LONG_LE = new DWORD2LongLE();
     public static final Schema<Number> DWORD_FLOAT_LE = new DWORD2FloatLE();
@@ -101,6 +103,16 @@ public final class NumberPSchema {
         }
     }
 
+    protected static class MEDIUM2Int extends NumberSchema.MEDIUM2Int {
+        public void readAndSet(ByteBuf input, Object obj) throws Exception {
+            f.setInt(obj, input.readMedium());
+        }
+
+        public void getAndWrite(ByteBuf output, Object obj) throws Exception {
+            output.writeMedium(f.getInt(obj));
+        }
+    }
+
     protected static class DWORD2Int extends NumberSchema.DWORD2Int {
         public void readAndSet(ByteBuf input, Object obj) throws Exception {
             f.setInt(obj, input.readInt());
@@ -168,6 +180,16 @@ public final class NumberPSchema {
 
         public void getAndWrite(ByteBuf output, Object obj) throws Exception {
             output.writeShortLE(f.getInt(obj));
+        }
+    }
+
+    protected static class MEDIUM2IntLE extends NumberSchema.MEDIUM2IntLE {
+        public void readAndSet(ByteBuf input, Object obj) throws Exception {
+            f.setInt(obj, input.readMediumLE());
+        }
+
+        public void getAndWrite(ByteBuf output, Object obj) throws Exception {
+            output.writeMediumLE(f.getInt(obj));
         }
     }
 
