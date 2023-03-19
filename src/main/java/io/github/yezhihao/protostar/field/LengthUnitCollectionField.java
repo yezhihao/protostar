@@ -29,8 +29,10 @@ public class LengthUnitCollectionField<T> extends BasicField<Collection<T>> {
     @Override
     public Collection<T> readFrom(ByteBuf input) {
         Collection<T> list = new ArrayList<>();
-        while (input.isReadable()) {
+        while (input.isReadable(lengthUnit)) {
             int length = intTool.read(input);
+            if (!input.isReadable(length))
+                break;
             T t = schema.readFrom(input, length);
             if (t == null)
                 break;
@@ -57,9 +59,11 @@ public class LengthUnitCollectionField<T> extends BasicField<Collection<T>> {
     @Override
     public Collection<T> readFrom(ByteBuf input, Explain explain) {
         Collection<T> list = new ArrayList<>();
-        while (input.isReadable()) {
+        while (input.isReadable(lengthUnit)) {
             int length = intTool.read(input);
             explain.lengthField(input.readerIndex() - lengthUnit, desc + "长度", length, lengthUnit);
+            if (!input.isReadable(length))
+                break;
             T t = schema.readFrom(input, length, explain);
             if (t == null)
                 break;

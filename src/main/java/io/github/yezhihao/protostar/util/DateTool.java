@@ -99,7 +99,13 @@ public class DateTool {
 
     /** 读取2字节时间(HHmm) */
     public final LocalTime readTime2(ByteBuf input) {
-        return LocalTime.of(toInt(input.readByte()), toInt(input.readByte()));
+        int hour = toInt(input.readByte());
+        int minute = toInt(input.readByte());
+        try {
+            return LocalTime.of(hour, minute);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /** 写入3字节时间(HHmmss) */
@@ -109,7 +115,14 @@ public class DateTool {
 
     /** 读取3字节时间(HHmmss) */
     public final LocalTime readTime3(ByteBuf input) {
-        return LocalTime.of(toInt(input.readByte()), toInt(input.readByte()), toInt(input.readByte()));
+        int hour = toInt(input.readByte());
+        int minute = toInt(input.readByte());
+        int second = toInt(input.readByte());
+        try {
+            return LocalTime.of(hour, minute, second);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /** 写入3字节日期(yyMMdd) */
@@ -119,7 +132,14 @@ public class DateTool {
 
     /** 读取3字节日期(yyMMdd) */
     public final LocalDate readDate3(ByteBuf input) {
-        return LocalDate.of(getYear(toInt(input.readByte())), toInt(input.readByte()), toInt(input.readByte()));
+        int year = getYear(toInt(input.readByte()));
+        int month = toInt(input.readByte());
+        int dayOfMonth = toInt(input.readByte());
+        try {
+            return LocalDate.of(year, month, dayOfMonth);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /** 写入4字节日期(yyyyMMdd) */
@@ -129,7 +149,14 @@ public class DateTool {
 
     /** 读取4字节日期(yyyyMMdd) */
     public final LocalDate readDate4(ByteBuf input) {
-        return LocalDate.of((toInt(input.readByte()) * 100) + toInt(input.readByte()), toInt(input.readByte()), toInt(input.readByte()));
+        int year = (toInt(input.readByte()) * 100) + toInt(input.readByte());
+        int month = toInt(input.readByte());
+        int dayOfMonth = toInt(input.readByte());
+        try {
+            return LocalDate.of(year, month, dayOfMonth);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /** 写入6字节时间(yyMMddHHmmss) */
@@ -140,7 +167,11 @@ public class DateTool {
 
     /** 读取6字节时间(yyMMdddHHmmss) */
     public final LocalDateTime readDateTime6(ByteBuf input) {
-        return LocalDateTime.of(readDate3(input), readTime3(input));
+        LocalDate date = readDate3(input);
+        LocalTime time = readTime3(input);
+        if (date == null || time == null)
+            return null;
+        return LocalDateTime.of(date, time);
     }
 
     /** 写入7字节时间(yyyyMMddHHmmss) */
@@ -151,7 +182,11 @@ public class DateTool {
 
     /** 读取7字节时间(yyyyMMdddHHmmss) */
     public final LocalDateTime readDateTime7(ByteBuf input) {
-        return LocalDateTime.of(readDate4(input), readTime3(input));
+        LocalDate date = readDate4(input);
+        LocalTime time = readTime3(input);
+        if (date == null || time == null)
+            return null;
+        return LocalDateTime.of(date, time);
     }
 
     private DateTool() {
