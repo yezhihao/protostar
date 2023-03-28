@@ -5,14 +5,14 @@ import io.github.yezhihao.protostar.schema.MapSchema;
 import io.github.yezhihao.protostar.schema.NumberSchema;
 import io.github.yezhihao.protostar.schema.StringSchema;
 
-public class AttributeSchema extends MapSchema<Integer, Object> {
+public class AttributeSchema extends MapSchema<Number, Object> {
 
     public AttributeSchema() {
         super(NumberSchema.BYTE_INT, 1);
     }
 
     @Override
-    protected void addSchemas(PrepareLoadStrategy<Integer> schemaRegistry) {
+    protected void addSchemas(PrepareLoadStrategy<Number> schemaRegistry) {
         schemaRegistry
                 .addSchema(1, NumberSchema.DWORD_INT)
                 .addSchema(2, StringSchema.GBK)

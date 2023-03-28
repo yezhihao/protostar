@@ -2,8 +2,8 @@ package io.github.yezhihao.protostar.simple;
 
 import io.github.yezhihao.protostar.ProtostarUtil;
 import io.github.yezhihao.protostar.annotation.Field;
-import io.github.yezhihao.protostar.util.ArrayMap;
 import io.github.yezhihao.protostar.schema.RuntimeSchema;
+import io.github.yezhihao.protostar.util.ArrayMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -33,6 +33,7 @@ public class Test {
         headSchema.mergeFrom(buffer, foo1);
         bodySchema.mergeFrom(buffer, foo1);
         System.out.println(foo);
+        System.out.println(foo1);
     }
 
     public static Foo foo() {
@@ -48,9 +49,9 @@ public class Test {
 
     public static class BaseDO {
 
-        @Field(index = 0, length = 2, desc = "ID")
+        @Field(length = 2, desc = "消息类型")
         protected int type;
-        @Field(index = 1, length = 20, desc = "名称")
+        @Field(length = 20, desc = "客户端ID")
         protected String clientId;
 
         public int getType() {
@@ -74,7 +75,7 @@ public class Test {
 
         @Field(lengthUnit = 1, desc = "名称")
         private String name;
-        @Field(length = 2, desc = "ID")
+        @Field(length = 2, desc = "编号")
         private int id;
         @Field(charset = "BCD", desc = "日期")
         private LocalDateTime dateTime;
