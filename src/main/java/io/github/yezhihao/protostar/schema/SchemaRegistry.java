@@ -161,32 +161,33 @@ public class SchemaRegistry {
         String name = typeClass.getName();
         String charset = field.charset().toUpperCase();
         int length = field.length();
+        BasicField schema = null;
 
         if (NUMBER.containsKey(name)) {
             if (length > 0)
                 name += "/" + length;
             if (charset.equals("LE"))
                 name += "/LE";
-            return NO_ARGS.get(name).get();
-        }
-
-        if (String.class.isAssignableFrom(typeClass)) {
-            return StringSchema.getInstance(charset, length, field.lengthUnit());
-        }
-        if (Temporal.class.isAssignableFrom(typeClass)) {
+            schema = NO_ARGS.get(name).get();
+        } else if (String.class.isAssignableFrom(typeClass)) {
+            schema = StringSchema.getInstance(charset, length, field.lengthUnit());
+        } else if (Temporal.class.isAssignableFrom(typeClass)) {
             if (length > 0)
                 name += "/" + length;
-            return TIME_SCHEMA.get(name).apply(charset.equals("BCD") ? DateTool.BCD : DateTool.BYTE);
+            schema = TIME_SCHEMA.get(name).apply(charset.equals("BCD") ? DateTool.BCD : DateTool.BYTE);
+        } else if (Schema.class != field.converter()) {
+            schema = get(field, f, getCustom(field.converter()));
+        } else {
+            Supplier<BasicField> supplier = NO_ARGS.get(name);
+            if (supplier != null) {
+                schema = get(field, f, supplier.get());
+            }
         }
 
-        if (Schema.class != field.converter()) {
-            return get(field, f, getCustom(field.converter()));
+        if (!field.lengthExpression().isEmpty()) {
+            return new ExpressionLengthField(schema, field.lengthExpression());
         }
-
-        Supplier<BasicField> supplier = NO_ARGS.get(name);
-        if (supplier != null)
-            return get(field, f, supplier.get());
-        return null;
+        return schema;
     }
 
     public static BasicField get(Field field, java.lang.reflect.Field f, Schema schema) {

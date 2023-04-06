@@ -39,8 +39,9 @@ public class Test {
     public static Foo foo() {
         Foo foo = new Foo();
         foo.setName("张三");
-        foo.setId(128);
+        foo.setId(4);
         foo.setDateTime(LocalDateTime.of(2020, 7, 7, 19, 23, 59));
+        foo.setStr("123123");
 
         foo.setType(1);
         foo.setClientId("123qwe");
@@ -80,6 +81,9 @@ public class Test {
         @Field(charset = "BCD", desc = "日期")
         private LocalDateTime dateTime;
 
+        @Field(lengthExpression = "id", desc = "str")
+        private String str;
+
         public String getName() {
             return name;
         }
@@ -104,6 +108,14 @@ public class Test {
             this.dateTime = dateTime;
         }
 
+        public String getStr() {
+            return str;
+        }
+
+        public void setStr(String str) {
+            this.str = str;
+        }
+
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder("Foo{");
@@ -112,6 +124,7 @@ public class Test {
             sb.append(", name='").append(name).append('\'');
             sb.append(", id=").append(id);
             sb.append(", dateTime=").append(dateTime);
+            sb.append(", str=").append(str);
             sb.append('}');
             return sb.toString();
         }

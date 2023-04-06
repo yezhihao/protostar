@@ -22,6 +22,9 @@ public @interface Field {
     /** 该字段的前置长度单位 1.BYTE 2.WORD 3.MEDIUM 4.DWORD */
     int lengthUnit() default -1;
 
+    /** 该字段长度由表达式决定 */
+    String lengthExpression() default "";
+
     /** 该字段的前置数量单位 1.BYTE 2.WORD 3.MEDIUM 4.DWORD */
     int totalUnit() default -1;
 

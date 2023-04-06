@@ -89,8 +89,8 @@ public abstract class BasicField<T> implements Schema<T>, Comparable<BasicField>
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder(12);
-        sb.append(desc).append(' ').append(field);
-        return sb.toString();
+        if (field == null)
+            return "";
+        return desc + ' ' + field;
     }
 }
