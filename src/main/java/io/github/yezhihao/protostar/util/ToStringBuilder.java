@@ -1,6 +1,5 @@
 package io.github.yezhihao.protostar.util;
 
-import java.beans.Transient;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -58,8 +57,7 @@ public class ToStringBuilder {
                 String methodName = method.getName();
                 if (isProperty(methodName)) {
                     String name = getName(methodName);
-                    if (!"class".equals(name) && !contains(ignores, name) &&
-                            method.getParameterCount() == 0 && !method.isAnnotationPresent(Transient.class))
+                    if (!"class".equals(name) && !contains(ignores, name) && method.getParameterCount() == 0)
                         result.add(new Builder(name, method, !typeClass.equals(method.getDeclaringClass())));
                 }
             }

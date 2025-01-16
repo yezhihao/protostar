@@ -93,11 +93,11 @@ public class ProtostarUtil {
 
     private static Map<Integer, Set<BasicField>> findMultiVersionFields(Map<String, ArrayMap<RuntimeSchema>> root, List<java.lang.reflect.Field> fs) {
         final int size = fs.size();
-        Map<Integer, Set<BasicField>> multiVersionFields = new TreeMap<Integer, Set<BasicField>>() {
+        Map<Integer, Set<BasicField>> multiVersionFields = new TreeMap<>() {
             @Override
             public Set<BasicField> get(Object key) {
-                Set result = super.get(key);
-                if (result == null) super.put((Integer) key, result = new HashSet(size));
+                Set<BasicField> result = super.get(key);
+                if (result == null) super.put((Integer) key, result = new HashSet<>(size));
                 return result;
             }
         };

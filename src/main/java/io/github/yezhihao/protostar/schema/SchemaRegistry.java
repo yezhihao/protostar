@@ -14,6 +14,7 @@ import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -168,13 +169,17 @@ public class SchemaRegistry {
                 name += "/" + length;
             if (charset.equals("LE"))
                 name += "/LE";
-            schema = NO_ARGS.get(name).get();
+            Supplier<BasicField> supplier = NO_ARGS.get(name);
+            Objects.requireNonNull(supplier, "不支持的类型：" + name);
+            schema = supplier.get();
         } else if (String.class.isAssignableFrom(typeClass)) {
             schema = StringSchema.getInstance(charset, length, field.lengthUnit());
         } else if (Temporal.class.isAssignableFrom(typeClass)) {
             if (length > 0)
                 name += "/" + length;
-            schema = TIME_SCHEMA.get(name).apply(charset.equals("BCD") ? DateTool.BCD : DateTool.BYTE);
+            Function<DateTool, BasicField> supplier = TIME_SCHEMA.get(name);
+            Objects.requireNonNull(supplier, "不支持的类型：" + name);
+            schema = supplier.apply(charset.equals("BCD") ? DateTool.BCD : DateTool.BYTE);
         } else if (Schema.class != field.converter()) {
             schema = get(field, f, getCustom(field.converter()));
         } else {
