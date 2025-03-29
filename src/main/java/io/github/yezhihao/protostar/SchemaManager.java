@@ -5,8 +5,9 @@ import io.github.yezhihao.protostar.schema.RuntimeSchema;
 import io.github.yezhihao.protostar.util.ArrayMap;
 import io.github.yezhihao.protostar.util.ClassUtils;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,27 +31,30 @@ public class SchemaManager {
     }
 
     public SchemaManager(String... basePackages) {
-        this(256, basePackages);
+        this(Arrays.stream(basePackages).map(ClassUtils::getClassList).flatMap(Collection::stream).toArray(Class[]::new));
     }
 
-    public SchemaManager(int initialCapacity, String... basePackages) {
-        this(initialCapacity);
-        for (String basePackage : basePackages) {
-            List<Class> types = ClassUtils.getClassList(basePackage);
-            for (Class<?> type : types) {
-                Message message = type.getAnnotation(Message.class);
-                if (message != null) {
-                    int[] values = message.value();
-                    for (Integer typeId : values)
-                        loadRuntimeSchema(typeId, type);
-                }
+    public SchemaManager(Class... types) {
+        this(types.length * 2);
+        loadRuntimeSchema(types);
+    }
+
+    public SchemaManager loadRuntimeSchema(Class... types) {
+        for (Class<?> type : types) {
+            Message message = type.getAnnotation(Message.class);
+            if (message != null) {
+                int[] values = message.value();
+                for (Integer typeId : values)
+                    loadRuntimeSchema(typeId, type);
             }
         }
+        return this;
     }
 
-    public void loadRuntimeSchema(Integer typeId, Class typeClass) {
+    public SchemaManager loadRuntimeSchema(Integer typeId, Class typeClass) {
         ArrayMap<RuntimeSchema> schemaMap = ProtostarUtil.getRuntimeSchema(typeClassMapping, typeClass);
         if (schemaMap != null) typeIdMapping.put(typeId, schemaMap);
+        return this;
     }
 
     public <T> RuntimeSchema<T> getRuntimeSchema(Class<T> typeClass, int version) {
